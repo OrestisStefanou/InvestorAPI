@@ -48,7 +48,8 @@ def serialize_stock_with_sector(stock: StockWithSector) -> s.SectorStock:
             smr_rating=stock.smr_rating.rating,
             sector_name=stock.sector_name,
             sector_daily_price_change_pct=stock.sector_daily_price_change_pct.value,
-            sector_start_of_year_price_change_pct=stock.sector_start_of_year_price_change_pct.value
+            sector_start_of_year_price_change_pct=stock.sector_start_of_year_price_change_pct.value,
+            registered_date=stock.registered_date
     )
 
 

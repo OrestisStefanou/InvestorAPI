@@ -59,7 +59,8 @@ class StocksWithSectorRepo(SqlRepo):
             smr_rating=SmrRating(row[10]),
             sector_name=row[11],
             sector_daily_price_change_pct=Percentage(row[12]),
-            sector_start_of_year_price_change_pct=Percentage(row[13])
+            sector_start_of_year_price_change_pct=Percentage(row[13]),
+            registered_date=row[14]
         )
 
 
@@ -103,7 +104,8 @@ class StocksWithSectorRepo(SqlRepo):
                 smr_rating,
                 sector_name,
                 sector_daily_price_change_pct,
-                sector_start_of_year_price_change_pct 
+                sector_start_of_year_price_change_pct,
+                registered_date 
 			FROM stocks_with_sector 
 			WHERE registered_date=?"""
         
