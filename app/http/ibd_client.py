@@ -11,6 +11,7 @@ class IbdClient(HttpClient):
         super().__init__(url=settings.ibd_base_url)
         
         self._month_dict = {
+            1: "jan",
             8: "aug",
             9: "sep",
             10: "oct",
