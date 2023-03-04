@@ -13,6 +13,7 @@ class IbdClient(HttpClient):
         self._month_dict = {
             1: "jan",
             2: "feb",
+            3: "mar",
             8: "aug",
             9: "sep",
             10: "oct",
