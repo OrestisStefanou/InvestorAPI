@@ -10,3 +10,5 @@ class Settings(BaseSettings):
     redis_host: str = "redis-10023.c135.eu-central-1-1.ec2.cloud.redislabs.com"
     redis_port: int = 10023
     redis_password: str = '7A3YqMImyKXKVoWh5Hcda9ooGHtVyi14'
+    # Yahoo finance
+    y_finance_base_url: str = 'https://finance.yahoo.com'
