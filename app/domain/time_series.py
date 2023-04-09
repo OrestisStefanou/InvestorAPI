@@ -2,10 +2,11 @@ from dataclasses import dataclass
 from typing import List
 
 from app.domain.price import Price
+from app.domain.date import Date
 
 @dataclass(frozen=True)
 class TimeSeriesEntry:
-    registered_date: str
+    registered_date: Date
 
 
 @dataclass(frozen=True)

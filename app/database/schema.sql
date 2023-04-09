@@ -127,3 +127,14 @@ CREATE TABLE small_mid_cap_leaders_index (
     registered_date TEXT NOT NULL,
     registered_date_ts INT NOT NULL
 );
+
+CREATE TABLE world_indices_time_series (
+    index_name TEXT NOT NULL,
+    open_price REAL NOT NULL,
+    high_price REAL NOT NULL,
+    low_price REAL NOT NULL,
+    close_price REAL NOT NULL,
+    volume REAL NOT NULL,
+    registered_date TEXT NOT NULL,
+    registered_date_ts INT NOT NULL
+);
