@@ -12,3 +12,6 @@ class Settings(BaseSettings):
     redis_password: str = '7A3YqMImyKXKVoWh5Hcda9ooGHtVyi14'
     # Yahoo finance
     y_finance_base_url: str = 'https://query1.finance.yahoo.com/v7'
+    # Alpha vantage
+    alpha_vantage_base_url: str = 'https://www.alphavantage.co/query'
+    alpha_vantage_token: str = 'LQ2GKKKWRJI6WAM9'

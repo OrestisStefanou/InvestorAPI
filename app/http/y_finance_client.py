@@ -5,7 +5,7 @@ from app import settings
 from app.http.http_client import HttpClient
 from app.errors.http import HttpRequestError
 from app.domain.world_index import WorldIndex
-
+from app.errors.y_finance import YFinanceRequestError
 
 class YFinanceClient(HttpClient):
     def __init__(self) -> None:
@@ -41,9 +41,10 @@ class YFinanceClient(HttpClient):
             )
         except HttpRequestError as err:
             logging.error(f"Call to get world indices price series failed with error: {str(err)}")
-            raise Exception()   # Create custom exception for this one
+            raise YFinanceRequestError(f"Call to get world indices price series failed with error: {str(err)}")
 
         if response.status_code != 200:
-            return None
+            logging.error(f"Call to get world indices price series failed with status: {response.status_code}")
+            raise YFinanceRequestError(f"Call to get world indices price series failed, status: {response.status_code}, response {response.text}")
 
         return response.content
