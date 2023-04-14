@@ -27,8 +27,9 @@ class TimeSeriesService:
         )
         return index_time_series
 
-# import asyncio
+import asyncio
 
-#asyncio.run(TimeSeriesService.scrape_and_store_index_time_series(index=WorldIndex.S_P_500))
-time_series = TimeSeriesService.get_index_time_series(index=WorldIndex.S_P_500)
-print(time_series)
+asyncio.run(TimeSeriesService._scrape_index_time_series(index=WorldIndex.Nyse_Composite))
+# asyncio.run(TimeSeriesService.scrape_and_store_index_time_series(index=WorldIndex.Nyse_Composite))
+# time_series = TimeSeriesService.get_index_time_series(index=WorldIndex.Nyse_Composite)
+# print(time_series)

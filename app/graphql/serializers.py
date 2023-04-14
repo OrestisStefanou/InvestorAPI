@@ -4,6 +4,7 @@ from app.domain.stock_leader import StockLeader
 from app.domain.composite_stock import StockWithSector
 from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
+from app.domain.time_series import IndexTimeSeriesEntry
 
 
 def serialize_composite_stock(comp_stock: CompositeStock) -> s.CompositeStock:
@@ -102,4 +103,16 @@ def serialize_stock_appearances_count(appearance: SymbolAppearancesCount) -> s.S
         symbol=appearance.symbol,
         name=appearance.name,
         count=appearance.count
+    )
+
+
+def serialize_index_time_series_entry(time_series_entry: IndexTimeSeriesEntry) -> s.IndexTimeSeriesEntry:
+    return s.IndexTimeSeriesEntry(
+        open_price=time_series_entry.open_price.value,
+        high_price=time_series_entry.high_price.value,
+        low_price=time_series_entry.low_price.value,
+        close_price=time_series_entry.close_price.value,
+        volume=time_series_entry.volume,
+        registered_date=time_series_entry.registered_date.date_string,
+        registered_date_ts=time_series_entry.registered_date.date_ts
     )

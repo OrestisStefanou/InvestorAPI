@@ -1,5 +1,6 @@
 from typing import List, Dict, Union
 
+from app.domain.world_index import WorldIndex
 from app.services.tech_leaders_stocks import TechLeadersStocksService
 from app.services.top_comp_stocks import TopCompositeStocksService
 from app.services.bottom_comp_stocks import BottomCompositeStocksService
@@ -10,6 +11,7 @@ from app.services.reit_leaders import ReitLeadersService
 from app.services.utility_leaders import UtilityLeadersService
 from app.services.leaders_index import SmallMidCapLeadersIndexService, LargeMidCapLeadersIndexService
 from app.services.aggregate_service import AggregateService
+from app.services.time_series import TimeSeriesService
 import app.graphql.schema as s
 from app.graphql.serializers import(
     serialize_composite_stock,
@@ -18,7 +20,8 @@ from app.graphql.serializers import(
     serialize_tech_leader_stock,
     serialize_low_priced_stock,
     serialize_leaders_index_stock,
-    serialize_stock_appearances_count
+    serialize_stock_appearances_count,
+    serialize_index_time_series_entry
 )
 
 
@@ -196,3 +199,19 @@ async def search_symbol_in_collection_resolver(
         serializer(stock)
         for stock in results
     ]
+
+
+async def index_time_series_resolver(
+    index: s.WorldIndex
+) -> s.IndexTimeSeries:
+    index_time_series = TimeSeriesService.get_index_time_series(
+        index=WorldIndex(index.value)
+    )
+
+    return s.IndexTimeSeries(
+        index=index,
+        time_series=[
+            serialize_index_time_series_entry(time_serie)
+            for time_serie in index_time_series
+        ]
+    )

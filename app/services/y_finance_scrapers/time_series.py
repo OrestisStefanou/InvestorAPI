@@ -11,6 +11,8 @@ from app.domain.date import Date
 class IndexTimeSeriesScraper:
     @classmethod
     def _convert_table_record_to_domain_model(cls, record) -> IndexTimeSeriesEntry:
+        print("TRYING TO CONVERT RECORD:")
+        print(record)
         # Convert datetime string to object
         date_time_obj = dt.datetime.strptime(record[0], '%b %d, %Y')
         return IndexTimeSeriesEntry(

@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from enum import Enum
 
 import strawberry as graphql
@@ -93,3 +93,28 @@ class Collection(Enum):
     TechLeaders = 'tech_leaders'
     LargeMidCapLeadersIndex = 'large_mid_cap_leaders_index'
     SmallMidCapLeadersIndex = 'small_mid_cap_leaders_index'
+
+
+@graphql.enum
+class WorldIndex(Enum):
+    S_P_500 = 'S&P 500'
+    Dow_Jones_Ind_Avg = 'Dow Jones Industrial Average'
+    Nasdaq_Composite = 'NASDAQ Composite'
+    Nyse_Composite = 'NYSE COMPOSITE'
+
+
+@graphql.type
+class IndexTimeSeriesEntry:
+    open_price: float
+    high_price: float
+    low_price: float
+    close_price: float
+    volume: float
+    registered_date: str
+    registered_date_ts: float
+
+
+@graphql.type
+class IndexTimeSeries:
+    index: WorldIndex
+    time_series: List[IndexTimeSeriesEntry]

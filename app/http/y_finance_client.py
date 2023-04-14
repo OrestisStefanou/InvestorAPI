@@ -12,7 +12,10 @@ class YFinanceClient(HttpClient):
         super().__init__(url=settings.y_finance_base_url)
 
         self._index_to_symbol_map = {
-            WorldIndex.S_P_500: '%5EGSPC'
+            WorldIndex.S_P_500: '%5EGSPC',
+            WorldIndex.Dow_Jones_Ind_Avg: '%5EDJI',
+            WorldIndex.Nasdaq_Composite: '%5EIXIC',
+            WorldIndex.Nyse_Composite: '%5ENYA'
         }
 
     async def get_world_index_time_series(self, index: WorldIndex):
@@ -38,7 +41,7 @@ class YFinanceClient(HttpClient):
                 headers=self.headers
             )
         except HttpRequestError as err:
-            logging.error("Call to get world indices price series failed")
+            logging.error(f"Call to get world indices price series failed with error: {str(err)}")
             raise Exception()   # Create custom exception for this one
 
         if response.status_code != 200:

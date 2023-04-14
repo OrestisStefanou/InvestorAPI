@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import List
 
 from app.domain.price import Price
 from app.domain.date import Date
