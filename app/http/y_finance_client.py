@@ -20,7 +20,7 @@ class YFinanceClient(HttpClient):
 
     async def get_world_index_time_series(self, index: WorldIndex):
         """
-        Returns html response of world index price series in 
+        Returns csv response of world index price series in 
         yahoo finance webiste
         """
         today = dt.datetime.today() # Get today's date and time
@@ -29,14 +29,13 @@ class YFinanceClient(HttpClient):
         params = {
             'period1': int(five_years_ago.timestamp()),
             'period2': int(today.timestamp()),
-            'interval': '1mo',
-            'filter': 'history',
-            'frequency': '1mo',
+            'interval': '1wk',
+            'events': 'history',
             'includeAdjustedClose': 'true'
         }
         try:
             response = await self.get(
-                endpoint=f'/quote/{index_symbol}/history',
+                endpoint=f'/finance/download/{index_symbol}',
                 params=params,
                 headers=self.headers
             )
@@ -47,4 +46,4 @@ class YFinanceClient(HttpClient):
         if response.status_code != 200:
             return None
 
-        return response.text
+        return response.content

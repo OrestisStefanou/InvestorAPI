@@ -11,4 +11,4 @@ class Settings(BaseSettings):
     redis_port: int = 10023
     redis_password: str = '7A3YqMImyKXKVoWh5Hcda9ooGHtVyi14'
     # Yahoo finance
-    y_finance_base_url: str = 'https://finance.yahoo.com'
+    y_finance_base_url: str = 'https://query1.finance.yahoo.com/v7'
