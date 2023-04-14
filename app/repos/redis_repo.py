@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from app import dependencies
@@ -11,8 +12,18 @@ class RedisRepo(object):
 		Sets <key>-<value> in Redis that will expire after <seconds_to_expire> time.
 		Default expiration time is 1 hour
 		"""
-		cls._redis_client.set(name=key, value=value, ex=seconds_to_expire)
+		try:
+			cls._redis_client.set(name=key, value=value, ex=seconds_to_expire)
+		except Exception as err:
+			logging.error(f"Failed to set key-valye with error: {str(err)}")
 
 	@classmethod
 	def _get_value_by_key(cls, key: str) -> Optional[str]:
-		return cls._redis_client.get(key)
+		try:
+			value = cls._redis_client.get(key)
+		except Exception as err:
+			logging.error(f"Failed to get value by key: {key} with error: {str(err)}")
+			value = None
+		
+		return value
+	
