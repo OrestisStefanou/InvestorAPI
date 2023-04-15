@@ -17,7 +17,8 @@ from app.graphql.resolvers import (
     large_mid_cap_leaders_index_resolver,
     appereances_count_per_stock_in_collection_resolver,
     search_symbol_in_collection_resolver,
-    index_time_series_resolver
+    index_time_series_resolver,
+    economic_indicator_time_series_resolver
 )
 
 
@@ -44,6 +45,6 @@ class Query:
         ]
     ] = graphql.field(resolver=search_symbol_in_collection_resolver)
     index_time_series: s.IndexTimeSeries = graphql.field(resolver=index_time_series_resolver)
-
+    economic_indicator_time_series: s.EconomicIndicatorTimeSeries = graphql.field(resolver=economic_indicator_time_series_resolver)
 
 schema = graphql.Schema(query=Query)

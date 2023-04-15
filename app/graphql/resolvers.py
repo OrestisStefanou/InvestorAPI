@@ -1,6 +1,7 @@
 from typing import List, Dict, Union
 
 from app.domain.world_index import WorldIndex
+from app.domain.economic_indicator import EconomicIndicator
 from app.services.tech_leaders_stocks import TechLeadersStocksService
 from app.services.top_comp_stocks import TopCompositeStocksService
 from app.services.bottom_comp_stocks import BottomCompositeStocksService
@@ -21,7 +22,8 @@ from app.graphql.serializers import(
     serialize_low_priced_stock,
     serialize_leaders_index_stock,
     serialize_stock_appearances_count,
-    serialize_index_time_series_entry
+    serialize_index_time_series_entry,
+    serialize_economic_indicator_time_series_entry
 )
 
 
@@ -213,5 +215,21 @@ async def index_time_series_resolver(
         time_series=[
             serialize_index_time_series_entry(time_serie)
             for time_serie in index_time_series
+        ]
+    )
+
+async def economic_indicator_time_series_resolver(
+    indicator: s.EconomicIndicator
+) -> s.EconomicIndicatorTimeSeries:
+    indicator_time_series = TimeSeriesService.get_economic_indicator_time_series(
+        indicator=EconomicIndicator(indicator.value)
+    )
+    
+    return s.EconomicIndicatorTimeSeries(
+        indicator=indicator,
+        unit=indicator_time_series[0].unit,
+        time_series=[
+            serialize_economic_indicator_time_series_entry(time_serie)
+            for time_serie in indicator_time_series
         ]
     )

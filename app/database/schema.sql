@@ -138,3 +138,11 @@ CREATE TABLE world_indices_time_series (
     registered_date TEXT NOT NULL,
     registered_date_ts INT NOT NULL
 );
+
+CREATE TABLE economic_indicator_time_series (
+    indicator_name TEXT NOT NULL,
+    value REAL NOT NULL,
+    unit TEXT NOT NULL,
+    registered_date TEXT NOT NULL,
+    registered_date_ts INT NOT NULL
+);

@@ -103,6 +103,14 @@ class WorldIndex(Enum):
     Nyse_Composite = 'NYSE COMPOSITE'
 
 
+@graphql.enum
+class EconomicIndicator(Enum):
+    Global_Commodities_Index = 'Global_Commodities_Index'
+    Treasury_Yield = 'Treasury_Yield'
+    Interest_Rate = 'Interest_Rate'
+    Inflation = 'Inflation'
+
+
 @graphql.type
 class IndexTimeSeriesEntry:
     open_price: float
@@ -118,3 +126,17 @@ class IndexTimeSeriesEntry:
 class IndexTimeSeries:
     index: WorldIndex
     time_series: List[IndexTimeSeriesEntry]
+
+
+@graphql.type
+class EconomicIndicatorTimeSeriesEntry:
+    value: float
+    registered_date: str
+    registered_date_ts: float
+
+
+@graphql.type
+class EconomicIndicatorTimeSeries:
+    indicator: EconomicIndicator
+    unit: str
+    time_series: List[EconomicIndicatorTimeSeriesEntry]

@@ -15,3 +15,9 @@ class IndexTimeSeriesEntry(TimeSeriesEntry):
     low_price: Price
     close_price: Price
     volume: float
+
+
+@dataclass(frozen=True)
+class EconomicIndicatorTimeSeriesEntry(TimeSeriesEntry):
+    value: Price
+    unit: str

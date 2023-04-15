@@ -43,7 +43,7 @@ class WorldIndicesTimeSeriesRepo(SqlRepo):
     @classmethod
     def add_or_replace_time_series_for_index(cls, index: WorldIndex, time_series: List[IndexTimeSeriesEntry]):
         """
-        Add time series for and index. This function will overwrite existing
+        Add time series for index. This function will overwrite existing
         time series for given index if they exist
         """
         with cls._db_conn as con:
