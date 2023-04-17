@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 
 import strawberry as graphql
 
@@ -7,7 +7,7 @@ from app.graphql.resolvers import (
     top_composite_stocks_resolver,
     bottom_composite_stocks_resolver,
     reit_leaders_resolver,
-    stocks_with_sector_resolver,
+    sector_stocks_resolver,
     sectors_performance_resolver,
     tech_leaders_stocks_resolver,
     top_low_priced_stocks_resolver,
@@ -47,5 +47,6 @@ class Query:
     index_time_series: s.IndexTimeSeries = graphql.field(resolver=index_time_series_resolver)
     economic_indicator_time_series: s.EconomicIndicatorTimeSeries = graphql.field(resolver=economic_indicator_time_series_resolver)
     sectors_performance: List[s.SectorPerformance] = graphql.field(resolver=sectors_performance_resolver)
+    sector_stocks: List[s.CompositeStock] = graphql.field(resolver=sector_stocks_resolver)
 
 schema = graphql.Schema(query=Query)

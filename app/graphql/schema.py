@@ -14,7 +14,6 @@ class CompositeStock:
     name: str
     symbol: str
     closing_price: Optional[float]
-    price_change_pct: Optional[float]
     vol_chg_pct: Optional[float]
     registered_date: Optional[str] = None
 

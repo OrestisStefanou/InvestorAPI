@@ -45,8 +45,8 @@ class StocksWithSectorRepo(SqlRepo):
 		)
 
     @classmethod
-    def _create_model_from_row(cls, row: Tuple[Any]) -> StockWithSector:
-        return StockWithSector(
+    def _create_model_from_row(cls, row: Tuple[Any]) -> CompositeStock:
+        return CompositeStock(
 			comp_rating=CompRating(row[0]),
 			eps_rating=EpsRating(row[1]),
 			rs_rating=RsRating(row[2]),
@@ -55,13 +55,9 @@ class StocksWithSectorRepo(SqlRepo):
 			name=row[5],
 			symbol=row[6],
 			closing_price=Price(row[7]),
-			price_change_pct=Percentage(row[8]),
-			vol_chg_pct=Percentage(row[9]),
-            smr_rating=SmrRating(row[10]),
-            sector_name=row[11],
-            sector_daily_price_change_pct=Percentage(row[12]),
-            sector_start_of_year_price_change_pct=Percentage(row[13]),
-            registered_date=row[14]
+			vol_chg_pct=Percentage(row[8]),
+            smr_rating=SmrRating(row[9]),
+            registered_date=row[10],
         )
 
 
@@ -85,11 +81,10 @@ class StocksWithSectorRepo(SqlRepo):
                 )
 
     @classmethod
-    def get_stocks_with_sector_for_date(
+    def get_sector_stocks(
         cls,
-        date: Date,
-        sector: str = None
-    ) -> Optional[List[StockWithSector]]:
+        sector: Sector
+    ) -> Optional[List[CompositeStock]]:
         cur = cls._db_conn.cursor()
         query = """SELECT 
 				comp_rating,
@@ -100,24 +95,20 @@ class StocksWithSectorRepo(SqlRepo):
 				name,
 				symbol,
 				closing_price,
-				price_change_pct,
 				vol_chg_pct,
                 smr_rating,
-                sector_name,
-                sector_daily_price_change_pct,
-                sector_start_of_year_price_change_pct,
-                registered_date 
+                registered_date
 			FROM stocks_with_sector 
-			WHERE registered_date=?"""
+			WHERE sector_name=? AND registered_date=(
+                SELECT registered_date
+                FROM stocks_with_sector
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY comp_rating DESC"""
         
-        query_params = (date.date_string, )
-        
-        if sector is not None:
-            query += " AND sector_name=?"
-            query_params = (date.date_string, sector)
-
-        query += " ORDER BY comp_rating DESC, rs_rating DESC, eps_rating DESC"
-
+        query_params = (sector.value, )
+    
         result = cur.execute(query,query_params).fetchall()
         return [
 			cls._create_model_from_row(row)

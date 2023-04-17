@@ -1,7 +1,7 @@
 import logging
 from typing import List, Optional, Tuple
 
-from app.domain.composite_stock import CompositeStock, StockWithSector
+from app.domain.composite_stock import CompositeStock
 from app.domain.date import Date
 from app.domain.sector_performance import SectorPerformance
 from app.domain.sector import Sector
@@ -44,31 +44,11 @@ class StocksWithSectorService:
         return stocks_with_sector
 
     @classmethod
-    def _fetch_stocks_with_sector_for_date_from_db(
+    async def get_sector_stocks(
         cls,
-        day: int,
-        month: int,
-        year: int,
-        sector: str = None
-    ) -> Optional[List[StockWithSector]]:
-        return StocksWithSectorRepo.get_stocks_with_sector_for_date(
-            date=Date(day, month, year),
-            sector=sector
-        )
-
-    @classmethod
-    async def get_stocks_with_sector_for_date(
-        cls,
-        day: int,
-        month: int,
-        year: int,
-        sector: str = None
-    ) -> Optional[List[StockWithSector]]:
-        # Check if data exists in cache
-        stocks_with_sector = cls._fetch_stocks_with_sector_for_date_from_db(
-            day, month, year, sector
-        )
-        return stocks_with_sector
+        sector: Sector
+    ) -> Optional[List[CompositeStock]]:
+        return StocksWithSectorRepo.get_sector_stocks(sector)
 
     @classmethod
     def get_sectors_performance(

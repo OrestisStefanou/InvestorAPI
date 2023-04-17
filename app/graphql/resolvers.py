@@ -18,7 +18,6 @@ import app.graphql.schema as s
 from app.graphql.serializers import(
     serialize_composite_stock,
     serialize_stock_leader,
-    serialize_stock_with_sector,
     serialize_tech_leader_stock,
     serialize_low_priced_stock,
     serialize_leaders_index_stock,
@@ -78,14 +77,14 @@ async def reit_leaders_resolver(day: int, month: int, year: int) -> List[s.Stock
     ]
  
 
-async def stocks_with_sector_resolver(day: int, month: int, year: int, sector: str = None) -> List[s.SectorStock]:
-    stocks_with_sector = await StocksWithSectorService.get_stocks_with_sector_for_date(
-        day, month, year, sector
+async def sector_stocks_resolver(sector: s.Sector) -> List[s.CompositeStock]:
+    sector_stocks = await StocksWithSectorService.get_sector_stocks(
+        sector=Sector(sector.value)
     )
 
     return [
-        serialize_stock_with_sector(stock)
-        for stock in stocks_with_sector
+        serialize_composite_stock(stock)
+        for stock in sector_stocks
     ]
 
 

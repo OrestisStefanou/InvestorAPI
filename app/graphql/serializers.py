@@ -18,7 +18,6 @@ def serialize_composite_stock(comp_stock: CompositeStock) -> s.CompositeStock:
         name=comp_stock.name,
         symbol=comp_stock.symbol,
         closing_price=comp_stock.closing_price.value,
-        price_change_pct=comp_stock.price_change_pct.value,
         vol_chg_pct=comp_stock.vol_chg_pct.value,
         registered_date=comp_stock.registered_date
     )
@@ -33,27 +32,6 @@ def serialize_stock_leader(stock_leader: StockLeader) -> s.StockLeader:
             dividend_growth_pct=stock_leader.dividend_growth_pct.value,
             registered_date=stock_leader.registered_date
     )
-
-
-def serialize_stock_with_sector(stock: StockWithSector) -> s.SectorStock:
-    return s.SectorStock(
-            comp_rating=stock.comp_rating.rating,
-            eps_rating=stock.eps_rating.rating,
-            rs_rating=stock.rs_rating.rating,
-            acc_dis_rating=stock.acc_dis_rating.rating,
-            fifty_two_wk_high=stock.fifty_two_wk_high.value,
-            name=stock.name,
-            symbol=stock.symbol,
-            closing_price=stock.closing_price.value,
-            price_change_pct=stock.price_change_pct.value,
-            vol_chg_pct=stock.vol_chg_pct.value,
-            smr_rating=stock.smr_rating.rating,
-            sector_name=stock.sector_name,
-            sector_daily_price_change_pct=stock.sector_daily_price_change_pct.value,
-            sector_start_of_year_price_change_pct=stock.sector_start_of_year_price_change_pct.value,
-            registered_date=stock.registered_date
-    )
-
 
 
 def serialize_tech_leader_stock(stock: TechLeaderStock) -> s.TechLeaderStock:
