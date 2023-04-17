@@ -22,7 +22,8 @@ class AlphaVantageClient(HttpClient):
             EconomicIndicator.Global_Commodities_Index: 'ALL_COMMODITIES',
             EconomicIndicator.Treasury_Yield: 'TREASURY_YIELD',
             EconomicIndicator.Interest_Rate: 'FEDERAL_FUNDS_RATE',
-            EconomicIndicator.Inflation: 'INFLATION'
+            EconomicIndicator.Inflation: 'INFLATION',
+            EconomicIndicator.Unemployment: 'UNEMPLOYMENT'
         }
 
         params = {

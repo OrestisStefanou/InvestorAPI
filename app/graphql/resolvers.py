@@ -1,7 +1,8 @@
-from typing import List, Dict, Union
+from typing import List, Dict, Union, Optional
 
 from app.domain.world_index import WorldIndex
 from app.domain.economic_indicator import EconomicIndicator
+from app.domain.sector import Sector
 from app.services.tech_leaders_stocks import TechLeadersStocksService
 from app.services.top_comp_stocks import TopCompositeStocksService
 from app.services.bottom_comp_stocks import BottomCompositeStocksService
@@ -88,16 +89,19 @@ async def stocks_with_sector_resolver(day: int, month: int, year: int, sector: s
     ]
 
 
-async def sectors_performance_resolver(day: int, month: int, year: int) -> List[s.SectorPerformance]:
-    sectors = StocksWithSectorService.get_sectors_performance(day, month, year)
-
+async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> List[s.SectorPerformance]:
+    sectors_performance = StocksWithSectorService.get_sectors_performance(
+        sector=Sector(sector.value) if sector else None
+    )
     return [
         s.SectorPerformance(
-            sector_name=sector.sector_name,
-            daily_price_change_pct=sector.daily_price_change_pct.value,
-            start_of_year_price_change_pct=sector.start_of_year_price_change_pct.value
+            sector_name=s.Sector(sector_perf.sector_name.value),
+            daily_price_change_pct=sector_perf.daily_price_change_pct.value,
+            start_of_year_price_change_pct=sector_perf.start_of_year_price_change_pct.value,
+            registered_date=sector_perf.registered_date,
+            registered_date_ts=sector_perf.registered_date_ts
         )
-        for sector in sectors
+        for sector_perf in sectors_performance
 
     ]
 

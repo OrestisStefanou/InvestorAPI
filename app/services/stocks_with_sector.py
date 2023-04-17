@@ -4,6 +4,7 @@ from typing import List, Optional, Tuple
 from app.domain.composite_stock import CompositeStock, StockWithSector
 from app.domain.date import Date
 from app.domain.sector_performance import SectorPerformance
+from app.domain.sector import Sector
 from app.errors.ibd import IbdScrapeError
 from app.services.ibd_scrapers.stocks_with_sector import StocksWithSectorScraper
 from app.repos.stocks_with_sector_repo import StocksWithSectorRepo
@@ -72,8 +73,6 @@ class StocksWithSectorService:
     @classmethod
     def get_sectors_performance(
         cls,
-        day: int,
-        month: int,
-        year: int,
+        sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
-        return StocksWithSectorRepo.get_sectors_performance_for_date(Date(day, month, year))
+        return StocksWithSectorRepo.get_sectors_performance(sector)

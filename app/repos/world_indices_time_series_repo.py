@@ -69,7 +69,8 @@ class WorldIndicesTimeSeriesRepo(SqlRepo):
             registered_date,
             registered_date_ts
         FROM world_indices_time_series
-        WHERE index_name=? 
+        WHERE index_name=?
+        ORDER BY registered_date_ts DESC
         """
 
         query_params = (index.value, )

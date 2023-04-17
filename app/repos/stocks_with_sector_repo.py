@@ -9,6 +9,7 @@ from app.domain.date import Date
 from app.domain.eps_rating import EpsRating
 from app.domain.rs_rating import RsRating
 from app.domain.sector_performance import SectorPerformance
+from app.domain.sector import Sector
 from app.domain.smr_rating import SmrRating
 from app.repos.sql_repo import SqlRepo
 
@@ -124,23 +125,35 @@ class StocksWithSectorRepo(SqlRepo):
 		]
 
     @classmethod
-    def get_sectors_performance_for_date(cls, date: Date) -> List[SectorPerformance]:
-        cur= cls._db_conn.cursor()
+    def get_sectors_performance(
+        cls,
+        sector: Optional[Sector] = None
+    ) -> List[SectorPerformance]:
+        cur = cls._db_conn.cursor()
         query = """SELECT 
                     DISTINCT sector_name,
                     sector_daily_price_change_pct,
-                    sector_start_of_year_price_change_pct 
-                FROM stocks_with_sector 
-                WHERE registered_date = ? 
-                ORDER BY sector_start_of_year_price_change_pct DESC"""
+                    sector_start_of_year_price_change_pct,
+                    registered_date,
+                    registered_date_ts
+                FROM stocks_with_sector"""
         
-        query_params = (date.date_string, )
+        query_params = ()
+        
+        if sector:
+            query += " WHERE sector_name = ?"
+            query_params = (sector.value, )
+            
+        query += " ORDER BY registered_date_ts DESC"
+        
         result = cur.execute(query, query_params).fetchall()
         return [
             SectorPerformance(
-                sector_name=row[0],
+                sector_name=Sector(row[0]),
                 daily_price_change_pct=Percentage(row[1]),
-                start_of_year_price_change_pct=Percentage(row[2])
+                start_of_year_price_change_pct=Percentage(row[2]),
+                registered_date=row[3],
+                registered_date_ts=row[4]
             )
             for row in result
         ]

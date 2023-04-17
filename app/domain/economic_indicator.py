@@ -5,3 +5,4 @@ class EconomicIndicator(str, enum.Enum):
     Treasury_Yield = 'Treasury_Yield'
     Interest_Rate = 'Interest_Rate'
     Inflation = 'Inflation'
+    Unemployment = 'Unemployment'

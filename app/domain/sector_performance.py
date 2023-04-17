@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Union
 
+from app.domain.sector import Sector
+
 class SectorPriceChangePct:
     def __init__(self, change_pct: Union[str, float], validate: bool = True) -> None:
         """
@@ -29,6 +31,8 @@ class SectorPriceChangePct:
 
 @dataclass
 class SectorPerformance:
-    sector_name: str
+    sector_name: Sector
     daily_price_change_pct: SectorPriceChangePct
     start_of_year_price_change_pct: SectorPriceChangePct
+    registered_date: str
+    registered_date_ts: float

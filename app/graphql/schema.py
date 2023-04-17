@@ -27,11 +27,50 @@ class SectorStock(CompositeStock):
     sector_start_of_year_price_change_pct: str   
 
 
+@graphql.enum
+class Sector(str, Enum):
+    ENERGY = "ENERGY"
+    INSURNCE = "INSURNCE"
+    COMPUTER = "COMPUTER"
+    AGRICULTRE = "AGRICULTRE"
+    AEROSPACE = "AEROSPACE"
+    METALS = "METALS"
+    FOOD_BEV = "FOOD/BEV"
+    ELECTRNCS = "ELECTRNCS"
+    APPAREL = "APPAREL"
+    OFFICE = "OFFICE"
+    MACHINE = "MACHINE"
+    RETAIL = "RETAIL"
+    ALCOHL_TOB = "ALCOHL/TOB"
+    CHEMICAL = "CHEMICAL"
+    BUSINS_SVC = "BUSINS SVC"
+    MISC = "MISC"
+    AUTO = "AUTO"
+    UTILITY = "UTILITY"
+    S_Ls = "S&Ls"
+    BANKS = "BANKS"
+    MEDICAL = "MEDICAL"
+    CONSUMER = "CONSUMER"
+    MINING = "MINING"
+    TELECOM = "TELECOM"
+    CHIPS = "CHIPS"
+    MEDIA = "MEDIA"
+    TRANSPRT = "TRANSPRT"
+    BUILDING = "BUILDING"
+    LEISURE = "LEISURE"
+    REAL_EST = "REAL EST"
+    SOFTWARE = "SOFTWARE"
+    FINANCE = "FINANCE"
+    INTERNET = "INTERNET"
+
+
 @graphql.type
 class SectorPerformance:
-    sector_name: str
+    sector_name: Sector
     daily_price_change_pct: float
     start_of_year_price_change_pct: float
+    registered_date: str
+    registered_date_ts: float
 
 
 @graphql.type
@@ -109,6 +148,7 @@ class EconomicIndicator(Enum):
     Treasury_Yield = 'Treasury_Yield'
     Interest_Rate = 'Interest_Rate'
     Inflation = 'Inflation'
+    Unemployment = 'Unemployment'
 
 
 @graphql.type
