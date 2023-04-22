@@ -4,11 +4,11 @@ from app.domain.acc_dis_rating import AccDisRating
 from app.domain.price import Price
 from app.domain.percentage import Percentage
 from app.domain.comp_rating import CompRating
-from app.domain.composite_stock import CompositeStock, StockWithSector
+from app.domain.composite_stock import CompositeStock
 from app.domain.date import Date
 from app.domain.eps_rating import EpsRating
 from app.domain.rs_rating import RsRating
-from app.domain.sector_performance import SectorPerformance
+from app.domain.sector_performance import SectorPerformance, SectorPriceChangePct
 from app.domain.sector import Sector
 from app.domain.smr_rating import SmrRating
 from app.repos.sql_repo import SqlRepo
@@ -141,8 +141,8 @@ class StocksWithSectorRepo(SqlRepo):
         return [
             SectorPerformance(
                 sector_name=Sector(row[0]),
-                daily_price_change_pct=Percentage(row[1]),
-                start_of_year_price_change_pct=Percentage(row[2]),
+                daily_price_change_pct=SectorPriceChangePct(row[1], validate=False),
+                start_of_year_price_change_pct=SectorPriceChangePct(row[2], validate=False),
                 registered_date=row[3],
                 registered_date_ts=row[4]
             )
