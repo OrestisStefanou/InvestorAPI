@@ -78,13 +78,24 @@ async def reit_leaders_resolver(day: int, month: int, year: int) -> List[s.Stock
  
 
 async def sector_stocks_resolver(sector: s.Sector) -> List[s.CompositeStock]:
-    sector_stocks = await StocksWithSectorService.get_sector_stocks(
+    sector_stocks = StocksWithSectorService.get_sector_stocks(
         sector=Sector(sector.value)
     )
 
     return [
         serialize_composite_stock(stock)
         for stock in sector_stocks
+    ]
+
+
+async def stock_historical_data_resolver(stock_symbol: str) -> List[s.CompositeStock]:
+    stock_historical_data = StocksWithSectorService.get_stock_historical_data(
+        stock_symbol=stock_symbol
+    )
+
+    return [
+        serialize_composite_stock(stock)
+        for stock in stock_historical_data
     ]
 
 

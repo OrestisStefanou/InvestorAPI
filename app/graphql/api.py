@@ -9,6 +9,7 @@ from app.graphql.resolvers import (
     reit_leaders_resolver,
     sector_stocks_resolver,
     sectors_performance_resolver,
+    stock_historical_data_resolver,
     tech_leaders_stocks_resolver,
     top_low_priced_stocks_resolver,
     dividend_leaders_resolver,
@@ -48,5 +49,6 @@ class Query:
     economic_indicator_time_series: s.EconomicIndicatorTimeSeries = graphql.field(resolver=economic_indicator_time_series_resolver)
     sectors_performance: List[s.SectorPerformance] = graphql.field(resolver=sectors_performance_resolver)
     sector_stocks: List[s.CompositeStock] = graphql.field(resolver=sector_stocks_resolver)
+    stock_historical_data: List[s.CompositeStock] = graphql.field(resolver=stock_historical_data_resolver)
 
 schema = graphql.Schema(query=Query)
