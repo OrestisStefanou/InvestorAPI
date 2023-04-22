@@ -1,7 +1,5 @@
 import logging
-from typing import List, Optional, Tuple, Dict, Any
-
-import pandas as pd
+from typing import List, Optional, Tuple
 
 from app.domain.composite_stock import CompositeStock
 from app.domain.date import Date
