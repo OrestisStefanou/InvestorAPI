@@ -44,7 +44,7 @@ class StocksWithSectorService:
         return stocks_with_sector
 
     @classmethod
-    async def get_sector_stocks(
+    def get_sector_stocks(
         cls,
         sector: Sector
     ) -> Optional[List[CompositeStock]]:
@@ -56,3 +56,10 @@ class StocksWithSectorService:
         sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
         return StocksWithSectorRepo.get_sectors_performance(sector)
+
+    @classmethod
+    def get_stock_historical_data(
+        cls,
+        stock_symbol: str
+    ) -> Optional[List[CompositeStock]]:
+        return StocksWithSectorRepo.get_stock_historical_data(stock_symbol)

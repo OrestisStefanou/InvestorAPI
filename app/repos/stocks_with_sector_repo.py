@@ -148,3 +148,33 @@ class StocksWithSectorRepo(SqlRepo):
             )
             for row in result
         ]
+
+    @classmethod
+    def get_stock_historical_data(
+        cls,
+        stock_symbol: str
+    ) -> Optional[List[CompositeStock]]:
+        cur = cls._db_conn.cursor()
+        query = """SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+                smr_rating,
+                registered_date
+			FROM stocks_with_sector 
+			WHERE symbol=?
+            ORDER BY registered_date_ts DESC"""
+        
+        query_params = (stock_symbol, )
+    
+        result = cur.execute(query,query_params).fetchall()
+        return [
+			cls._create_model_from_row(row)
+			for row in result
+		]
