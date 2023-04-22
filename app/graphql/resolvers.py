@@ -95,8 +95,8 @@ async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> Lis
     return [
         s.SectorPerformance(
             sector_name=s.Sector(sector_perf.sector_name.value),
-            daily_price_change_pct=sector_perf.daily_price_change_pct.value,
-            start_of_year_price_change_pct=sector_perf.start_of_year_price_change_pct.value,
+            daily_price_change_pct=sector_perf.daily_price_change_pct.change_pct,
+            start_of_year_price_change_pct=sector_perf.start_of_year_price_change_pct.change_pct,
             registered_date=sector_perf.registered_date,
             registered_date_ts=sector_perf.registered_date_ts
         )

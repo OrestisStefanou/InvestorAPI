@@ -1,7 +1,6 @@
 from app.graphql import schema as s
 from app.domain.composite_stock import CompositeStock
 from app.domain.stock_leader import StockLeader
-from app.domain.composite_stock import StockWithSector
 from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.domain.time_series import IndexTimeSeriesEntry
