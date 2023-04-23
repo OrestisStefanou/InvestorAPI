@@ -18,14 +18,6 @@ class CompositeStock:
     registered_date: Optional[str] = None
 
 
-@graphql.type
-class SectorStock(CompositeStock):
-    smr_rating: str
-    sector_name: str
-    sector_daily_price_change_pct: str
-    sector_start_of_year_price_change_pct: str   
-
-
 @graphql.enum
 class Sector(str, Enum):
     ENERGY = "ENERGY"
@@ -124,7 +116,6 @@ class StockAppereancesCount:
 @graphql.enum
 class Collection(Enum):
     TopCompositeStocks = 'top_composite_stocks'
-    BottomCompositeStocks = 'bottom_composite_stocks'
     DividendLeaders = 'dividend_leaders'
     UtilityLeaders = 'utility_leaders'
     ReitLeaders = 'reit_leaders'

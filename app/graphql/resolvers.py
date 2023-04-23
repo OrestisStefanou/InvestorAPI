@@ -29,7 +29,6 @@ from app.graphql.serializers import(
 
 _collection_to_service: Dict[s.Collection, AggregateService] = {
     s.Collection.TopCompositeStocks: TopCompositeStocksService,
-    s.Collection.BottomCompositeStocks: BottomCompositeStocksService,
     s.Collection.DividendLeaders: DividendLeadersService,
     s.Collection.ReitLeaders: ReitLeadersService,
     s.Collection.UtilityLeaders: UtilityLeadersService,
@@ -38,31 +37,12 @@ _collection_to_service: Dict[s.Collection, AggregateService] = {
     s.Collection.SmallMidCapLeadersIndex: SmallMidCapLeadersIndexService
 }
 
-_collection_to_serializer = {
-    s.Collection.TopCompositeStocks: serialize_composite_stock,
-    s.Collection.BottomCompositeStocks: serialize_composite_stock,
-    s.Collection.DividendLeaders: serialize_stock_leader,
-    s.Collection.ReitLeaders: serialize_stock_leader,
-    s.Collection.UtilityLeaders: serialize_stock_leader,
-    s.Collection.TechLeaders: serialize_tech_leader_stock,
-    s.Collection.LargeMidCapLeadersIndex: serialize_leaders_index_stock,
-    s.Collection.SmallMidCapLeadersIndex: serialize_leaders_index_stock
-}
 
-
-async def top_composite_stocks_resolver(day: int, month: int, year: int, limit: int = 200) -> List[s.CompositeStock]:
-    top_comp_stocks = await TopCompositeStocksService.get_top_200_comp_stocks_for_date(day, month, year)
+async def top_composite_stocks_resolver(limit: int = 200) -> List[s.CompositeStock]:
+    top_comp_stocks = TopCompositeStocksService.get_latest_top_comp_stocks(limit=limit)
     return [
         serialize_composite_stock(comp_stock)
         for comp_stock in top_comp_stocks[:limit]
-    ]
-
-
-async def bottom_composite_stocks_resolver(day: int, month: int, year: int, limit: int = 200) -> List[s.CompositeStock]:
-    bottom_comp_stocks = await BottomCompositeStocksService.get_bottom_200_comp_stocks_for_date(day, month, year)
-    return [
-        serialize_composite_stock(comp_stock)
-        for comp_stock in bottom_comp_stocks[:limit]
     ]
 
 
@@ -184,36 +164,17 @@ async def large_mid_cap_leaders_index_resolver(day: int, month: int, year: int) 
 
 async def appereances_count_per_stock_in_collection_resolver(
     collection: s.Collection,
-    min_count: int = 1,
     limit: int = 100
 ) -> List[s.StockAppereancesCount]:    
     service = _collection_to_service.get(collection)
     
     appereances_count = service.get_appereances_count_for_each_symbol(
         limit=limit,
-        min_count=min_count
     )
 
     return [
         serialize_stock_appearances_count(appearance)
         for appearance in appereances_count
-    ]
-
-
-async def search_symbol_in_collection_resolver(
-    symbol: str,
-    collection: s.Collection
-) -> List[Union[s.CompositeStock, s.StockLeader, s.TechLeaderStock, s.LeadersIndexStock]]:    
-    service = _collection_to_service.get(collection)
-    serializer = _collection_to_serializer.get(collection)
-
-    results = service.search_by_symbol(
-        symbol=symbol,
-    )
-
-    return [
-        serializer(stock)
-        for stock in results
     ]
 
 
