@@ -5,7 +5,6 @@ import strawberry as graphql
 import app.graphql.schema as s
 from app.graphql.resolvers import (
     top_composite_stocks_resolver,
-    bottom_composite_stocks_resolver,
     reit_leaders_resolver,
     sector_stocks_resolver,
     sectors_performance_resolver,
