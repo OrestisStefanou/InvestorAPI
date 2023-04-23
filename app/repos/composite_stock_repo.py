@@ -46,9 +46,8 @@ class CompositeStockRepo(SqlRepo, RedisRepo):
 			name=row[5],
 			symbol=row[6],
 			closing_price=Price(row[7]),
-			price_change_pct=Percentage(row[8]),
-			vol_chg_pct=Percentage(row[9]),
-			registered_date=row[10]
+			vol_chg_pct=Percentage(row[8]),
+			registered_date=row[9]
 		)
 
 	@classmethod
@@ -113,7 +112,6 @@ class CompositeStockRepo(SqlRepo, RedisRepo):
 				name,
 				symbol,
 				closing_price,
-				price_change_pct,
 				vol_chg_pct,
 				registered_date 
 			FROM {cls._table_name} 
@@ -128,9 +126,42 @@ class CompositeStockRepo(SqlRepo, RedisRepo):
 		]
 
 	@classmethod
+	def get_latest_comp_stocks(
+		cls,
+		limit: int = 200
+	) -> Optional[List[CompositeStock]]:
+		cur = cls._db_conn.cursor()
+		query =	f"""SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+				registered_date 
+			FROM {cls._table_name} 
+			WHERE registered_date=(
+                SELECT registered_date
+                FROM {cls._table_name}
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+	    	ORDER BY comp_rating DESC
+			LIMIT ?"""
+		
+		query_params = (limit, )
+		result = cur.execute(query, query_params)
+		return [
+			cls._create_model_from_row(row)
+			for row in result
+		]
+
+	@classmethod
 	def get_appereances_count_for_each_symbol(
 		cls,
-		min_count: Optional[int] = 1,
 		limit: Optional[int] = 100
 	) -> List[SymbolAppearancesCount]:
 		cur = cls._db_conn.cursor()
@@ -140,11 +171,10 @@ class CompositeStockRepo(SqlRepo, RedisRepo):
 					COUNT(*) 
 				FROM {cls._table_name} 
 				GROUP BY symbol
-				HAVING COUNT(*) > ?
 				ORDER BY COUNT(*) DESC
 				LIMIT ?"""
 		
-		query_params = (min_count, limit)
+		query_params = (limit, )
 		result = cur.execute(query, query_params)
 		return [
 			SymbolAppearancesCount(

@@ -98,6 +98,10 @@ class TopCompositeStocksService(AggregateService):
         )
 
     @classmethod
+    def get_latest_top_comp_stocks(cls, limit: int = 100) -> List[CompositeStock]:
+        return TopCompositeStocksRepo.get_latest_comp_stocks(limit=limit)
+
+    @classmethod
     async def get_top_200_comp_stocks_for_date(cls, day: int, month: int, year: int) -> List[CompositeStock]:
         # Check if data exists in cache
         top_200_comp_stocks = cls._fetch_top_200_comp_stocks_for_date_from_cache(day, month, year)
@@ -124,11 +128,11 @@ class TopCompositeStocksService(AggregateService):
         return []
     
     @classmethod
-    def get_appereances_count_for_each_symbol(cls, min_count: int = 1, limit: int = 100) -> List[SymbolAppearancesCount]:
+    def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
         """
         Returns how many times each symbol appeared in top composite stocks
         """
-        return TopCompositeStocksRepo.get_appereances_count_for_each_symbol(min_count=min_count, limit=limit)
+        return TopCompositeStocksRepo.get_appereances_count_for_each_symbol(limit=limit)
     
     @classmethod
     def search_by_symbol(cls, symbol: str) -> List[CompositeStock]:

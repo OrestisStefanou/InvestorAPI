@@ -120,9 +120,8 @@ class UtilityLeadersService(AggregateService):
         return []
 
     @classmethod
-    def get_appereances_count_for_each_symbol(cls, min_count: int = 1, limit: int = 100) -> List[SymbolAppearancesCount]:
+    def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
         return UtilityLeadersRepo.get_appereances_count_for_each_symbol(
-            min_count=min_count,
             limit=limit
         )
 

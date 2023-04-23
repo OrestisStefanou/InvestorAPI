@@ -99,7 +99,6 @@ class StockLeadersRepo(SqlRepo, RedisRepo):
     @classmethod
     def get_appereances_count_for_each_symbol(
         cls,
-        min_count: Optional[int] = 1,
         limit: Optional[int] = 100
     ) -> List[SymbolAppearancesCount]:
         cur = cls._db_conn.cursor()
@@ -109,11 +108,10 @@ class StockLeadersRepo(SqlRepo, RedisRepo):
                     COUNT(*) 
                 FROM {cls._table_name} 
                 GROUP BY stock_symbol
-                HAVING COUNT(*) > ?
                 ORDER BY COUNT(*) DESC
                 LIMIT ?"""
         
-        query_params = (min_count, limit)
+        query_params = (limit, )
         result = cur.execute(query, query_params)
         return [
             SymbolAppearancesCount(
