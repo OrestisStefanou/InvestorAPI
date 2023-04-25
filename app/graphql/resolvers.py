@@ -1,11 +1,10 @@
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Optional
 
 from app.domain.world_index import WorldIndex
 from app.domain.economic_indicator import EconomicIndicator
 from app.domain.sector import Sector
 from app.services.tech_leaders_stocks import TechLeadersStocksService
 from app.services.top_comp_stocks import TopCompositeStocksService
-from app.services.bottom_comp_stocks import BottomCompositeStocksService
 from app.services.stocks_with_sector import StocksWithSectorService
 from app.services.dividend_leaders import DividendLeadersService
 from app.services.top_low_priced_stocks import TopLowPricedStocksService
@@ -96,10 +95,8 @@ async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> Lis
     ]
 
 
-async def tech_leaders_stocks_resolver(day: int, month: int, year: int) -> List[s.TechLeaderStock]:
-    tech_leaders_stocks = await TechLeadersStocksService.get_tech_leaders_stocks_for_date(
-        day, month, year
-    )
+async def tech_leaders_stocks_resolver() -> List[s.TechLeaderStock]:
+    tech_leaders_stocks = TechLeadersStocksService.get_latest_tech_leaders_stocks()
 
     return [
         serialize_tech_leader_stock(stock)

@@ -129,6 +129,38 @@ class TechLeadersStocksRepo(SqlRepo, RedisRepo):
         ]
 
     @classmethod
+    def get_latest_tech_leaders_stocks(
+        cls
+    ) -> Optional[List[TechLeaderStock]]:
+        cur = cls._db_conn.cursor()
+        query = """SELECT 
+                    comp_rating,
+                    eps_rating,
+                    rs_rating,
+                    stock_name,
+                    stock_symbol,
+                    price,
+                    annual_eps_change_pct,
+                    last_qtr_eps_change_pct,
+                    next_qtr_eps_change_pct,
+                    last_qtr_sales_change_pct,
+                    return_on_equity,
+                    registered_date
+                FROM tech_leaders 
+                WHERE registered_date=(
+                    SELECT registered_date
+                    FROM tech_leaders
+                    ORDER BY registered_date_ts DESC
+                    LIMIT 1
+                )
+	    	    ORDER BY comp_rating DESC"""
+        result = cur.execute(query)
+        return [
+            cls._create_model_from_row(row)
+            for row in result
+        ]
+
+    @classmethod
     def get_appereances_count_for_each_symbol(
         cls,
         limit: Optional[int] = 100
