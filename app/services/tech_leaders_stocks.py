@@ -94,6 +94,10 @@ class TechLeadersStocksService(AggregateService):
         )
 
     @classmethod
+    def get_latest_tech_leaders_stocks(cls) -> List[TechLeaderStock]:
+        return TechLeadersStocksRepo.get_latest_tech_leaders_stocks()
+
+    @classmethod
     async def get_tech_leaders_stocks_for_date(cls, day: int, month: int, year: int) -> List[TechLeaderStock]:
         # Check if data exists in cache
         tech_leaders_stocks = cls._fetch_tech_leaders_stocks_for_date_from_cache(day, month, year)

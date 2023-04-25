@@ -24,7 +24,7 @@ from app.graphql.resolvers import (
 @graphql.type
 class Query:
     top_composite_stocks: List[s.CompositeStock] = graphql.field(resolver=top_composite_stocks_resolver)
-    # tech_leaders: List[s.TechLeaderStock] = graphql.field(resolver=tech_leaders_stocks_resolver)
+    tech_leaders: List[s.TechLeaderStock] = graphql.field(resolver=tech_leaders_stocks_resolver)
     # top_low_priced_stocks: List[s.LowPricedStock] = graphql.field(resolver=top_low_priced_stocks_resolver)
     # dividend_leaders: List[s.StockLeader] = graphql.field(resolver=dividend_leaders_resolver)
     # reit_leaders: List[s.StockLeader] = graphql.field(resolver=reit_leaders_resolver)
