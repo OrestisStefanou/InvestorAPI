@@ -94,6 +94,10 @@ class DividendLeadersService(AggregateService):
         )
 
     @classmethod
+    def get_latest_dividend_leaders(cls) -> List[StockLeader]:
+        return DividendLeadersRepo.get_latest_stock_leaders()
+
+    @classmethod
     async def get_dividend_leaders_for_date(cls, day: int, month: int, year: int) -> List[StockLeader]:
         # Check if data exists in cache
         dividend_leaders = cls._fetch_dividend_leaders_for_date_from_cache(day, month, year)
