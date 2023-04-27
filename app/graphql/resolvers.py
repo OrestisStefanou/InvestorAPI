@@ -43,10 +43,8 @@ async def top_composite_stocks_resolver(limit: int = 200) -> List[s.CompositeSto
     ]
 
 
-async def reit_leaders_resolver(day: int, month: int, year: int) -> List[s.StockLeader]:
-    reit_leaders = await ReitLeadersService.get_reit_leaders_for_date(
-        day, month, year
-    )
+async def reit_leaders_resolver() -> List[s.StockLeader]:
+    reit_leaders = ReitLeadersService.get_latest_reit_leaders()
 
     return [
         serialize_stock_leader(reit_leader)
