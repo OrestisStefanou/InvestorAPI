@@ -7,7 +7,6 @@ from app.services.tech_leaders_stocks import TechLeadersStocksService
 from app.services.top_comp_stocks import TopCompositeStocksService
 from app.services.stocks_with_sector import StocksWithSectorService
 from app.services.dividend_leaders import DividendLeadersService
-from app.services.top_low_priced_stocks import TopLowPricedStocksService
 from app.services.reit_leaders import ReitLeadersService
 from app.services.utility_leaders import UtilityLeadersService
 from app.services.leaders_index import SmallMidCapLeadersIndexService, LargeMidCapLeadersIndexService
@@ -18,7 +17,6 @@ from app.graphql.serializers import(
     serialize_composite_stock,
     serialize_stock_leader,
     serialize_tech_leader_stock,
-    serialize_low_priced_stock,
     serialize_leaders_index_stock,
     serialize_stock_appearances_count,
     serialize_index_time_series_entry,
@@ -104,21 +102,8 @@ async def tech_leaders_stocks_resolver() -> List[s.TechLeaderStock]:
     ]
 
 
-async def top_low_priced_stocks_resolver(day: int, month: int, year: int) -> List[s.LowPricedStock]:
-    low_priced_stocks = await TopLowPricedStocksService.get_top_low_priced_stocks_for_date(
-        day, month, year
-    )
-  
-    return [
-        serialize_low_priced_stock(stock)
-        for stock in low_priced_stocks
-    ]
-
-
-async def dividend_leaders_resolver(day: int, month: int, year: int) -> List[s.StockLeader]:
-    dividend_leaders = await DividendLeadersService.get_dividend_leaders_for_date(
-        day, month, year
-    )
+async def dividend_leaders_resolver() -> List[s.StockLeader]:
+    dividend_leaders = DividendLeadersService.get_latest_dividend_leaders()
 
     return [
         serialize_stock_leader(dividend_leader)

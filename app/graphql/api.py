@@ -10,7 +10,6 @@ from app.graphql.resolvers import (
     sectors_performance_resolver,
     stock_historical_data_resolver,
     tech_leaders_stocks_resolver,
-    top_low_priced_stocks_resolver,
     dividend_leaders_resolver,
     utility_leaders_resolver,
     small_mid_cap_leaders_index_resolver,
@@ -25,8 +24,7 @@ from app.graphql.resolvers import (
 class Query:
     top_composite_stocks: List[s.CompositeStock] = graphql.field(resolver=top_composite_stocks_resolver)
     tech_leaders: List[s.TechLeaderStock] = graphql.field(resolver=tech_leaders_stocks_resolver)
-    # top_low_priced_stocks: List[s.LowPricedStock] = graphql.field(resolver=top_low_priced_stocks_resolver)
-    # dividend_leaders: List[s.StockLeader] = graphql.field(resolver=dividend_leaders_resolver)
+    dividend_leaders: List[s.StockLeader] = graphql.field(resolver=dividend_leaders_resolver)
     # reit_leaders: List[s.StockLeader] = graphql.field(resolver=reit_leaders_resolver)
     # utility_leaders: List[s.StockLeader] = graphql.field(resolver=utility_leaders_resolver)
     # small_mid_cap_leaders_index: List[s.LeadersIndexStock] = graphql.field(resolver=small_mid_cap_leaders_index_resolver)
