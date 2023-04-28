@@ -94,6 +94,10 @@ class UtilityLeadersService(AggregateService):
         )
 
     @classmethod
+    def get_latest_utility_leaders(cls) -> List[StockLeader]:
+        return UtilityLeadersRepo.get_latest_stock_leaders()
+
+    @classmethod
     async def get_utility_leaders_for_date(cls, day: int, month: int, year: int) -> List[StockLeader]:
         # Check if data exists in cache
         utility_leaders = cls._fetch_utility_leaders_for_date_from_cache(day, month, year)

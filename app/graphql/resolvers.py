@@ -109,10 +109,8 @@ async def dividend_leaders_resolver() -> List[s.StockLeader]:
     ]
 
 
-async def utility_leaders_resolver(day: int, month: int, year: int) -> List[s.StockLeader]:
-    utility_leaders = await UtilityLeadersService.get_utility_leaders_for_date(
-        day, month, year
-    )
+async def utility_leaders_resolver() -> List[s.StockLeader]:
+    utility_leaders = UtilityLeadersService.get_latest_utility_leaders()
 
     return [
         serialize_stock_leader(utility_leader)
