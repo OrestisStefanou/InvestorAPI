@@ -118,10 +118,8 @@ async def utility_leaders_resolver() -> List[s.StockLeader]:
     ]
 
 
-async def small_mid_cap_leaders_index_resolver(day: int, month: int, year: int) -> List[s.LeadersIndexStock]:
-    small_mid_cap_leaders_index = await SmallMidCapLeadersIndexService.get_leaders_index_for_date(
-        day, month, year
-    )
+async def small_mid_cap_leaders_index_resolver() -> List[s.LeadersIndexStock]:
+    small_mid_cap_leaders_index = SmallMidCapLeadersIndexService.get_latest_leaders_index()
 
     return [
         serialize_leaders_index_stock(stock)
@@ -129,10 +127,8 @@ async def small_mid_cap_leaders_index_resolver(day: int, month: int, year: int) 
     ]
 
 
-async def large_mid_cap_leaders_index_resolver(day: int, month: int, year: int) -> List[s.LeadersIndexStock]:
-    large_mid_cap_leaders_index = await LargeMidCapLeadersIndexService.get_leaders_index_for_date(
-        day, month, year
-    )
+async def large_mid_cap_leaders_index_resolver() -> List[s.LeadersIndexStock]:
+    large_mid_cap_leaders_index = LargeMidCapLeadersIndexService.get_latest_leaders_index()
 
     return [
         serialize_leaders_index_stock(stock)

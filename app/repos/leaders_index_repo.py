@@ -73,7 +73,7 @@ class LeadersIndexRepo(SqlRepo, RedisRepo):
                 f"INSERT INTO {cls._table_name} VALUES(?,?,?,?,?,?,?)",
                 [cls._create_row_tuple_from_model(stock_leader, date) for stock_leader in data]
             )
-    
+
     @classmethod
     def get_stock_leaders_for_date(
         cls,
@@ -91,6 +91,34 @@ class LeadersIndexRepo(SqlRepo, RedisRepo):
             FROM {cls._table_name} 
             WHERE registered_date=?""",
             (date.date_string, )
+        ).fetchall()
+        return [
+            cls._create_model_from_row(row)
+            for row in result
+        ]
+
+    @classmethod
+    def get_latest_stock_leaders(
+        cls,
+    ) -> List[StockLeader]:
+        cur = cls._db_conn.cursor()
+        result = cur.execute(
+            f"""SELECT  
+                comp_rating,
+                rs_rating,
+                stock_name,
+                stock_symbol,
+                price,
+                registered_date
+            FROM {cls._table_name} 
+            WHERE registered_date=(
+                SELECT registered_date
+                FROM tech_leaders
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY comp_rating DESC
+            """
         ).fetchall()
         return [
             cls._create_model_from_row(row)

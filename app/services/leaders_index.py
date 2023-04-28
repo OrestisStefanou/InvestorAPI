@@ -95,6 +95,10 @@ class LeadersIndexService(AggregateService):
         )
 
     @classmethod
+    def get_latest_leaders_index(cls) -> List[StockLeader]:
+        return  cls._repo.get_latest_stock_leaders()
+
+    @classmethod
     async def get_leaders_index_for_date(cls, day: int, month: int, year: int) -> List[StockLeader]:
         # Check if data exists in cache
         leaders_index = cls._fetch_leaders_index_for_date_from_cache(day, month, year)
