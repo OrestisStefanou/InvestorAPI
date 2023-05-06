@@ -18,6 +18,7 @@ def serialize_composite_stock(comp_stock: CompositeStock) -> s.CompositeStock:
         symbol=comp_stock.symbol,
         closing_price=comp_stock.closing_price.value,
         vol_chg_pct=comp_stock.vol_chg_pct.value,
+        smr_rating=comp_stock.smr_rating.rating if comp_stock.smr_rating else None,
         registered_date=comp_stock.registered_date
     )
 

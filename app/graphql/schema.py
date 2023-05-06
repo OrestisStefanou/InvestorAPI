@@ -15,6 +15,7 @@ class CompositeStock:
     symbol: str
     closing_price: Optional[float]
     vol_chg_pct: Optional[float]
+    smr_rating: Optional[str] = None
     registered_date: Optional[str] = None
 
 
