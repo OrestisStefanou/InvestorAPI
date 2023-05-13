@@ -178,3 +178,65 @@ class StocksWithSectorRepo(SqlRepo):
 			cls._create_model_from_row(row)
 			for row in result
 		]
+
+    @classmethod
+    def get_eps_rating_leaders(cls) -> List[CompositeStock]:
+        cur = cls._db_conn.cursor()
+        query = """SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+                smr_rating,
+                registered_date
+			FROM stocks_with_sector 
+			WHERE registered_date=(
+                SELECT registered_date
+                FROM stocks_with_sector
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY eps_rating DESC
+            LIMIT 100"""
+            
+        result = cur.execute(query).fetchall()
+        return [
+			cls._create_model_from_row(row)
+			for row in result
+		]
+
+    @classmethod
+    def get_rs_rating_leaders(cls) -> List[CompositeStock]:
+        cur = cls._db_conn.cursor()
+        query = """SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+                smr_rating,
+                registered_date
+			FROM stocks_with_sector 
+			WHERE registered_date=(
+                SELECT registered_date
+                FROM stocks_with_sector
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY rs_rating DESC
+            LIMIT 100"""
+            
+        result = cur.execute(query).fetchall()
+        return [
+			cls._create_model_from_row(row)
+			for row in result
+		]
