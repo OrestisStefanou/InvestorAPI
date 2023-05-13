@@ -63,3 +63,11 @@ class StocksWithSectorService:
         stock_symbol: str
     ) -> Optional[List[CompositeStock]]:
         return StocksWithSectorRepo.get_stock_historical_data(stock_symbol)
+
+    @classmethod
+    def get_eps_rating_leaders(cls) -> List[CompositeStock]:
+        return StocksWithSectorRepo.get_eps_rating_leaders()
+
+    @classmethod
+    def get_rs_rating_leaders(cls) -> List[CompositeStock]:
+        return StocksWithSectorRepo.get_rs_rating_leaders()

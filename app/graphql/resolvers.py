@@ -167,6 +167,7 @@ async def index_time_series_resolver(
         ]
     )
 
+
 async def economic_indicator_time_series_resolver(
     indicator: s.EconomicIndicator
 ) -> s.EconomicIndicatorTimeSeries:
@@ -182,3 +183,19 @@ async def economic_indicator_time_series_resolver(
             for time_serie in indicator_time_series
         ]
     )
+
+
+async def eps_rating_leaders_resolver() -> List[s.CompositeStock]:
+    eps_leaders = StocksWithSectorService.get_eps_rating_leaders()
+    return [
+        serialize_composite_stock(stock)
+        for stock in eps_leaders
+    ]
+
+
+async def rs_rating_leaders_resolver() -> List[s.CompositeStock]:
+    eps_leaders = StocksWithSectorService.get_rs_rating_leaders()
+    return [
+        serialize_composite_stock(stock)
+        for stock in eps_leaders
+    ]

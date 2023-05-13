@@ -16,7 +16,9 @@ from app.graphql.resolvers import (
     large_mid_cap_leaders_index_resolver,
     appereances_count_per_stock_in_collection_resolver,
     index_time_series_resolver,
-    economic_indicator_time_series_resolver
+    economic_indicator_time_series_resolver,
+    eps_rating_leaders_resolver,
+    rs_rating_leaders_resolver
 )
 
 
@@ -27,6 +29,8 @@ class Query:
     dividend_leaders: List[s.StockLeader] = graphql.field(resolver=dividend_leaders_resolver)
     reit_leaders: List[s.StockLeader] = graphql.field(resolver=reit_leaders_resolver)
     utility_leaders: List[s.StockLeader] = graphql.field(resolver=utility_leaders_resolver)
+    eps_rating_leaders: List[s.CompositeStock] = graphql.field(resolver=eps_rating_leaders_resolver)
+    rs_rating_leaders: List[s.CompositeStock] = graphql.field(resolver=rs_rating_leaders_resolver)
     small_mid_cap_leaders_index: List[s.LeadersIndexStock] = graphql.field(resolver=small_mid_cap_leaders_index_resolver)
     large_mid_cap_leaders_index: List[s.LeadersIndexStock] = graphql.field(resolver=large_mid_cap_leaders_index_resolver)
     most_appeared_stocks_in_collection: List[s.StockAppereancesCount] = graphql.field(resolver=appereances_count_per_stock_in_collection_resolver)
