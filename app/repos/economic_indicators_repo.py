@@ -64,7 +64,8 @@ class EconomicIndicatorTimeSeriesRepo(SqlRepo):
             registered_date,
             registered_date_ts
         FROM economic_indicator_time_series
-        WHERE indicator_name=? 
+        WHERE indicator_name=?
+        ORDER BY registered_date_ts DESC
         """
 
         query_params = (indicator.value, )
