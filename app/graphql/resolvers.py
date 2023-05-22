@@ -75,7 +75,7 @@ async def stock_historical_data_resolver(stock_symbol: str) -> List[s.CompositeS
 
 
 async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> List[s.SectorPerformance]:
-    sectors_performance = StocksWithSectorService.get_sectors_performance(
+    sectors_performance = StocksWithSectorService.get_sectors_historical_performance(
         sector=Sector(sector.value) if sector else None
     )
     return [

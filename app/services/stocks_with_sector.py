@@ -51,11 +51,11 @@ class StocksWithSectorService:
         return StocksWithSectorRepo.get_sector_stocks(sector)
 
     @classmethod
-    def get_sectors_performance(
+    def get_sectors_historical_performance(
         cls,
         sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
-        return StocksWithSectorRepo.get_sectors_performance(sector)
+        return StocksWithSectorRepo.get_sectors_historical_performance(sector)
 
     @classmethod
     def get_stock_historical_data(

@@ -116,7 +116,7 @@ class StocksWithSectorRepo(SqlRepo):
 		]
 
     @classmethod
-    def get_sectors_performance(
+    def get_sectors_historical_performance(
         cls,
         sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
@@ -240,3 +240,7 @@ class StocksWithSectorRepo(SqlRepo):
 			cls._create_model_from_row(row)
 			for row in result
 		]
+
+    @classmethod
+    def get_stock_rank_in_sector(symbol: str) -> int:
+        pass

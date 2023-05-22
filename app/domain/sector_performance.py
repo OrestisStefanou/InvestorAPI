@@ -34,5 +34,6 @@ class SectorPerformance:
     sector_name: Sector
     daily_price_change_pct: SectorPriceChangePct
     start_of_year_price_change_pct: SectorPriceChangePct
+    rank: Optional[int] = None
     registered_date: Optional[str] = None
     registered_date_ts: Optional[float] = None

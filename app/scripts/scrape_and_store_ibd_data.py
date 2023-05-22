@@ -8,7 +8,6 @@ from app.services.reit_leaders import ReitLeadersService
 from app.services.stocks_with_sector import StocksWithSectorService
 from app.services.tech_leaders_stocks import TechLeadersStocksService
 from app.services.top_comp_stocks import TopCompositeStocksService
-from app.services.top_low_priced_stocks import TopLowPricedStocksService
 from app.services.utility_leaders import UtilityLeadersService
 
 async def scrape_and_store_data(day: int, month: int, year: int):
@@ -65,13 +64,6 @@ async def scrape_and_store_data(day: int, month: int, year: int):
         await TopCompositeStocksService.scrape_and_store_top_200_comp_stocks_for_date(day, month, year)
     except Exception as err:
         logging.error("Failed to scrape and store top composite stocks:", err)
-
-    time.sleep(2)
-
-    try:
-        await TopLowPricedStocksService.scrape_and_store_top_low_priced_stocks_for_date(day, month, year)
-    except Exception as err:
-        logging.error("Failed to scrape and store top low priced stocks:", err)
 
     time.sleep(2)
 

@@ -16,6 +16,7 @@ class IbdClient(HttpClient):
             3: "mar",
             4: "apr",
             5: "may",
+            7: "jul",
             8: "aug",
             9: "sep",
             10: "oct",

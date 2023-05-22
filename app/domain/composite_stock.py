@@ -18,12 +18,10 @@ class CompositeStock:
 	symbol: str
 	fifty_two_wk_high: Price = None
 	closing_price: Price = None
-	price_change_pct: Percentage = None
+	price_change_pct: Percentage = None		# This is a deprecated field
 	vol_chg_pct: Percentage = None
 	acc_dis_rating: AccDisRating = None
 	smr_rating: Optional[SmrRating] = None
-	industry_group_strength: Optional[str] = None
-	year_high: Optional[Price] = None
 	registered_date: Optional[str] = None
 
 

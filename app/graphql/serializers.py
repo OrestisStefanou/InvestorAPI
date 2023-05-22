@@ -51,21 +51,6 @@ def serialize_tech_leader_stock(stock: TechLeaderStock) -> s.TechLeaderStock:
     )
 
 
-def serialize_low_priced_stock(stock: CompositeStock) -> s.LowPricedStock:
-    return s.LowPricedStock(
-        comp_rating=stock.comp_rating.rating,
-        eps_rating=stock.eps_rating.rating,
-        rs_rating=stock.rs_rating.rating,
-        acc_dis_rating=stock.acc_dis_rating.rating,
-        year_high=stock.year_high.value,
-        name=stock.name,
-        symbol=stock.symbol,
-        closing_price=stock.closing_price.value,
-        price_change_pct=stock.price_change_pct.value,
-        vol_chg_pct=stock.vol_chg_pct.value
-    )
-
-
 def serialize_leaders_index_stock(stock: StockLeader) -> s.LeadersIndexStock:
     return s.LeadersIndexStock(
         comp_rating=stock.comp_rating.rating,
