@@ -150,6 +150,29 @@ class StocksWithSectorRepo(SqlRepo):
         ]
 
     @classmethod
+    def get_sectors_performance(
+        cls,
+        sector: Optional[Sector] = None
+    ) -> List[SectorPerformance]:
+        cur = cls._db_conn.cursor()
+        query = """SELECT 
+                    DISTINCT sector_name,
+                    sector_daily_price_change_pct,
+                    sector_start_of_year_price_change_pct,
+                    registered_date,
+                    registered_date_ts
+                FROM stocks_with_sector
+                WHERE registered_date=(
+                    SELECT registered_date
+                    FROM stocks_with_sector
+                    ORDER BY registered_date_ts DESC
+                    LIMIT 1
+                )
+                ORDER BY sector_start_of_year_price_change_pct DESC
+            """
+
+
+    @classmethod
     def get_stock_historical_data(
         cls,
         stock_symbol: str
