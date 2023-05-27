@@ -1,6 +1,6 @@
 from enum import Enum
 
-class Sector(Enum):
+class Sector(str, Enum):
     ENERGY = "ENERGY"
     INSURNCE = "INSURNCE"
     COMPUTER = "COMPUTER"

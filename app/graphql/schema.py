@@ -4,21 +4,6 @@ from enum import Enum
 import strawberry as graphql
 
 
-@graphql.type
-class CompositeStock:
-    comp_rating: int
-    eps_rating: int
-    rs_rating: int
-    acc_dis_rating: str
-    fifty_two_wk_high: Optional[float]
-    name: str
-    symbol: str
-    closing_price: Optional[float]
-    vol_chg_pct: Optional[float]
-    smr_rating: Optional[str] = None
-    registered_date: Optional[str] = None
-
-
 @graphql.enum
 class Sector(str, Enum):
     ENERGY = "ENERGY"
@@ -54,6 +39,22 @@ class Sector(str, Enum):
     SOFTWARE = "SOFTWARE"
     FINANCE = "FINANCE"
     INTERNET = "INTERNET"
+
+
+@graphql.type
+class CompositeStock:
+    comp_rating: int
+    eps_rating: int
+    rs_rating: int
+    acc_dis_rating: str
+    fifty_two_wk_high: Optional[float]
+    name: str
+    symbol: str
+    closing_price: Optional[float]
+    vol_chg_pct: Optional[float]
+    smr_rating: Optional[str] = None
+    sector: Optional[Sector] = None
+    registered_date: Optional[str] = None
 
 
 @graphql.type

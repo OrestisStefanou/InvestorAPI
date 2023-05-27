@@ -8,6 +8,7 @@ from app.domain.rs_rating import RsRating
 from app.domain.smr_rating import SmrRating
 from app.domain.price import Price
 from app.domain.percentage import Percentage
+from app.domain.sector import Sector
 
 @dataclass(frozen=True)
 class CompositeStock:
@@ -22,6 +23,7 @@ class CompositeStock:
 	vol_chg_pct: Percentage = None
 	acc_dis_rating: AccDisRating = None
 	smr_rating: Optional[SmrRating] = None
+	sector: Optional[Sector] = None
 	industry_group_strength: Optional[str] = None
 	year_high: Optional[Price] = None
 	registered_date: Optional[str] = None

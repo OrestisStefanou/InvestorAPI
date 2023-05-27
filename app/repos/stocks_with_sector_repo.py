@@ -57,7 +57,8 @@ class StocksWithSectorRepo(SqlRepo):
 			closing_price=Price(row[7]),
 			vol_chg_pct=Percentage(row[8]),
             smr_rating=SmrRating(row[9]),
-            registered_date=row[10],
+            sector=Sector(row[10]),
+            registered_date=row[11],
         )
 
 
@@ -97,6 +98,7 @@ class StocksWithSectorRepo(SqlRepo):
 				closing_price,
 				vol_chg_pct,
                 smr_rating,
+                sector_name,
                 registered_date
 			FROM stocks_with_sector 
 			WHERE sector_name=? AND registered_date=(
@@ -116,7 +118,7 @@ class StocksWithSectorRepo(SqlRepo):
 		]
 
     @classmethod
-    def get_sectors_performance(
+    def get_sectors_historical_performance(
         cls,
         sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
@@ -166,6 +168,7 @@ class StocksWithSectorRepo(SqlRepo):
 				closing_price,
 				vol_chg_pct,
                 smr_rating,
+                sector_name,
                 registered_date
 			FROM stocks_with_sector 
 			WHERE symbol=?
@@ -193,6 +196,7 @@ class StocksWithSectorRepo(SqlRepo):
 				closing_price,
 				vol_chg_pct,
                 smr_rating,
+                sector_name,
                 registered_date
 			FROM stocks_with_sector 
 			WHERE registered_date=(
@@ -224,6 +228,7 @@ class StocksWithSectorRepo(SqlRepo):
 				closing_price,
 				vol_chg_pct,
                 smr_rating,
+                sector_name,
                 registered_date
 			FROM stocks_with_sector 
 			WHERE registered_date=(
