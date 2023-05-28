@@ -8,9 +8,9 @@ from app.domain.date import Date
 from app.domain.composite_stock import CompositeStock
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.services.aggregate_service import AggregateService
+from app.services.base_service import BaseService
 
-
-class TopCompositeStocksService(AggregateService):
+class TopCompositeStocksService(BaseService, AggregateService):
     @classmethod
     async def scrape_and_store_top_200_comp_stocks_for_date(
         cls,
@@ -30,7 +30,7 @@ class TopCompositeStocksService(AggregateService):
             raise IbdScrapeError('Failed to scrape top 200 composite stocks')            
 
         # Store
-        TopCompositeStocksRepo.add_comp_stocks_for_date(
+        TopCompositeStocksRepo().add_comp_stocks_for_date(
             date=Date(day, month, year),
             data=top_200_comp_stocks
         )
@@ -58,85 +58,17 @@ class TopCompositeStocksService(AggregateService):
 
         return top_200_comp_stocks
 
-    @classmethod
-    def _fetch_top_200_comp_stocks_for_date_from_db(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[CompositeStock]]:
-        return TopCompositeStocksRepo.get_comp_stocks_for_date(
-            date=Date(day, month, year)
-        )
-
-    @classmethod
-    def _fetch_top_200_comp_stocks_for_date_from_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[CompositeStock]]:
-        """
-        Fetch top 200 composite stocks for given date from Redis
-        """
-        return TopCompositeStocksRepo.get_comp_stocks_for_date_from_cache(
-            date=Date(day, month, year)
-        )
-
-
-    @classmethod
-    def _store_top_200_comp_stocks_for_date_in_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int,
-        top_200_comp_stocks: List[CompositeStock]
-    ) -> None:
-        TopCompositeStocksRepo.store_comp_stocks_for_date_in_cache(
-            date=Date(day, month, year),
-            data=top_200_comp_stocks
-        )
-
-    @classmethod
-    def get_latest_top_comp_stocks(cls, limit: int = 100) -> List[CompositeStock]:
-        return TopCompositeStocksRepo.get_latest_comp_stocks(limit=limit)
-
-    @classmethod
-    async def get_top_200_comp_stocks_for_date(cls, day: int, month: int, year: int) -> List[CompositeStock]:
-        # Check if data exists in cache
-        top_200_comp_stocks = cls._fetch_top_200_comp_stocks_for_date_from_cache(day, month, year)
-        if top_200_comp_stocks:
-            return top_200_comp_stocks
-
-        # If not in cache check database
-        top_200_comp_stocks = cls._fetch_top_200_comp_stocks_for_date_from_db(day, month, year)
-        if top_200_comp_stocks:
-            return top_200_comp_stocks
-
-        # And if not in db as well scrape the data from ibd
-        top_200_comp_stocks = await cls._scrape_top_200_comp_stocks_for_date(day, month, year)
-        if top_200_comp_stocks:
-            # Store in cache to avoid overloading ibd website
-            cls._store_top_200_comp_stocks_for_date_in_cache(
-                day=day,
-                month=month,
-                year=year,
-                top_200_comp_stocks=top_200_comp_stocks
-            )
-            return top_200_comp_stocks
-
-        return []
+    def get_latest_top_comp_stocks(self, limit: int = 100) -> List[CompositeStock]:
+        return TopCompositeStocksRepo(self._db_session).get_latest_comp_stocks(limit=limit)
     
-    @classmethod
-    def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
+    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
         """
         Returns how many times each symbol appeared in top composite stocks
         """
-        return TopCompositeStocksRepo.get_appereances_count_for_each_symbol(limit=limit)
+        return TopCompositeStocksRepo(self._db_session).get_appereances_count_for_each_symbol(limit=limit)
     
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> List[CompositeStock]:
+    def search_by_symbol(self, symbol: str) -> List[CompositeStock]:
         """
         Returns all occurences of given symbol in top composite stocks
         """
-        return TopCompositeStocksRepo.search_by_symbol(symbol)
+        return TopCompositeStocksRepo(self._db_session).search_by_symbol(symbol)

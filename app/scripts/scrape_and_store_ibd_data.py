@@ -1,7 +1,6 @@
 import logging
 import time
 
-from app.services.bottom_comp_stocks import BottomCompositeStocksService
 from app.services.dividend_leaders import DividendLeadersService
 from app.services.leaders_index import SmallMidCapLeadersIndexService, LargeMidCapLeadersIndexService
 from app.services.reit_leaders import ReitLeadersService
@@ -11,13 +10,6 @@ from app.services.top_comp_stocks import TopCompositeStocksService
 from app.services.utility_leaders import UtilityLeadersService
 
 async def scrape_and_store_data(day: int, month: int, year: int):
-    try:
-        await BottomCompositeStocksService.scrape_and_store_bottom_200_comp_stocks_for_date(day, month, year)
-    except Exception as err:
-        logging.error("Failed to scrape and store bottom composite stocks:", err)
-
-    time.sleep(2)   # We sleep to don't send all the requests at the same time
-
     try:
         await DividendLeadersService.scrape_and_store_dividend_leaders_for_date(day, month, year)
     except Exception as err:

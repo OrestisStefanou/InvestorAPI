@@ -8,10 +8,8 @@ class AggregateService:
     """
     Aggregate Base class
     """
-    @classmethod
-    def get_appereances_count_for_each_symbol(cls, min_count: int = 1, limit: int = 100) -> List[SymbolAppearancesCount]:
+    def get_appereances_count_for_each_symbol(self, min_count: int = 1, limit: int = 100) -> List[SymbolAppearancesCount]:
         raise NotImplementedError()
     
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> List[Union[CompositeStock, StockLeader]]:
+    def search_by_symbol(self, symbol: str) -> List[Union[CompositeStock, StockLeader]]:
         raise NotImplementedError()

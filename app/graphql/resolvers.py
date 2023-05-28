@@ -36,7 +36,7 @@ _collection_to_service: Dict[s.Collection, AggregateService] = {
 
 
 async def top_composite_stocks_resolver(limit: int = 200) -> List[s.CompositeStock]:
-    top_comp_stocks = TopCompositeStocksService.get_latest_top_comp_stocks(limit=limit)
+    top_comp_stocks = TopCompositeStocksService().get_latest_top_comp_stocks(limit=limit)
     return [
         serialize_composite_stock(comp_stock)
         for comp_stock in top_comp_stocks[:limit]
@@ -53,7 +53,7 @@ async def reit_leaders_resolver() -> List[s.StockLeader]:
  
 
 async def sector_stocks_resolver(sector: s.Sector) -> List[s.CompositeStock]:
-    sector_stocks = StocksWithSectorService.get_sector_stocks(
+    sector_stocks = StocksWithSectorService().get_sector_stocks(
         sector=Sector(sector.value)
     )
 
@@ -64,7 +64,7 @@ async def sector_stocks_resolver(sector: s.Sector) -> List[s.CompositeStock]:
 
 
 async def stock_historical_data_resolver(stock_symbol: str) -> List[s.CompositeStock]:
-    stock_historical_data = StocksWithSectorService.get_stock_historical_data(
+    stock_historical_data = StocksWithSectorService().get_stock_historical_data(
         stock_symbol=stock_symbol
     )
 
@@ -75,7 +75,7 @@ async def stock_historical_data_resolver(stock_symbol: str) -> List[s.CompositeS
 
 
 async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> List[s.SectorPerformance]:
-    sectors_performance = StocksWithSectorService.get_sectors_performance(
+    sectors_performance = StocksWithSectorService().get_sectors_performance(
         sector=Sector(sector.value) if sector else None
     )
     return [
@@ -186,7 +186,7 @@ async def economic_indicator_time_series_resolver(
 
 
 async def eps_rating_leaders_resolver() -> List[s.CompositeStock]:
-    eps_leaders = StocksWithSectorService.get_eps_rating_leaders()
+    eps_leaders = StocksWithSectorService().get_eps_rating_leaders()
     return [
         serialize_composite_stock(stock)
         for stock in eps_leaders
@@ -194,8 +194,8 @@ async def eps_rating_leaders_resolver() -> List[s.CompositeStock]:
 
 
 async def rs_rating_leaders_resolver() -> List[s.CompositeStock]:
-    eps_leaders = StocksWithSectorService.get_rs_rating_leaders()
+    rs_leaders = StocksWithSectorService().get_rs_rating_leaders()
     return [
         serialize_composite_stock(stock)
-        for stock in eps_leaders
+        for stock in rs_leaders
     ]
