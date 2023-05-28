@@ -67,12 +67,6 @@ class SectorPerformance:
 
 
 @graphql.type
-class LowPricedStock(CompositeStock):
-    year_high: float
-    fifty_two_wk_high: Optional[float] = None
-
-
-@graphql.type
 class TechLeaderStock:
     name: str
     symbol: str
