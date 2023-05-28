@@ -24,13 +24,4 @@ class CompositeStock:
 	acc_dis_rating: AccDisRating = None
 	smr_rating: Optional[SmrRating] = None
 	sector: Optional[Sector] = None
-	industry_group_strength: Optional[str] = None
-	year_high: Optional[Price] = None
 	registered_date: Optional[str] = None
-
-
-@dataclass(frozen=True)
-class StockWithSector(CompositeStock):
-	sector_name: str = None
-	sector_daily_price_change_pct: Percentage = None
-	sector_start_of_year_price_change_pct: Percentage = None
