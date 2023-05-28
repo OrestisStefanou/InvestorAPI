@@ -118,7 +118,7 @@ class StocksWithSectorRepo(SqlRepo):
 		]
 
     @classmethod
-    def get_sectors_historical_performance(
+    def get_sectors_performance(
         cls,
         sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
