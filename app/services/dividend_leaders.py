@@ -8,9 +8,9 @@ from app.domain.date import Date
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.domain.stock_leader import StockLeader
 from app.services.aggregate_service import AggregateService
+from app.services.base_service import BaseService
 
-
-class DividendLeadersService(AggregateService):
+class DividendLeadersService(BaseService, AggregateService):
     @classmethod
     async def scrape_and_store_dividend_leaders_for_date(
         cls,
@@ -30,7 +30,7 @@ class DividendLeadersService(AggregateService):
             raise IbdScrapeError('Failed to scrape dividend_leaders')            
 
         # Store
-        DividendLeadersRepo.add_stock_leaders_for_date(
+        DividendLeadersRepo().add_stock_leaders_for_date(
             date=Date(day, month, year),
             data=dividend_leaders
         )
@@ -54,81 +54,13 @@ class DividendLeadersService(AggregateService):
 
         return dividend_leaders
 
-    @classmethod
-    def _fetch_dividend_leaders_for_date_from_db(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[StockLeader]]:
-        return DividendLeadersRepo.get_stock_leaders_for_date(
-            date=Date(day, month, year)
-        )
+    def get_latest_dividend_leaders(self) -> List[StockLeader]:
+        return DividendLeadersRepo(self._db_session).get_latest_stock_leaders()
 
-    @classmethod
-    def _fetch_dividend_leaders_for_date_from_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[StockLeader]]:
-        """
-        Fetch dividend leaders for given date from Redis
-        """
-        return DividendLeadersRepo.get_stock_leaders_for_date_from_cache(
-            date=Date(day, month, year)
-        )
-
-
-    @classmethod
-    def _store_dividend_leaders_for_date_in_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int,
-        dividend_leaders: List[StockLeader]
-    ) -> None:
-        DividendLeadersRepo.store_stock_leaders_for_date_in_cache(
-            date=Date(day, month, year),
-            data=dividend_leaders
-        )
-
-    @classmethod
-    def get_latest_dividend_leaders(cls) -> List[StockLeader]:
-        return DividendLeadersRepo.get_latest_stock_leaders()
-
-    @classmethod
-    async def get_dividend_leaders_for_date(cls, day: int, month: int, year: int) -> List[StockLeader]:
-        # Check if data exists in cache
-        dividend_leaders = cls._fetch_dividend_leaders_for_date_from_cache(day, month, year)
-        if dividend_leaders:
-            return dividend_leaders
-
-        # If not in cache check database
-        dividend_leaders = cls._fetch_dividend_leaders_for_date_from_db(day, month, year)
-        if dividend_leaders:
-            return dividend_leaders
-
-        # And if not in db as well scrape the data from ibd
-        dividend_leaders = await cls._scrape_dividend_leaders_for_date(day, month, year)
-        if dividend_leaders:
-            # Store in cache to avoid overloading ibd website
-            cls._store_dividend_leaders_for_date_in_cache(
-                day=day,
-                month=month,
-                year=year,
-                dividend_leaders=dividend_leaders
-            )
-            return dividend_leaders
-
-        return []
-
-    @classmethod
-    def get_appereances_count_for_each_symbol(cls, min_count: int = 1, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return DividendLeadersRepo.get_appereances_count_for_each_symbol(
+    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
+        return DividendLeadersRepo(self._db_session).get_appereances_count_for_each_symbol(
             limit=limit
         )
 
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> List[StockLeader]:
-        return DividendLeadersRepo.search_by_symbol(symbol)
+    def search_by_symbol(self, symbol: str) -> List[StockLeader]:
+        return DividendLeadersRepo(self._db_session).search_by_symbol(symbol)

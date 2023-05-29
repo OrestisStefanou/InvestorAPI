@@ -34,9 +34,8 @@ class EconomicIndicatorTimeSeriesRepo(SqlRepo):
             unit=row[2]
         )
     
-    @classmethod
     def add_or_replace_time_series_for_indicator(
-        cls,
+        self,
         indicator: EconomicIndicator,
         time_series: List[EconomicIndicatorTimeSeriesEntry]        
     ):
@@ -44,19 +43,18 @@ class EconomicIndicatorTimeSeriesRepo(SqlRepo):
         Add time series for indicator. This function will overwrite existing
         time series for given indicator if they exist
         """
-        with cls._db_conn as con:
+        with self._db_conn as con:
             con.execute("DELETE FROM economic_indicator_time_series WHERE indicator_name = ?", (indicator.value, ))
             con.executemany(
                 f"INSERT INTO economic_indicator_time_series VALUES(?,?,?,?,?)",
                 [
-                    cls._create_row_tuple_from_model(indicator=indicator.value, time_serie=time_serie)
+                    self._create_row_tuple_from_model(indicator=indicator.value, time_serie=time_serie)
                     for time_serie in time_series
                 ]
             )
 
-    @classmethod
-    def get_indicator_time_series(cls, indicator: EconomicIndicator) -> List[EconomicIndicatorTimeSeriesEntry]:
-        cur = cls._db_conn.cursor()
+    def get_indicator_time_series(self, indicator: EconomicIndicator) -> List[EconomicIndicatorTimeSeriesEntry]:
+        cur = self._db_conn.cursor()
         query = """SELECT
             indicator_name,
             value,
@@ -71,6 +69,6 @@ class EconomicIndicatorTimeSeriesRepo(SqlRepo):
         query_params = (indicator.value, )
         result = cur.execute(query, query_params)
         return [
-            cls._create_model_from_row(row)
+            self._create_model_from_row(row)
             for row in result
         ]
