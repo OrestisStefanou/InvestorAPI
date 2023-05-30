@@ -8,9 +8,10 @@ from app.domain.date import Date
 from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.services.aggregate_service import AggregateService
+from app.services.base_service import BaseService
 
 
-class TechLeadersStocksService(AggregateService):
+class TechLeadersStocksService(BaseService, AggregateService):
     @classmethod
     async def scrape_and_store_tech_leaders_stocks_for_date(
         cls,
@@ -30,7 +31,7 @@ class TechLeadersStocksService(AggregateService):
             raise IbdScrapeError('Failed to scrape tech leaders stocks')            
 
         # Store
-        TechLeadersStocksRepo.add_tech_leaders_stocks_for_date(
+        TechLeadersStocksRepo().add_tech_leaders_stocks_for_date(
             date=Date(day, month, year),
             data=tech_leaders_stocks
         )
@@ -54,81 +55,13 @@ class TechLeadersStocksService(AggregateService):
 
         return tech_leaders_stocks
 
-    @classmethod
-    def _fetch_tech_leaders_stocks_for_date_from_db(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[TechLeaderStock]]:
-        return TechLeadersStocksRepo.get_tech_leaders_stocks_for_date(
-            date=Date(day, month, year)
-        )
+    def get_latest_tech_leaders_stocks(self) -> List[TechLeaderStock]:
+        return TechLeadersStocksRepo(self._db_session).get_latest_tech_leaders_stocks()
 
-    @classmethod
-    def _fetch_tech_leaders_stocks_for_date_from_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[TechLeaderStock]]:
-        """
-        Fetch tech leaders stocks for given date from Redis
-        """
-        return TechLeadersStocksRepo.get_tech_leaders_stocks_for_date_from_cache(
-            date=Date(day, month, year)
-        )
-
-
-    @classmethod
-    def _store_tech_leaders_stocks_for_date_in_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int,
-        tech_leaders_stocks: List[TechLeaderStock]
-    ) -> None:
-        TechLeadersStocksRepo.store_tech_leaders_stocks_for_date_in_cache(
-            date=Date(day, month, year),
-            data=tech_leaders_stocks
-        )
-
-    @classmethod
-    def get_latest_tech_leaders_stocks(cls) -> List[TechLeaderStock]:
-        return TechLeadersStocksRepo.get_latest_tech_leaders_stocks()
-
-    @classmethod
-    async def get_tech_leaders_stocks_for_date(cls, day: int, month: int, year: int) -> List[TechLeaderStock]:
-        # Check if data exists in cache
-        tech_leaders_stocks = cls._fetch_tech_leaders_stocks_for_date_from_cache(day, month, year)
-        if tech_leaders_stocks:
-            return tech_leaders_stocks
-
-        # If not in cache check database
-        tech_leaders_stocks = cls._fetch_tech_leaders_stocks_for_date_from_db(day, month, year)
-        if tech_leaders_stocks:
-            return tech_leaders_stocks
-
-        # And if not in db as well scrape the data from ibd
-        tech_leaders_stocks = await cls._scrape_tech_leaders_stocks_for_date(day, month, year)
-        if tech_leaders_stocks:
-            # Store in cache to avoid overloading ibd website
-            cls._store_tech_leaders_stocks_for_date_in_cache(
-                day=day,
-                month=month,
-                year=year,
-                tech_leaders_stocks=tech_leaders_stocks
-            )
-            return tech_leaders_stocks
-
-        return []
-
-    @classmethod
-    def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return TechLeadersStocksRepo.get_appereances_count_for_each_symbol(
+    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
+        return TechLeadersStocksRepo(self._db_session).get_appereances_count_for_each_symbol(
             limit=limit
         )
 
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> List[TechLeaderStock]:
-        return TechLeadersStocksRepo.search_by_symbol(symbol)
+    def search_by_symbol(self, symbol: str) -> List[TechLeaderStock]:
+        return TechLeadersStocksRepo(self._db_session).search_by_symbol(symbol)

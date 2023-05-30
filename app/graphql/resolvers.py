@@ -92,7 +92,7 @@ async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> Lis
 
 
 async def tech_leaders_stocks_resolver() -> List[s.TechLeaderStock]:
-    tech_leaders_stocks = TechLeadersStocksService.get_latest_tech_leaders_stocks()
+    tech_leaders_stocks = TechLeadersStocksService().get_latest_tech_leaders_stocks()
 
     return [
         serialize_tech_leader_stock(stock)
