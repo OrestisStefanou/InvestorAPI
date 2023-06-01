@@ -25,11 +25,11 @@ from app.graphql.serializers import(
 
 
 _collection_to_service: Dict[s.Collection, AggregateService] = {
-    s.Collection.TopCompositeStocks: TopCompositeStocksService,
-    s.Collection.DividendLeaders: DividendLeadersService,
-    s.Collection.ReitLeaders: ReitLeadersService,
-    s.Collection.UtilityLeaders: UtilityLeadersService,
-    s.Collection.TechLeaders: TechLeadersStocksService,
+    s.Collection.TopCompositeStocks: TopCompositeStocksService(),
+    s.Collection.DividendLeaders: DividendLeadersService(),
+    s.Collection.ReitLeaders: ReitLeadersService(),
+    s.Collection.UtilityLeaders: UtilityLeadersService(),
+    s.Collection.TechLeaders: TechLeadersStocksService(),
     s.Collection.LargeMidCapLeadersIndex: LargeMidCapLeadersIndexService,
     s.Collection.SmallMidCapLeadersIndex: SmallMidCapLeadersIndexService
 }
