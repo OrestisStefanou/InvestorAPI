@@ -1,4 +1,3 @@
-import json
 from typing import Any, Dict, List, Optional, Tuple
 
 from app.domain.stock_leader import StockLeader
@@ -92,7 +91,6 @@ class LeadersIndexRepo(SqlRepo, RedisRepo):
             ORDER BY comp_rating DESC
             """
         ).fetchall()
-        print(result)
         return [
             self._create_model_from_row(row)
             for row in result
