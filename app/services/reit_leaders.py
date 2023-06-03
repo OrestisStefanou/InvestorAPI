@@ -7,10 +7,9 @@ from app.repos.reit_leaders_repo import ReitLeadersRepo
 from app.domain.date import Date
 from app.domain.stock_leader import StockLeader
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
-from app.services.aggregate_service import AggregateService
 from app.services.base_service import BaseService
 
-class ReitLeadersService(BaseService, AggregateService):
+class ReitLeadersService(BaseService):
     @classmethod
     async def scrape_and_store_reit_leaders_for_date(
         cls,
@@ -56,11 +55,3 @@ class ReitLeadersService(BaseService, AggregateService):
 
     def get_latest_reit_leaders(self) -> List[StockLeader]:
         return ReitLeadersRepo(self._db_session).get_latest_stock_leaders()
-
-    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return ReitLeadersRepo(self._db_session).get_appereances_count_for_each_symbol(
-            limit=limit
-        )
-
-    def search_by_symbol(self, symbol: str) -> List[StockLeader]:
-        return ReitLeadersRepo(self._db_session).search_by_symbol(symbol)

@@ -7,10 +7,9 @@ from app.repos.dividend_leaders_repo import DividendLeadersRepo
 from app.domain.date import Date
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.domain.stock_leader import StockLeader
-from app.services.aggregate_service import AggregateService
 from app.services.base_service import BaseService
 
-class DividendLeadersService(BaseService, AggregateService):
+class DividendLeadersService(BaseService):
     @classmethod
     async def scrape_and_store_dividend_leaders_for_date(
         cls,
@@ -56,11 +55,3 @@ class DividendLeadersService(BaseService, AggregateService):
 
     def get_latest_dividend_leaders(self) -> List[StockLeader]:
         return DividendLeadersRepo(self._db_session).get_latest_stock_leaders()
-
-    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return DividendLeadersRepo(self._db_session).get_appereances_count_for_each_symbol(
-            limit=limit
-        )
-
-    def search_by_symbol(self, symbol: str) -> List[StockLeader]:
-        return DividendLeadersRepo(self._db_session).search_by_symbol(symbol)
