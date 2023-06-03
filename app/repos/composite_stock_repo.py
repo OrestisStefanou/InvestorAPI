@@ -8,12 +8,11 @@ from app.domain.price import Price
 from app.domain.percentage import Percentage
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.repos.sql_repo import SqlRepo
-from app.repos.redis_repo import RedisRepo
 from app.domain.composite_stock import CompositeStock
 from app.domain.date import Date
 
 
-class CompositeStockRepo(SqlRepo, RedisRepo):
+class CompositeStockRepo(SqlRepo):
 	# Repos that inherit from this class must override table name
 	_table_name = None
 

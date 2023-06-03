@@ -1,5 +1,4 @@
-import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from app.domain.stock_leader import StockLeader
 from app.domain.price import Price
@@ -7,9 +6,8 @@ from app.domain.percentage import Percentage
 from app.domain.date import Date
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.repos.sql_repo import SqlRepo
-from app.repos.redis_repo import RedisRepo
 
-class StockLeadersRepo(SqlRepo, RedisRepo):
+class StockLeadersRepo(SqlRepo):
     # Repos that inherit from this class must override table name
     _table_name = None
 

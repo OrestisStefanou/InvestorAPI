@@ -9,10 +9,9 @@ from app.domain.percentage import Percentage
 from app.domain.date import Date
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.repos.sql_repo import SqlRepo
-from app.repos.redis_repo import RedisRepo
 
 
-class TechLeadersStocksRepo(SqlRepo, RedisRepo):
+class TechLeadersStocksRepo(SqlRepo):
     """
     Repo for tech_leaders table.
     """
