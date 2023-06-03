@@ -4,4 +4,8 @@ class SqlRepo(object):
     """
     Base class for repos that are top of sql table(s)
     """
-    _db_conn = dependencies.db_conn
+    def __init__(self, db_conn = None) -> None:
+        if db_conn is None:
+            db_conn = dependencies.get_db_conn()
+        
+        self._db_conn = db_conn

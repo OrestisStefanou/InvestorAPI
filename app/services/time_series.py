@@ -8,9 +8,10 @@ from app.domain.time_series import EconomicIndicatorTimeSeriesEntry
 from app.domain.economic_indicator import EconomicIndicator
 from app.repos.world_indices_time_series_repo import WorldIndicesTimeSeriesRepo
 from app.repos.economic_indicators_repo import EconomicIndicatorTimeSeriesRepo
+from app.services.base_service import BaseService
 
 
-class TimeSeriesService:
+class TimeSeriesService(BaseService):
     @classmethod
     async def _scrape_index_time_series(cls, index: WorldIndex) -> List[IndexTimeSeriesEntry]:
         time_series = await IndexTimeSeriesScraper.scrape_index_time_series(index)
@@ -27,7 +28,7 @@ class TimeSeriesService:
     @classmethod
     async def scrape_and_store_index_time_series(cls, index: WorldIndex):
         index_time_series = await cls._scrape_index_time_series(index)
-        WorldIndicesTimeSeriesRepo.add_or_replace_time_series_for_index(
+        WorldIndicesTimeSeriesRepo().add_or_replace_time_series_for_index(
             index=index,
             time_series=index_time_series
         )
@@ -35,17 +36,15 @@ class TimeSeriesService:
     @classmethod
     async def scrape_and_store_economic_indicator_time_series(cls, indicator: EconomicIndicator):
         indicator_time_series = await cls._scrape_economic_indicator_time_series(indicator)
-        EconomicIndicatorTimeSeriesRepo.add_or_replace_time_series_for_indicator(
+        EconomicIndicatorTimeSeriesRepo().add_or_replace_time_series_for_indicator(
             indicator=indicator,
             time_series=indicator_time_series
         )
 
-    @classmethod
-    def get_index_time_series(cls, index: WorldIndex) -> List[IndexTimeSeriesEntry]:
-        return WorldIndicesTimeSeriesRepo.get_index_time_series(
+    def get_index_time_series(self, index: WorldIndex) -> List[IndexTimeSeriesEntry]:
+        return WorldIndicesTimeSeriesRepo(self._db_session).get_index_time_series(
             index=index
         )
 
-    @classmethod
-    def get_economic_indicator_time_series(cls, indicator: EconomicIndicator) -> List[EconomicIndicatorTimeSeriesEntry]:
-        return EconomicIndicatorTimeSeriesRepo.get_indicator_time_series(indicator)
+    def get_economic_indicator_time_series(self, indicator: EconomicIndicator) -> List[EconomicIndicatorTimeSeriesEntry]:
+        return EconomicIndicatorTimeSeriesRepo(self._db_session).get_indicator_time_series(indicator)

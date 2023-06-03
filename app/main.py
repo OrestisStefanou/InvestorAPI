@@ -11,4 +11,4 @@ app.include_router(graphql_app, prefix="/graphql")
 
 @app.on_event("shutdown")
 def shutdown_event():
-    dependencies.db_conn.close()
+    dependencies.close_db_conn()

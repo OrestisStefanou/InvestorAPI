@@ -1,5 +1,4 @@
-import json
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
 from app.domain.comp_rating import CompRating
 from app.domain.tech_leader_stock import TechLeaderStock
@@ -51,61 +50,23 @@ class TechLeadersStocksRepo(SqlRepo, RedisRepo):
             return_on_equity=row[10],
             registered_date=row[11]
         )
-
-    @classmethod
-    def _serialize_composite_stock(cls, tech_leader_stock: TechLeaderStock) -> Dict[str, Any]:
-        return {
-            "name": tech_leader_stock.name,
-            "symbol": tech_leader_stock.symbol,
-            "eps_rating": tech_leader_stock.eps_rating.rating,
-            "rs_rating": tech_leader_stock.rs_rating.rating,
-            "price": tech_leader_stock.price.value,
-            "comp_rating": tech_leader_stock.comp_rating.rating,
-            "annual_eps_change_pct": tech_leader_stock.annual_eps_change_pct.value,
-            "last_qtr_eps_change_pct": tech_leader_stock.last_qtr_eps_change_pct.value,
-            "next_qtr_eps_change_pct": tech_leader_stock.next_qtr_eps_change_pct.value,
-            "last_qtr_sales_change_pct": tech_leader_stock.last_qtr_sales_change_pct.value,
-            "return_on_equity": tech_leader_stock.return_on_equity
-        }
-
-    @classmethod
-    def _deserialize_document(cls, document: Dict[str, Any]) -> TechLeaderStock:
-        return TechLeaderStock(
-            comp_rating=CompRating(document.get('comp_rating')),
-            eps_rating=EpsRating(document.get('eps_rating')),
-            rs_rating=RsRating(document.get('rs_rating')),
-            name=document.get('name'),
-            symbol=document.get('symbol'),
-            price=Price(document.get('price')),
-            annual_eps_change_pct=Percentage(document.get('annual_eps_change_pct')),
-            last_qtr_eps_change_pct=Percentage(document.get('last_qtr_eps_change_pct')),
-            next_qtr_eps_change_pct=Percentage(document.get('next_qtr_eps_change_pct')),
-            last_qtr_sales_change_pct=Percentage(document.get('last_qtr_sales_change_pct')),
-            return_on_equity=document.get('return_on_equity')
-        )
-
-    @classmethod
-    def _create_redis_key(cls, date: Date):
-        return f'tech_leaders_stocks_{date.date_string}'
     
-    @classmethod
     def add_tech_leaders_stocks_for_date(
-        cls,
+        self,
         date: Date,
         data: List[TechLeaderStock]
     ) -> None:
-        with cls._db_conn as con:
+        with self._db_conn as con:
             con.executemany(
                 f"INSERT INTO tech_leaders VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                [cls._create_row_tuple_from_model(tech_leader, date) for tech_leader in data]
+                [self._create_row_tuple_from_model(tech_leader, date) for tech_leader in data]
             )
 
-    @classmethod
     def get_tech_leaders_stocks_for_date(
-        cls,
+        self,
         date: Date
     ) -> Optional[List[TechLeaderStock]]:
-        cur = cls._db_conn.cursor()
+        cur = self._db_conn.cursor()
         query = """SELECT 
                     comp_rating,
                     eps_rating,
@@ -124,15 +85,14 @@ class TechLeadersStocksRepo(SqlRepo, RedisRepo):
         query_params = (date.date_string, )
         result = cur.execute(query, query_params)
         return [
-            cls._create_model_from_row(row)
+            self._create_model_from_row(row)
             for row in result
         ]
 
-    @classmethod
     def get_latest_tech_leaders_stocks(
-        cls
+        self
     ) -> Optional[List[TechLeaderStock]]:
-        cur = cls._db_conn.cursor()
+        cur = self._db_conn.cursor()
         query = """SELECT 
                     comp_rating,
                     eps_rating,
@@ -156,16 +116,15 @@ class TechLeadersStocksRepo(SqlRepo, RedisRepo):
 	    	    ORDER BY comp_rating DESC"""
         result = cur.execute(query)
         return [
-            cls._create_model_from_row(row)
+            self._create_model_from_row(row)
             for row in result
         ]
 
-    @classmethod
     def get_appereances_count_for_each_symbol(
-        cls,
+        self,
         limit: Optional[int] = 100
     ) -> List[SymbolAppearancesCount]:
-        cur = cls._db_conn.cursor()
+        cur = self._db_conn.cursor()
         query = """SELECT 
                     stock_symbol,
                     stock_name,
@@ -186,9 +145,8 @@ class TechLeadersStocksRepo(SqlRepo, RedisRepo):
             for row in result
         ]
 
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> Optional[List[TechLeaderStock]]:
-        cur = cls._db_conn.cursor()
+    def search_by_symbol(self, symbol: str) -> Optional[List[TechLeaderStock]]:
+        cur = self._db_conn.cursor()
         query =	f"""SELECT 
                 comp_rating,
                 eps_rating,
@@ -209,32 +167,6 @@ class TechLeadersStocksRepo(SqlRepo, RedisRepo):
         query_params = (symbol, )
         result = cur.execute(query, query_params)
         return [
-            cls._create_model_from_row(row)
+            self._create_model_from_row(row)
             for row in result
-        ]
-
-    @classmethod
-    def store_tech_leaders_stocks_for_date_in_cache(
-        cls,
-        date: Date,
-        data: List[TechLeaderStock]
-    ) -> None:
-        key = cls._create_redis_key(date)
-        serialized_data = [cls._serialize_composite_stock(stock) for stock in data]
-        cls._set_key_value(key, json.dumps(serialized_data))
-
-    @classmethod
-    def get_tech_leaders_stocks_for_date_from_cache(
-        cls,
-        date: Date
-    ) -> Optional[List[TechLeaderStock]]:
-        key = cls._create_redis_key(date)
-        json_data = cls._get_value_by_key(key)
-
-        if json_data is None:
-            return None
-
-        return [
-            cls._deserialize_document(stock)
-            for stock in json.loads(json_data)
         ]

@@ -71,58 +71,8 @@ class LeadersIndexService(AggregateService):
         )
 
     @classmethod
-    def _fetch_leaders_index_for_date_from_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[StockLeader]]:
-        return cls._repo.get_stock_leaders_for_date_from_cache(
-            date=Date(day, month, year)
-        )
-
-    @classmethod
-    def _store_leaders_index_for_date_in_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int,
-        leaders_index: List[StockLeader]
-    ) -> None:
-        cls._repo.store_stock_leaders_for_date_in_cache(
-            date=Date(day, month, year),
-            data=leaders_index
-        )
-
-    @classmethod
     def get_latest_leaders_index(cls) -> List[StockLeader]:
         return  cls._repo.get_latest_stock_leaders()
-
-    @classmethod
-    async def get_leaders_index_for_date(cls, day: int, month: int, year: int) -> List[StockLeader]:
-        # Check if data exists in cache
-        leaders_index = cls._fetch_leaders_index_for_date_from_cache(day, month, year)
-        if leaders_index:
-            return leaders_index
-
-        # If not in cache check database
-        leaders_index = cls._fetch_leaders_index_for_date_from_db(day, month, year)
-        if leaders_index:
-            return leaders_index
-
-        # And if not in db as well scrape the data from ibd
-        leaders_index = await cls._scrape_leaders_index_for_date(day, month, year)
-        if leaders_index:
-            # Store in cache to avoid overloading ibd website
-            cls._store_leaders_index_for_date_in_cache(
-                day=day,
-                month=month,
-                year=year,
-                leaders_index=leaders_index
-            )
-            return leaders_index
-
-        return []
 
     @classmethod
     def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
@@ -136,10 +86,10 @@ class LeadersIndexService(AggregateService):
 
 
 class SmallMidCapLeadersIndexService(LeadersIndexService):
-    _repo: LeadersIndexRepo = SmallMidCapLeadersIndexRepo
+    _repo: LeadersIndexRepo = SmallMidCapLeadersIndexRepo()
     _scrape_function = LeadersIndexScraper.scrape_small_mid_cap_leaders_index
 
 
 class LargeMidCapLeadersIndexService(LeadersIndexService):
-    _repo: LeadersIndexRepo = LargeMidCapLeadersIndexRepo
+    _repo: LeadersIndexRepo = LargeMidCapLeadersIndexRepo()
     _scrape_function = LeadersIndexScraper.scrape_large_mid_cap_leaders_index

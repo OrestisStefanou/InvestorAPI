@@ -61,32 +61,29 @@ class StocksWithSectorRepo(SqlRepo):
             registered_date=row[11],
         )
 
-
-    @classmethod
     def add_stocks_with_sector_for_date(
-        cls,
+        self,
         date: Date,
         stocks: List[List[CompositeStock]],
         sectors: List[SectorPerformance]
     ):
-        with cls._db_conn as con:
+        with self._db_conn as con:
             for i in range(len(sectors)):
                 sector = sectors[i]
                 sector_stocks = stocks[i]
                 con.executemany(
                     f"INSERT INTO stocks_with_sector VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     [
-                        cls._create_row_tuple_from_model(stock, sector, date)
+                        self._create_row_tuple_from_model(stock, sector, date)
                         for stock in sector_stocks
                     ]
                 )
 
-    @classmethod
     def get_sector_stocks(
-        cls,
+        self,
         sector: Sector
     ) -> Optional[List[CompositeStock]]:
-        cur = cls._db_conn.cursor()
+        cur = self._db_conn.cursor()
         query = """SELECT 
 				comp_rating,
 				eps_rating,
@@ -113,16 +110,15 @@ class StocksWithSectorRepo(SqlRepo):
     
         result = cur.execute(query,query_params).fetchall()
         return [
-			cls._create_model_from_row(row)
+			self._create_model_from_row(row)
 			for row in result
 		]
 
-    @classmethod
     def get_sectors_performance(
-        cls,
+        self,
         sector: Optional[Sector] = None
     ) -> List[SectorPerformance]:
-        cur = cls._db_conn.cursor()
+        cur = self._db_conn.cursor()
         query = """SELECT 
                     DISTINCT sector_name,
                     sector_daily_price_change_pct,
@@ -151,12 +147,11 @@ class StocksWithSectorRepo(SqlRepo):
             for row in result
         ]
 
-    @classmethod
     def get_stock_historical_data(
-        cls,
+        self,
         stock_symbol: str
     ) -> Optional[List[CompositeStock]]:
-        cur = cls._db_conn.cursor()
+        cur = self._db_conn.cursor()
         query = """SELECT 
 				comp_rating,
 				eps_rating,
@@ -178,13 +173,12 @@ class StocksWithSectorRepo(SqlRepo):
     
         result = cur.execute(query,query_params).fetchall()
         return [
-			cls._create_model_from_row(row)
+			self._create_model_from_row(row)
 			for row in result
 		]
 
-    @classmethod
-    def get_eps_rating_leaders(cls) -> List[CompositeStock]:
-        cur = cls._db_conn.cursor()
+    def get_eps_rating_leaders(self) -> List[CompositeStock]:
+        cur = self._db_conn.cursor()
         query = """SELECT 
 				comp_rating,
 				eps_rating,
@@ -210,13 +204,12 @@ class StocksWithSectorRepo(SqlRepo):
             
         result = cur.execute(query).fetchall()
         return [
-			cls._create_model_from_row(row)
+			self._create_model_from_row(row)
 			for row in result
 		]
 
-    @classmethod
-    def get_rs_rating_leaders(cls) -> List[CompositeStock]:
-        cur = cls._db_conn.cursor()
+    def get_rs_rating_leaders(self) -> List[CompositeStock]:
+        cur = self._db_conn.cursor()
         query = """SELECT 
 				comp_rating,
 				eps_rating,
@@ -242,6 +235,6 @@ class StocksWithSectorRepo(SqlRepo):
             
         result = cur.execute(query).fetchall()
         return [
-			cls._create_model_from_row(row)
+			self._create_model_from_row(row)
 			for row in result
 		]

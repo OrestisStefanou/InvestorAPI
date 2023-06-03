@@ -40,25 +40,23 @@ class WorldIndicesTimeSeriesRepo(SqlRepo):
             volume=float(row[5])
         )
     
-    @classmethod
-    def add_or_replace_time_series_for_index(cls, index: WorldIndex, time_series: List[IndexTimeSeriesEntry]):
+    def add_or_replace_time_series_for_index(self, index: WorldIndex, time_series: List[IndexTimeSeriesEntry]):
         """
         Add time series for index. This function will overwrite existing
         time series for given index if they exist
         """
-        with cls._db_conn as con:
+        with self._db_conn as con:
             con.execute("DELETE FROM world_indices_time_series WHERE index_name = ?", (index.value, ))
             con.executemany(
                 f"INSERT INTO world_indices_time_series VALUES(?,?,?,?,?,?,?,?)",
                 [
-                    cls._create_row_tuple_from_model(index_name=index.value, time_serie=time_serie)
+                    self._create_row_tuple_from_model(index_name=index.value, time_serie=time_serie)
                     for time_serie in time_series
                 ]
             )
 
-    @classmethod
-    def get_index_time_series(cls, index: WorldIndex) -> List[IndexTimeSeriesEntry]:
-        cur = cls._db_conn.cursor()
+    def get_index_time_series(self, index: WorldIndex) -> List[IndexTimeSeriesEntry]:
+        cur = self._db_conn.cursor()
         query = """SELECT
             index_name,
             open_price,
@@ -76,6 +74,6 @@ class WorldIndicesTimeSeriesRepo(SqlRepo):
         query_params = (index.value, )
         result = cur.execute(query, query_params)
         return [
-            cls._create_model_from_row(row)
+            self._create_model_from_row(row)
             for row in result
         ]

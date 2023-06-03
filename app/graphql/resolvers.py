@@ -25,18 +25,18 @@ from app.graphql.serializers import(
 
 
 _collection_to_service: Dict[s.Collection, AggregateService] = {
-    s.Collection.TopCompositeStocks: TopCompositeStocksService,
-    s.Collection.DividendLeaders: DividendLeadersService,
-    s.Collection.ReitLeaders: ReitLeadersService,
-    s.Collection.UtilityLeaders: UtilityLeadersService,
-    s.Collection.TechLeaders: TechLeadersStocksService,
+    s.Collection.TopCompositeStocks: TopCompositeStocksService(),
+    s.Collection.DividendLeaders: DividendLeadersService(),
+    s.Collection.ReitLeaders: ReitLeadersService(),
+    s.Collection.UtilityLeaders: UtilityLeadersService(),
+    s.Collection.TechLeaders: TechLeadersStocksService(),
     s.Collection.LargeMidCapLeadersIndex: LargeMidCapLeadersIndexService,
     s.Collection.SmallMidCapLeadersIndex: SmallMidCapLeadersIndexService
 }
 
 
 async def top_composite_stocks_resolver(limit: int = 200) -> List[s.CompositeStock]:
-    top_comp_stocks = TopCompositeStocksService.get_latest_top_comp_stocks(limit=limit)
+    top_comp_stocks = TopCompositeStocksService().get_latest_top_comp_stocks(limit=limit)
     return [
         serialize_composite_stock(comp_stock)
         for comp_stock in top_comp_stocks[:limit]
@@ -44,7 +44,7 @@ async def top_composite_stocks_resolver(limit: int = 200) -> List[s.CompositeSto
 
 
 async def reit_leaders_resolver() -> List[s.StockLeader]:
-    reit_leaders = ReitLeadersService.get_latest_reit_leaders()
+    reit_leaders = ReitLeadersService().get_latest_reit_leaders()
 
     return [
         serialize_stock_leader(reit_leader)
@@ -53,7 +53,7 @@ async def reit_leaders_resolver() -> List[s.StockLeader]:
  
 
 async def sector_stocks_resolver(sector: s.Sector) -> List[s.CompositeStock]:
-    sector_stocks = StocksWithSectorService.get_sector_stocks(
+    sector_stocks = StocksWithSectorService().get_sector_stocks(
         sector=Sector(sector.value)
     )
 
@@ -64,7 +64,7 @@ async def sector_stocks_resolver(sector: s.Sector) -> List[s.CompositeStock]:
 
 
 async def stock_historical_data_resolver(stock_symbol: str) -> List[s.CompositeStock]:
-    stock_historical_data = StocksWithSectorService.get_stock_historical_data(
+    stock_historical_data = StocksWithSectorService().get_stock_historical_data(
         stock_symbol=stock_symbol
     )
 
@@ -75,7 +75,7 @@ async def stock_historical_data_resolver(stock_symbol: str) -> List[s.CompositeS
 
 
 async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> List[s.SectorPerformance]:
-    sectors_performance = StocksWithSectorService.get_sectors_performance(
+    sectors_performance = StocksWithSectorService().get_sectors_performance(
         sector=Sector(sector.value) if sector else None
     )
     return [
@@ -92,7 +92,7 @@ async def sectors_performance_resolver(sector: Optional[s.Sector] = None) -> Lis
 
 
 async def tech_leaders_stocks_resolver() -> List[s.TechLeaderStock]:
-    tech_leaders_stocks = TechLeadersStocksService.get_latest_tech_leaders_stocks()
+    tech_leaders_stocks = TechLeadersStocksService().get_latest_tech_leaders_stocks()
 
     return [
         serialize_tech_leader_stock(stock)
@@ -101,7 +101,7 @@ async def tech_leaders_stocks_resolver() -> List[s.TechLeaderStock]:
 
 
 async def dividend_leaders_resolver() -> List[s.StockLeader]:
-    dividend_leaders = DividendLeadersService.get_latest_dividend_leaders()
+    dividend_leaders = DividendLeadersService().get_latest_dividend_leaders()
 
     return [
         serialize_stock_leader(dividend_leader)
@@ -110,7 +110,7 @@ async def dividend_leaders_resolver() -> List[s.StockLeader]:
 
 
 async def utility_leaders_resolver() -> List[s.StockLeader]:
-    utility_leaders = UtilityLeadersService.get_latest_utility_leaders()
+    utility_leaders = UtilityLeadersService().get_latest_utility_leaders()
 
     return [
         serialize_stock_leader(utility_leader)
@@ -155,7 +155,7 @@ async def appereances_count_per_stock_in_collection_resolver(
 async def index_time_series_resolver(
     index: s.WorldIndex
 ) -> s.IndexTimeSeries:
-    index_time_series = TimeSeriesService.get_index_time_series(
+    index_time_series = TimeSeriesService().get_index_time_series(
         index=WorldIndex(index.value)
     )
 
@@ -171,7 +171,7 @@ async def index_time_series_resolver(
 async def economic_indicator_time_series_resolver(
     indicator: s.EconomicIndicator
 ) -> s.EconomicIndicatorTimeSeries:
-    indicator_time_series = TimeSeriesService.get_economic_indicator_time_series(
+    indicator_time_series = TimeSeriesService().get_economic_indicator_time_series(
         indicator=EconomicIndicator(indicator.value)
     )
     
@@ -186,7 +186,7 @@ async def economic_indicator_time_series_resolver(
 
 
 async def eps_rating_leaders_resolver() -> List[s.CompositeStock]:
-    eps_leaders = StocksWithSectorService.get_eps_rating_leaders()
+    eps_leaders = StocksWithSectorService().get_eps_rating_leaders()
     return [
         serialize_composite_stock(stock)
         for stock in eps_leaders
@@ -194,8 +194,8 @@ async def eps_rating_leaders_resolver() -> List[s.CompositeStock]:
 
 
 async def rs_rating_leaders_resolver() -> List[s.CompositeStock]:
-    eps_leaders = StocksWithSectorService.get_rs_rating_leaders()
+    rs_leaders = StocksWithSectorService().get_rs_rating_leaders()
     return [
         serialize_composite_stock(stock)
-        for stock in eps_leaders
+        for stock in rs_leaders
     ]

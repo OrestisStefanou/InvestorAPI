@@ -8,9 +8,9 @@ from app.domain.date import Date
 from app.domain.stock_leader import StockLeader
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.services.aggregate_service import AggregateService
+from app.services.base_service import BaseService
 
-
-class ReitLeadersService(AggregateService):
+class ReitLeadersService(BaseService, AggregateService):
     @classmethod
     async def scrape_and_store_reit_leaders_for_date(
         cls,
@@ -30,7 +30,7 @@ class ReitLeadersService(AggregateService):
             raise IbdScrapeError('Failed to scrape reit_leader')            
 
         # Store
-        ReitLeadersRepo.add_stock_leaders_for_date(
+        ReitLeadersRepo().add_stock_leaders_for_date(
             date=Date(day, month, year),
             data=reit_leaders
         )
@@ -54,81 +54,13 @@ class ReitLeadersService(AggregateService):
 
         return reit_leaders
 
-    @classmethod
-    def _fetch_reit_leaders_for_date_from_db(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[StockLeader]]:
-        return ReitLeadersRepo.get_stock_leaders_for_date(
-            date=Date(day, month, year)
-        )
+    def get_latest_reit_leaders(self) -> List[StockLeader]:
+        return ReitLeadersRepo(self._db_session).get_latest_stock_leaders()
 
-    @classmethod
-    def _fetch_reit_leaders_for_date_from_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int
-    ) -> Optional[List[StockLeader]]:
-        """
-        Fetch reit leaders for given date from Redis
-        """
-        return ReitLeadersRepo.get_stock_leaders_for_date_from_cache(
-            date=Date(day, month, year)
-        )
-
-
-    @classmethod
-    def _store_reit_leaders_for_date_in_cache(
-        cls,
-        day: int,
-        month: int,
-        year: int,
-        reit_leaders: List[StockLeader]
-    ) -> None:
-        ReitLeadersRepo.store_stock_leaders_for_date_in_cache(
-            date=Date(day, month, year),
-            data=reit_leaders
-        )
-
-    @classmethod
-    def get_latest_reit_leaders(cls) -> List[StockLeader]:
-        return ReitLeadersRepo.get_latest_stock_leaders()
-
-    @classmethod
-    async def get_reit_leaders_for_date(cls, day: int, month: int, year: int) -> List[StockLeader]:
-        # Check if data exists in cache
-        reit_leaders = cls._fetch_reit_leaders_for_date_from_cache(day, month, year)
-        if reit_leaders:
-            return reit_leaders
-
-        # If not in cache check database
-        reit_leaders = cls._fetch_reit_leaders_for_date_from_db(day, month, year)
-        if reit_leaders:
-            return reit_leaders
-
-        # And if not in db as well scrape the data from ibd
-        reit_leaders = await cls._scrape_reit_leaders_for_date(day, month, year)
-        if reit_leaders:
-            # Store in cache to avoid overloading ibd website
-            cls._store_reit_leaders_for_date_in_cache(
-                day=day,
-                month=month,
-                year=year,
-                reit_leaders=reit_leaders
-            )
-            return reit_leaders
-
-        return []
-
-    @classmethod
-    def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return ReitLeadersRepo.get_appereances_count_for_each_symbol(
+    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
+        return ReitLeadersRepo(self._db_session).get_appereances_count_for_each_symbol(
             limit=limit
         )
 
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> List[StockLeader]:
-        return ReitLeadersRepo.search_by_symbol(symbol)
+    def search_by_symbol(self, symbol: str) -> List[StockLeader]:
+        return ReitLeadersRepo(self._db_session).search_by_symbol(symbol)
