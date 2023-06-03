@@ -1,14 +1,6 @@
 import sqlite3
 
-import redis
-
 from app import settings
-
-redis_client = redis.Redis(
-	host=settings.redis_host,
-	port=settings.redis_port,
-	password=settings.redis_password
-)
 
 DB_CONN = sqlite3.connect(settings.db_path)
 
