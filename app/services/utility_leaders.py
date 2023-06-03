@@ -7,11 +7,10 @@ from app.repos.utility_leaders_repo import UtilityLeadersRepo
 from app.domain.date import Date
 from app.domain.stock_leader import StockLeader
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
-from app.services.aggregate_service import AggregateService
 from app.services.base_service import BaseService
 
 
-class UtilityLeadersService(BaseService, AggregateService):
+class UtilityLeadersService(BaseService):
     @classmethod
     async def scrape_and_store_utility_leaders_for_date(
         cls,
@@ -57,11 +56,3 @@ class UtilityLeadersService(BaseService, AggregateService):
 
     def get_latest_utility_leaders(self) -> List[StockLeader]:
         return UtilityLeadersRepo(self._db_session).get_latest_stock_leaders()
-
-    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return UtilityLeadersRepo(self._db_session).get_appereances_count_for_each_symbol(
-            limit=limit
-        )
-
-    def search_by_symbol(self, symbol: str) -> List[StockLeader]:
-        return UtilityLeadersRepo(self._db_session).search_by_symbol(symbol)

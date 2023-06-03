@@ -10,7 +10,6 @@ from app.services.dividend_leaders import DividendLeadersService
 from app.services.reit_leaders import ReitLeadersService
 from app.services.utility_leaders import UtilityLeadersService
 from app.services.leaders_index import SmallMidCapLeadersIndexService, LargeMidCapLeadersIndexService
-from app.services.aggregate_service import AggregateService
 from app.services.time_series import TimeSeriesService
 import app.graphql.schema as s
 from app.graphql.serializers import(
@@ -22,17 +21,6 @@ from app.graphql.serializers import(
     serialize_index_time_series_entry,
     serialize_economic_indicator_time_series_entry
 )
-
-
-_collection_to_service: Dict[s.Collection, AggregateService] = {
-    s.Collection.TopCompositeStocks: TopCompositeStocksService(),
-    s.Collection.DividendLeaders: DividendLeadersService(),
-    s.Collection.ReitLeaders: ReitLeadersService(),
-    s.Collection.UtilityLeaders: UtilityLeadersService(),
-    s.Collection.TechLeaders: TechLeadersStocksService(),
-    s.Collection.LargeMidCapLeadersIndex: LargeMidCapLeadersIndexService,
-    s.Collection.SmallMidCapLeadersIndex: SmallMidCapLeadersIndexService
-}
 
 
 async def top_composite_stocks_resolver(limit: int = 200) -> List[s.CompositeStock]:
@@ -133,22 +121,6 @@ async def large_mid_cap_leaders_index_resolver() -> List[s.LeadersIndexStock]:
     return [
         serialize_leaders_index_stock(stock)
         for stock in large_mid_cap_leaders_index
-    ]
-
-
-async def appereances_count_per_stock_in_collection_resolver(
-    collection: s.Collection,
-    limit: int = 100
-) -> List[s.StockAppereancesCount]:    
-    service = _collection_to_service.get(collection)
-    
-    appereances_count = service.get_appereances_count_for_each_symbol(
-        limit=limit,
-    )
-
-    return [
-        serialize_stock_appearances_count(appearance)
-        for appearance in appereances_count
     ]
 
 

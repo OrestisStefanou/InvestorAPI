@@ -7,11 +7,10 @@ from app.repos.tech_leaders_stocks_repo import TechLeadersStocksRepo
 from app.domain.date import Date
 from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
-from app.services.aggregate_service import AggregateService
 from app.services.base_service import BaseService
 
 
-class TechLeadersStocksService(BaseService, AggregateService):
+class TechLeadersStocksService(BaseService):
     @classmethod
     async def scrape_and_store_tech_leaders_stocks_for_date(
         cls,
@@ -57,11 +56,3 @@ class TechLeadersStocksService(BaseService, AggregateService):
 
     def get_latest_tech_leaders_stocks(self) -> List[TechLeaderStock]:
         return TechLeadersStocksRepo(self._db_session).get_latest_tech_leaders_stocks()
-
-    def get_appereances_count_for_each_symbol(self, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return TechLeadersStocksRepo(self._db_session).get_appereances_count_for_each_symbol(
-            limit=limit
-        )
-
-    def search_by_symbol(self, symbol: str) -> List[TechLeaderStock]:
-        return TechLeadersStocksRepo(self._db_session).search_by_symbol(symbol)

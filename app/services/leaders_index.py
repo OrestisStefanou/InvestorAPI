@@ -9,9 +9,9 @@ from app.repos.small_mid_cap_leaders_index_repo import SmallMidCapLeadersIndexRe
 from app.domain.date import Date
 from app.domain.stock_leader import StockLeader
 from app.domain.symbol_appearances_count import SymbolAppearancesCount
-from app.services.aggregate_service import AggregateService
 
-class LeadersIndexService(AggregateService):
+
+class LeadersIndexService:
 
     _repo: LeadersIndexRepo = None
     _scrape_function = None
@@ -73,16 +73,6 @@ class LeadersIndexService(AggregateService):
     @classmethod
     def get_latest_leaders_index(cls) -> List[StockLeader]:
         return  cls._repo.get_latest_stock_leaders()
-
-    @classmethod
-    def get_appereances_count_for_each_symbol(cls, limit: int = 100) -> List[SymbolAppearancesCount]:
-        return cls._repo.get_appereances_count_for_each_symbol(
-            limit=limit
-        )
-
-    @classmethod
-    def search_by_symbol(cls, symbol: str) -> List[StockLeader]:
-        return cls._repo.search_by_symbol(symbol)
 
 
 class SmallMidCapLeadersIndexService(LeadersIndexService):
