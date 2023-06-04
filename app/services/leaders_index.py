@@ -8,7 +8,6 @@ from app.repos.large_mid_cap_leaders_index_repo import LargeMidCapLeadersIndexRe
 from app.repos.small_mid_cap_leaders_index_repo import SmallMidCapLeadersIndexRepo
 from app.domain.date import Date
 from app.domain.stock_leader import StockLeader
-from app.domain.symbol_appearances_count import SymbolAppearancesCount
 
 
 class LeadersIndexService:

@@ -5,7 +5,6 @@ from app.errors.ibd import IbdScrapeError
 from app.services.ibd_scrapers.stock_leaders import StockLeadersScraper
 from app.repos.dividend_leaders_repo import DividendLeadersRepo
 from app.domain.date import Date
-from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.domain.stock_leader import StockLeader
 from app.services.base_service import BaseService
 

@@ -15,3 +15,11 @@ def get_db_conn() -> sqlite3.Connection:
 def close_db_conn():
 	global DB_CONN
 	DB_CONN.close()
+
+
+async def create_db_conn():
+    db = sqlite3.connect(settings.db_path)
+    try:
+        yield db
+    finally:
+        db.close()
