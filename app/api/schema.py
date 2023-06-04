@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 import pydantic
 
@@ -49,6 +49,17 @@ class CollectionStock(pydantic.BaseModel):
     name: str
 
 
-class DividendLeader(CollectionStock):
+class StockLeader(CollectionStock):
     yield_pct: float
     dividend_growth_pct: float
+
+
+class TechLeader(CollectionStock):
+    comp_rating: int
+    eps_rating: int
+    rs_rating: int
+    annual_eps_change_pct: Optional[float] = None
+    last_qtr_eps_change_pct: Optional[float] = None
+    next_qtr_eps_change_pct: Optional[float] = None
+    last_qtr_sales_change_pct: Optional[float] = None
+    return_on_equity: Optional[str] = None

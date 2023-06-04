@@ -2,6 +2,7 @@ from app.api import schema
 from app.domain.time_series import EconomicIndicatorTimeSeriesEntry
 from app.domain.time_series import IndexTimeSeriesEntry
 from app.domain.stock_leader import StockLeader
+from app.domain.tech_leader_stock import TechLeaderStock
 
 
 def serialize_economic_indicator_time_series_entry(
@@ -26,10 +27,25 @@ def serialize_index_time_series_entry(time_series_entry: IndexTimeSeriesEntry) -
     )
 
 
-def serialize_dividend_leaders(dividend_leader: StockLeader) -> schema.DividendLeader:
-    return schema.DividendLeader(
-        symbol=dividend_leader.symbol,
-        name=dividend_leader.name,
-        yield_pct=dividend_leader.yield_pct.value,
-        dividend_growth_pct=dividend_leader.dividend_growth_pct.value
+def serialize_stock_leader(stock_leader: StockLeader) -> schema.StockLeader:
+    return schema.StockLeader(
+        symbol=stock_leader.symbol,
+        name=stock_leader.name,
+        yield_pct=stock_leader.yield_pct.value,
+        dividend_growth_pct=stock_leader.dividend_growth_pct.value
+    )
+
+
+def serialize_tech_leader(tech_leader: TechLeaderStock) -> schema.TechLeader:
+    return schema.TechLeader(
+        symbol=tech_leader.symbol,
+        name=tech_leader.name,
+        comp_rating=tech_leader.comp_rating.rating,
+        eps_rating=tech_leader.eps_rating.rating,
+        rs_rating=tech_leader.rs_rating.rating,
+        annual_eps_change_pct=tech_leader.annual_eps_change_pct.value,
+        last_qtr_eps_change_pct=tech_leader.last_qtr_eps_change_pct.value,
+        next_qtr_eps_change_pct=tech_leader.next_qtr_eps_change_pct.value,
+        last_qtr_sales_change_pct=tech_leader.last_qtr_sales_change_pct.value,
+        return_on_equity=tech_leader.return_on_equity
     )

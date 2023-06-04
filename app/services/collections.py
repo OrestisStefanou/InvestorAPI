@@ -33,3 +33,9 @@ class CollectionsService(BaseService):
 
     def get_price_rs_rating_leaders(self) -> List[CompositeStock]:
         return StocksWithSectorRepo(self._db_session).get_rs_rating_leaders()
+
+    def get_stocks_under_heavy_buying(self) -> List[CompositeStock]:
+        return StocksWithSectorRepo(self._db_session).get_stocks_under_heavy_buying()
+
+    def get_stocks_under_heavy_selling(self) -> List[CompositeStock]:
+        return StocksWithSectorRepo(self._db_session).get_stocks_under_heavy_selling()
