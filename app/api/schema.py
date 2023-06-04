@@ -42,3 +42,13 @@ class IndexTimeSeriesEntry(pydantic.BaseModel):
 class IndexTimeSeries(pydantic.BaseModel):
     index: WorldIndex
     time_series: List[IndexTimeSeriesEntry]
+
+
+class CollectionStock(pydantic.BaseModel):
+    symbol: str
+    name: str
+
+
+class DividendLeader(CollectionStock):
+    yield_pct: float
+    dividend_growth_pct: float
