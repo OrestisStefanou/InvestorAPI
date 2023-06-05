@@ -54,7 +54,7 @@ def serialize_tech_leader(tech_leader: TechLeaderStock) -> schema.TechLeader:
 
 def serialize_stock(stock: CompositeStock) -> schema.Stock:
     return schema.Stock(
-        comp_rating=stock.comp_rating.rating,
+        overall_rating=stock.comp_rating.rating,
         eps_rating=stock.eps_rating.rating,
         rs_rating=stock.rs_rating.rating,
         name=stock.name,
