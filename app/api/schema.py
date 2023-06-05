@@ -17,6 +17,42 @@ class WorldIndex(str, Enum):
     Nyse_Composite = 'NYSE COMPOSITE'
 
 
+class Sector(str, Enum):
+    ENERGY = "ENERGY"
+    INSURNCE = "INSURNCE"
+    COMPUTER = "COMPUTER"
+    AGRICULTRE = "AGRICULTRE"
+    AEROSPACE = "AEROSPACE"
+    METALS = "METALS"
+    FOOD_BEV = "FOOD/BEV"
+    ELECTRNCS = "ELECTRNCS"
+    APPAREL = "APPAREL"
+    OFFICE = "OFFICE"
+    MACHINE = "MACHINE"
+    RETAIL = "RETAIL"
+    ALCOHL_TOB = "ALCOHL/TOB"
+    CHEMICAL = "CHEMICAL"
+    BUSINS_SVC = "BUSINS SVC"
+    MISC = "MISC"
+    AUTO = "AUTO"
+    UTILITY = "UTILITY"
+    S_Ls = "S&Ls"
+    BANKS = "BANKS"
+    MEDICAL = "MEDICAL"
+    CONSUMER = "CONSUMER"
+    MINING = "MINING"
+    TELECOM = "TELECOM"
+    CHIPS = "CHIPS"
+    MEDIA = "MEDIA"
+    TRANSPRT = "TRANSPRT"
+    BUILDING = "BUILDING"
+    LEISURE = "LEISURE"
+    REAL_EST = "REAL EST"
+    SOFTWARE = "SOFTWARE"
+    FINANCE = "FINANCE"
+    INTERNET = "INTERNET"
+
+
 class EconomicIndicatorTimeSeriesEntry(pydantic.BaseModel):
     value: float
     registered_date: str
