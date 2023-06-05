@@ -24,13 +24,13 @@ class Sector(str, Enum):
     AGRICULTRE = "AGRICULTRE"
     AEROSPACE = "AEROSPACE"
     METALS = "METALS"
-    FOOD_BEV = "FOOD/BEV"
+    FOOD_BEV = "FOOD_BEV"
     ELECTRNCS = "ELECTRNCS"
     APPAREL = "APPAREL"
     OFFICE = "OFFICE"
     MACHINE = "MACHINE"
     RETAIL = "RETAIL"
-    ALCOHL_TOB = "ALCOHL/TOB"
+    ALCOHL_TOB = "ALCOHL_TOB"
     CHEMICAL = "CHEMICAL"
     BUSINS_SVC = "BUSINS SVC"
     MISC = "MISC"
@@ -113,3 +113,19 @@ class Stock(pydantic.BaseModel):
 	acc_dis_rating: Optional[str] = None
 	smr_rating: Optional[str] = None
 	sector: Optional[str] = None
+
+
+class SectorPerformance(pydantic.BaseModel):
+    sector: Sector
+    daily_price_change_pct: float
+    start_of_year_price_change_pct: float
+
+
+class SectorsPerformanceEntry(pydantic.BaseModel):
+    date: str
+    sectors_performance: List[SectorPerformance]
+
+
+class SectorPerformanceEntry(pydantic.BaseModel):
+    date: str
+    sector_performance: SectorPerformance
