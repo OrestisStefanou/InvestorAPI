@@ -5,6 +5,23 @@ from app.domain.stock_leader import StockLeader
 from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.composite_stock import CompositeStock
 from app.domain.sector_performance import SectorPerformance
+from app.domain.sector import Sector
+
+
+def _sector_domain_model_to_schema(sector: Sector) -> schema.Sector:
+    """
+    We use this function because the values of schema.Sector.FOOD_BEV
+    and schema.Sector.ALCOHL_TOB don't match the values of the domain Sector
+    values. The reason they don't match is because having / in the enum causes
+    problems in the endpoint
+    """
+    if sector == sector.FOOD_BEV:
+        return schema.Sector.FOOD_BEV
+    
+    if sector == sector.ALCOHL_TOB:
+        return schema.Sector.ALCOHL_TOB
+    
+    return schema.Sector(sector.value)
 
 
 def serialize_economic_indicator_time_series_entry(
@@ -65,13 +82,13 @@ def serialize_stock(stock: CompositeStock) -> schema.Stock:
         vol_chg_pct=stock.vol_chg_pct.value,
         acc_dis_rating=stock.acc_dis_rating.rating,
         smr_rating=stock.smr_rating.rating,
-        sector=stock.sector.value
+        sector=_sector_domain_model_to_schema(stock.sector)
     )
 
 
 def serialize_sector_performance(performance: SectorPerformance) -> schema.SectorPerformance:
     return schema.SectorPerformance(
-        sector=schema.Sector(performance.sector_name.value),
+        sector=_sector_domain_model_to_schema(performance.sector_name),
         daily_price_change_pct=performance.daily_price_change_pct.change_pct,
         start_of_year_price_change_pct=performance.start_of_year_price_change_pct.change_pct
     )

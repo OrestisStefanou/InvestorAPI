@@ -24,13 +24,13 @@ class Sector(str, Enum):
     AGRICULTRE = "AGRICULTRE"
     AEROSPACE = "AEROSPACE"
     METALS = "METALS"
-    FOOD_BEV = "FOOD/BEV"
+    FOOD_BEV = "FOOD_BEV"
     ELECTRNCS = "ELECTRNCS"
     APPAREL = "APPAREL"
     OFFICE = "OFFICE"
     MACHINE = "MACHINE"
     RETAIL = "RETAIL"
-    ALCOHL_TOB = "ALCOHL/TOB"
+    ALCOHL_TOB = "ALCOHL_TOB"
     CHEMICAL = "CHEMICAL"
     BUSINS_SVC = "BUSINS SVC"
     MISC = "MISC"
@@ -124,3 +124,8 @@ class SectorPerformance(pydantic.BaseModel):
 class SectorsPerformanceEntry(pydantic.BaseModel):
     date: str
     sectors_performance: List[SectorPerformance]
+
+
+class SectorPerformanceEntry(pydantic.BaseModel):
+    date: str
+    sector_performance: SectorPerformance

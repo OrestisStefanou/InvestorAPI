@@ -25,3 +25,16 @@ class SectorService(BaseService):
             performance_dict[date].append(performance_entry)
 
         return performance_dict
+
+    def get_sector_performance(self, sector: Sector) -> Dict[str, SectorPerformance]:
+        """
+        Returns a dictionary with key the date in string format
+        and value the performance of the sector on that date
+        """
+        sectors_performance = StocksWithSectorRepo(self._db_session).get_sectors_performance(sector)
+        performance_dict = defaultdict(list)
+        for performance_entry in sectors_performance:
+            date = performance_entry.registered_date
+            performance_dict[date] = performance_entry
+
+        return performance_dict
