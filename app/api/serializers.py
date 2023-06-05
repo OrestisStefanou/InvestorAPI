@@ -4,6 +4,7 @@ from app.domain.time_series import IndexTimeSeriesEntry
 from app.domain.stock_leader import StockLeader
 from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.composite_stock import CompositeStock
+from app.domain.sector_performance import SectorPerformance
 
 
 def serialize_economic_indicator_time_series_entry(
@@ -65,4 +66,12 @@ def serialize_stock(stock: CompositeStock) -> schema.Stock:
         acc_dis_rating=stock.acc_dis_rating.rating,
         smr_rating=stock.smr_rating.rating,
         sector=stock.sector.value
+    )
+
+
+def serialize_sector_performance(performance: SectorPerformance) -> schema.SectorPerformance:
+    return schema.SectorPerformance(
+        sector=schema.Sector(performance.sector_name.value),
+        daily_price_change_pct=performance.daily_price_change_pct.change_pct,
+        start_of_year_price_change_pct=performance.start_of_year_price_change_pct.change_pct
     )

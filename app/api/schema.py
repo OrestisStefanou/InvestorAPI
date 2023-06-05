@@ -113,3 +113,14 @@ class Stock(pydantic.BaseModel):
 	acc_dis_rating: Optional[str] = None
 	smr_rating: Optional[str] = None
 	sector: Optional[str] = None
+
+
+class SectorPerformance(pydantic.BaseModel):
+    sector: Sector
+    daily_price_change_pct: float
+    start_of_year_price_change_pct: float
+
+
+class SectorsPerformanceEntry(pydantic.BaseModel):
+    date: str
+    sectors_performance: List[SectorPerformance]

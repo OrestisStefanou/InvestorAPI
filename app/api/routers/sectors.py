@@ -27,3 +27,30 @@ async def get_sector_stocks(
         serializers.serialize_stock(stock)
         for stock in stocks
     ]
+
+
+@router.get(
+    "/sectors/performance",
+    tags=["Sectors"],
+    status_code=200,
+    response_model=List[schema.SectorsPerformanceEntry]
+)
+async def get_sectors_performance(
+    db_session = Depends(create_db_conn)
+):
+    service = SectorService(db_session)
+    sectors_historical_performance = service.get_sectors_performance()
+    
+    response = []
+    for date, sectors_performance in sectors_historical_performance.items():
+        response.append(
+            schema.SectorsPerformanceEntry(
+                date=date,
+                sectors_performance=[
+                    serializers.serialize_sector_performance(performance)
+                    for performance in sectors_performance
+                ]
+            )
+        )
+
+    return response
