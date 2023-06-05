@@ -76,3 +76,37 @@ async def get_tech_leaders_collection(
         serializers.serialize_tech_leader(tech_leader)
         for tech_leader in tech_leaders
     ]
+
+
+@router.get(
+    "/stocks_under_heavy_buying",
+    tags=["Collections"],
+    status_code=200,
+    response_model=List[schema.Stock]
+)
+async def get_stocks_under_heavy_buying_collection(
+    db_session = Depends(create_db_conn)
+):
+    service = CollectionsService(db_session)
+    stocks = service.get_stocks_under_heavy_buying()
+    return [
+        serializers.serialize_stock(stock)
+        for stock in stocks
+    ]
+
+
+@router.get(
+    "/stocks_under_heavy_selling",
+    tags=["Collections"],
+    status_code=200,
+    response_model=List[schema.Stock]
+)
+async def get_stocks_under_heavy_selling_collection(
+    db_session = Depends(create_db_conn)
+):
+    service = CollectionsService(db_session)
+    stocks = service.get_stocks_under_heavy_selling()
+    return [
+        serializers.serialize_stock(stock)
+        for stock in stocks
+    ]

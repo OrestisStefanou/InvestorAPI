@@ -63,3 +63,17 @@ class TechLeader(CollectionStock):
     next_qtr_eps_change_pct: Optional[float] = None
     last_qtr_sales_change_pct: Optional[float] = None
     return_on_equity: Optional[str] = None
+
+
+class Stock(pydantic.BaseModel):
+	comp_rating: int
+	eps_rating: int
+	rs_rating: int
+	name: str
+	symbol: str
+	fifty_two_wk_high: Optional[float] = None
+	closing_price: Optional[float] = None
+	vol_chg_pct: Optional[float] = None
+	acc_dis_rating: Optional[str] = None
+	smr_rating: Optional[str] = None
+	sector: Optional[str] = None

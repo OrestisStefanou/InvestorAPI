@@ -3,6 +3,7 @@ from app.domain.time_series import EconomicIndicatorTimeSeriesEntry
 from app.domain.time_series import IndexTimeSeriesEntry
 from app.domain.stock_leader import StockLeader
 from app.domain.tech_leader_stock import TechLeaderStock
+from app.domain.composite_stock import CompositeStock
 
 
 def serialize_economic_indicator_time_series_entry(
@@ -48,4 +49,20 @@ def serialize_tech_leader(tech_leader: TechLeaderStock) -> schema.TechLeader:
         next_qtr_eps_change_pct=tech_leader.next_qtr_eps_change_pct.value,
         last_qtr_sales_change_pct=tech_leader.last_qtr_sales_change_pct.value,
         return_on_equity=tech_leader.return_on_equity
+    )
+
+
+def serialize_stock(stock: CompositeStock) -> schema.Stock:
+    return schema.Stock(
+        comp_rating=stock.comp_rating.rating,
+        eps_rating=stock.eps_rating.rating,
+        rs_rating=stock.rs_rating.rating,
+        name=stock.name,
+        symbol=stock.symbol,
+        fifty_two_wk_high=stock.fifty_two_wk_high.value,
+        closing_price=stock.closing_price.value,
+        vol_chg_pct=stock.vol_chg_pct.value,
+        acc_dis_rating=stock.acc_dis_rating.rating,
+        smr_rating=stock.smr_rating.rating,
+        sector=stock.sector.value
     )
