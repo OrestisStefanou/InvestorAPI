@@ -6,7 +6,8 @@ from app import dependencies
 from app.api.routers import (
     economic_indicators,
     world_indices,
-    collections
+    collections,
+    sectors
 )
 
 app = FastAPI()
@@ -16,6 +17,7 @@ app.include_router(graphql_app, prefix="/graphql")
 app.include_router(economic_indicators.router)
 app.include_router(world_indices.router)
 app.include_router(collections.router)
+app.include_router(sectors.router)
 
 
 @app.on_event("shutdown")
