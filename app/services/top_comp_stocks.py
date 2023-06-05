@@ -6,7 +6,6 @@ from app.services.ibd_scrapers.composite_stocks import CompositeStocksScraper
 from app.repos.top_composite_stocks_repo import TopCompositeStocksRepo
 from app.domain.date import Date
 from app.domain.composite_stock import CompositeStock
-from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.services.base_service import BaseService
 
 class TopCompositeStocksService(BaseService):

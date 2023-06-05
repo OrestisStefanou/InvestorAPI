@@ -238,3 +238,67 @@ class StocksWithSectorRepo(SqlRepo):
 			self._create_model_from_row(row)
 			for row in result
 		]
+
+    def get_stocks_under_heavy_buying(self) -> List[CompositeStock]:
+        cur = self._db_conn.cursor()
+        query = """SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+                smr_rating,
+                sector_name,
+                registered_date
+			FROM stocks_with_sector 
+			WHERE acc_dis_rating='A+'
+            AND registered_date=(
+                SELECT registered_date
+                FROM stocks_with_sector
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY eps_rating DESC
+            LIMIT 100"""
+
+        result = cur.execute(query).fetchall()
+        return [
+			self._create_model_from_row(row)
+			for row in result
+		]
+
+    def get_stocks_under_heavy_selling(self) -> List[CompositeStock]:
+        cur = self._db_conn.cursor()
+        query = """SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+                smr_rating,
+                sector_name,
+                registered_date
+			FROM stocks_with_sector 
+			WHERE acc_dis_rating='E'
+            AND registered_date=(
+                SELECT registered_date
+                FROM stocks_with_sector
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY eps_rating DESC
+            LIMIT 100"""
+
+        result = cur.execute(query).fetchall()
+        return [
+			self._create_model_from_row(row)
+			for row in result
+		]

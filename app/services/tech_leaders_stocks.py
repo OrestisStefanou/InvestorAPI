@@ -6,7 +6,6 @@ from app.services.ibd_scrapers.tech_leaders_stocks import TechLeadersStocksScrap
 from app.repos.tech_leaders_stocks_repo import TechLeadersStocksRepo
 from app.domain.date import Date
 from app.domain.tech_leader_stock import TechLeaderStock
-from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.services.base_service import BaseService
 
 

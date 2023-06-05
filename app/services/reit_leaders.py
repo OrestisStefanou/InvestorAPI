@@ -6,7 +6,6 @@ from app.services.ibd_scrapers.stock_leaders import StockLeadersScraper
 from app.repos.reit_leaders_repo import ReitLeadersRepo
 from app.domain.date import Date
 from app.domain.stock_leader import StockLeader
-from app.domain.symbol_appearances_count import SymbolAppearancesCount
 from app.services.base_service import BaseService
 
 class ReitLeadersService(BaseService):
