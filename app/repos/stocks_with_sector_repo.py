@@ -302,3 +302,35 @@ class StocksWithSectorRepo(SqlRepo):
 			self._create_model_from_row(row)
 			for row in result
 		]
+
+    def get_top_overall_rated_stocks(self, limit: int = 200) -> List[CompositeStock]:
+        cur = self._db_conn.cursor()
+        query = """SELECT 
+				comp_rating,
+				eps_rating,
+				rs_rating,
+				acc_dis_rating,
+				fifty_two_wk_high,
+				name,
+				symbol,
+				closing_price,
+				vol_chg_pct,
+                smr_rating,
+                sector_name,
+                registered_date
+			FROM stocks_with_sector 
+			WHERE registered_date=(
+                SELECT registered_date
+                FROM stocks_with_sector
+                ORDER BY registered_date_ts DESC
+                LIMIT 1
+            )
+            ORDER BY comp_rating DESC, eps_rating DESC, rs_rating DESC
+            LIMIT ?"""
+
+        query_params = (limit, )
+        result = cur.execute(query,query_params).fetchall()
+        return [
+			self._create_model_from_row(row)
+			for row in result
+		]

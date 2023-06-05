@@ -79,6 +79,57 @@ async def get_tech_leaders_collection(
 
 
 @router.get(
+    "/top_200_overall_rated_stocks",
+    tags=["Collections"],
+    status_code=200,
+    response_model=List[schema.Stock]
+)
+async def get_top_overall_rated_stocks_collection(
+    db_session = Depends(create_db_conn)
+):
+    service = CollectionsService(db_session)
+    stocks = service.get_top_composite_stocks()
+    return [
+        serializers.serialize_stock(stock)
+        for stock in stocks
+    ]
+
+
+@router.get(
+    "/eps_rating_leaders",
+    tags=["Collections"],
+    status_code=200,
+    response_model=List[schema.Stock]
+)
+async def get_eps_rating_leaders_collection(
+    db_session = Depends(create_db_conn)
+):
+    service = CollectionsService(db_session)
+    stocks = service.get_eps_rating_leaders()
+    return [
+        serializers.serialize_stock(stock)
+        for stock in stocks
+    ]
+
+
+@router.get(
+    "/price_strength_rating_leaders",
+    tags=["Collections"],
+    status_code=200,
+    response_model=List[schema.Stock]
+)
+async def get_rs_rating_leaders_collection(
+    db_session = Depends(create_db_conn)
+):
+    service = CollectionsService(db_session)
+    stocks = service.get_price_rs_rating_leaders()
+    return [
+        serializers.serialize_stock(stock)
+        for stock in stocks
+    ]
+
+
+@router.get(
     "/stocks_under_heavy_buying",
     tags=["Collections"],
     status_code=200,

@@ -66,7 +66,7 @@ class TechLeader(CollectionStock):
 
 
 class Stock(pydantic.BaseModel):
-	comp_rating: int
+	overall_rating: int
 	eps_rating: int
 	rs_rating: int
 	name: str

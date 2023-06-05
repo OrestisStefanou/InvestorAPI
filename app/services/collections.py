@@ -23,7 +23,7 @@ class CollectionsService(BaseService):
         return UtilityLeadersRepo(self._db_session).get_latest_stock_leaders()
 
     def get_top_composite_stocks(self) -> List[CompositeStock]:
-        return TopCompositeStocksRepo(self._db_session).get_latest_comp_stocks()
+        return StocksWithSectorRepo(self._db_session).get_top_overall_rated_stocks()
     
     def get_tech_leaders(self) -> List[TechLeaderStock]:
         return TechLeadersStocksRepo(self._db_session).get_latest_tech_leaders_stocks()
