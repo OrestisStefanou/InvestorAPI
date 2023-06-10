@@ -7,7 +7,8 @@ from app.api.routers import (
     economic_indicators,
     world_indices,
     collections,
-    sectors
+    sectors,
+    stocks
 )
 
 app = FastAPI()
@@ -18,6 +19,7 @@ app.include_router(economic_indicators.router)
 app.include_router(world_indices.router)
 app.include_router(collections.router)
 app.include_router(sectors.router)
+app.include_router(stocks.router)
 
 
 @app.on_event("shutdown")
