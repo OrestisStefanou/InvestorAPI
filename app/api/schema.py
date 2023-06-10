@@ -129,3 +129,25 @@ class SectorsPerformanceEntry(pydantic.BaseModel):
 class SectorPerformanceEntry(pydantic.BaseModel):
     date: str
     sector_performance: SectorPerformance
+
+
+class StockPerformance(pydantic.BaseModel):
+	overall_rating: int
+	eps_rating: int
+	rs_rating: int
+	closing_price: Optional[float] = None
+	vol_chg_pct: Optional[float] = None
+	acc_dis_rating: Optional[str] = None
+	smr_rating: Optional[str] = None
+
+
+class StockHistoricalPerformanceEntry(pydantic.BaseModel):
+    date: str
+    performance: StockPerformance
+
+
+class StockHistoricalPerformance(pydantic.BaseModel):
+    symbol: str
+    name: str
+    sector: Sector
+    historical_performance: List[StockHistoricalPerformanceEntry]

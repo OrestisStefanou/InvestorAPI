@@ -1,3 +1,5 @@
+from typing import List
+
 from app.api import schema
 from app.domain.time_series import EconomicIndicatorTimeSeriesEntry
 from app.domain.time_series import IndexTimeSeriesEntry
@@ -91,4 +93,34 @@ def serialize_sector_performance(performance: SectorPerformance) -> schema.Secto
         sector=_sector_domain_model_to_schema(performance.sector_name),
         daily_price_change_pct=performance.daily_price_change_pct.change_pct,
         start_of_year_price_change_pct=performance.start_of_year_price_change_pct.change_pct
+    )
+
+
+def serialize_stock_historical_performance(stock_data: List[CompositeStock]) -> schema.StockHistoricalPerformance:
+    symbol = stock_data[0].symbol
+    name = stock_data[0].name
+    sector=_sector_domain_model_to_schema(stock_data[0].sector)
+
+    historical_performance = []
+    for stock_performance in stock_data:
+        historical_performance.append(
+            schema.StockHistoricalPerformanceEntry(
+                date=stock_performance.registered_date,
+                performance=schema.StockPerformance(
+                    overall_rating=stock_performance.comp_rating.rating,
+                    eps_rating=stock_performance.eps_rating.rating,
+                    rs_rating=stock_performance.rs_rating.rating,
+                    closing_price=stock_performance.closing_price.value,
+                    vol_chg_pct=stock_performance.vol_chg_pct.value,
+                    acc_dis_rating=stock_performance.acc_dis_rating.rating,
+                    smr_rating=stock_performance.smr_rating.rating
+                )
+            )
+        )
+
+    return schema.StockHistoricalPerformance(
+        symbol=symbol,
+        name=name,
+        sector=sector,
+        historical_performance=historical_performance
     )

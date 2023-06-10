@@ -150,7 +150,7 @@ class StocksWithSectorRepo(SqlRepo):
     def get_stock_historical_data(
         self,
         stock_symbol: str
-    ) -> Optional[List[CompositeStock]]:
+    ) -> List[CompositeStock]:
         cur = self._db_conn.cursor()
         query = """SELECT 
 				comp_rating,
