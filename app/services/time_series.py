@@ -1,5 +1,6 @@
 from typing import List
 
+from app import settings
 from app.services.y_finance_scrapers.time_series import IndexTimeSeriesScraper
 from app.services.alpha_vantage_scrapers.economic_indicators import EconomicIndicatorScraper
 from app.domain.world_index import WorldIndex
@@ -8,7 +9,7 @@ from app.domain.time_series import EconomicIndicatorTimeSeriesEntry
 from app.domain.economic_indicator import EconomicIndicator
 from app.repos.world_indices_time_series_repo import WorldIndicesTimeSeriesRepo
 from app.repos.economic_indicators_repo import EconomicIndicatorTimeSeriesRepo
-from app.services.base_service import BaseService
+from app.services.base_service import BaseService, timed_lru_cache
 
 
 class TimeSeriesService(BaseService):
@@ -41,10 +42,12 @@ class TimeSeriesService(BaseService):
             time_series=indicator_time_series
         )
 
+    @timed_lru_cache(minutes=settings.cache_time_minutes)
     def get_index_time_series(self, index: WorldIndex) -> List[IndexTimeSeriesEntry]:
         return WorldIndicesTimeSeriesRepo(self._db_session).get_index_time_series(
             index=index
         )
 
+    @timed_lru_cache(minutes=settings.cache_time_minutes)
     def get_economic_indicator_time_series(self, indicator: EconomicIndicator) -> List[EconomicIndicatorTimeSeriesEntry]:
         return EconomicIndicatorTimeSeriesRepo(self._db_session).get_indicator_time_series(indicator)

@@ -11,3 +11,6 @@ class Settings(BaseSettings):
     # Alpha vantage
     alpha_vantage_base_url: str = 'https://www.alphavantage.co/query'
     alpha_vantage_token: str = 'LQ2GKKKWRJI6WAM9'
+
+    # App settings
+    cache_time_minutes = 60 * 2
