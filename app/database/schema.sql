@@ -146,3 +146,33 @@ CREATE TABLE economic_indicator_time_series (
     registered_date TEXT NOT NULL,
     registered_date_ts INT NOT NULL
 );
+
+CREATE TABLE stock_overview (
+    symbol TEXT NOT NULL,
+    sector TEXT NOT NULL,
+    market_cap REAL,
+    ebitda REAL,
+    forward_pe_ratio REAL,
+    trailing_pe_ratio REAL,
+    peg_ratio REAL,
+    book_value REAL,
+    divided_per_share REAL,
+    dividend_yield REAL,
+    trailing_eps REAL,
+    forward_eps REAL,
+    revenue_per_share REAL,
+    profit_margins REAL,
+    operating_margins REAL,
+    return_on_assets REAL,
+    return_on_equity REAL,
+    revenue REAL,
+    gross_profit REAL,
+    earnings_growth REAL,
+    revenue_growth REAL,
+    target_high_price REAL,
+    target_low_price REAL,
+    target_mean_price REAL,
+    target_median_price REAL,
+    registered_date TEXT NOT NULL,
+    registered_date_ts INT NOT NULL
+)
