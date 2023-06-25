@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional
 
 from app.repos.sql_repo import SqlRepo
 from app.domain.date import Date
@@ -88,3 +88,48 @@ class StockOverviewRepo(SqlRepo):
                 INSERT INTO stock_overview VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ''', self._create_row_tuple_from_model(stock_overview, date)
             )
+
+    def get_stock_overview(
+        self,
+        symbol: str
+    ) -> Optional[StockOverview]:
+        cur  = self._db_conn.cursor()
+        query = '''
+            SELECT
+                symbol,
+                sector,
+                market_cap,
+                ebitda,
+                forward_pe_ratio,
+                trailing_pe_ratio,
+                peg_ratio,
+                book_value,
+                divided_per_share,
+                dividend_yield,
+                eps,
+                revenue_per_share,
+                profit_margins,
+                operating_margins,
+                return_on_assets,
+                return_on_equity,
+                revenue,
+                gross_profit,
+                earnings_growth,
+                revenue_growth,
+                target_price,
+                beta,
+                price_to_sales_ratio,
+                price_to_book_ratio,
+                ev_to_revenue,
+                ev_to_ebitda,
+                registered_date,
+                registered_date_ts
+            FROM stock_overview
+            WHERE symbol = ?
+            ORDER BY registered_date_ts DESC
+            LIMIT 1
+        '''
+
+        query_params = (symbol, )
+        row = cur.execute(query, query_params).fetchone()
+        return self._create_model_from_row(row) if row else None

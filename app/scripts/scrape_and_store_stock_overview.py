@@ -11,28 +11,48 @@ from app.domain.date import Date
 DAY_LIMIT = 500
 MINUTE_LIMIT = 5
 
-def try_convert_to_float(string_value):
+def try_convert_to_float(value):
+    if value is None:
+        return None
+
     try:
-        float_value = float(string_value)
+        float_value = float(value)
         return float_value
     except ValueError:
         return None
 
 
 with dependencies.get_db_conn() as conn:
-    # Modify the query to fetch all the latest stock symbols that we have
     query = '''
-        SELECT DISTINCT symbol, sector_name FROM stocks_with_sector WHERE sector_name = 'CHIPS'
+        SELECT 
+            symbol,
+            sector_name 
+        FROM stocks_with_sector 
+        WHERE comp_rating > 90 AND registered_date = (
+            SELECT registered_date
+            FROM stocks_with_sector
+            ORDER BY registered_date_ts DESC
+            LIMIT 1
+        )
+        ORDER BY comp_rating DESC
     '''
     result = conn.execute(query)
-    result = [('SMCI', 'CHIPS')]
     stock_overview_repo = StockOverviewRepo()
     av_client = AlphaVantageClient()
+
+    minute_count = 0
+    total_count = 0
 
     for row in result:
         symbol = row[0]
         sector = Sector(row[1])
-        
+
+        overview = stock_overview_repo.get_stock_overview(symbol)
+        if overview:
+            continue
+
+        print(f'Fetching for {symbol}: {sector}')
+
         company_info = asyncio.run(av_client.get_company_overview(symbol))
         stock_overview = StockOverview(
             symbol=symbol,
@@ -68,4 +88,13 @@ with dependencies.get_db_conn() as conn:
             stock_overview=stock_overview
         )
 
-        time.sleep(2)
+        minute_count += 1
+        total_count += 1
+
+        if total_count == DAY_LIMIT:
+            break
+
+        if minute_count == MINUTE_LIMIT:
+            time.sleep(65)
+            minute_count = 0
+        
