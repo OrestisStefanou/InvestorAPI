@@ -25,7 +25,7 @@ with dependencies.get_db_conn() as conn:
         SELECT DISTINCT symbol, sector_name FROM stocks_with_sector WHERE sector_name = 'CHIPS'
     '''
     result = conn.execute(query)
-
+    result = [('SMCI', 'CHIPS')]
     stock_overview_repo = StockOverviewRepo()
     av_client = AlphaVantageClient()
 
@@ -58,11 +58,13 @@ with dependencies.get_db_conn() as conn:
             target_price=try_convert_to_float(company_info.get('AnalystTargetPrice')),
             beta=try_convert_to_float(company_info.get('Beta')),
             price_to_sales_ratio=try_convert_to_float(company_info.get('PriceToSalesRatioTTM')),
-            price_to_book_ratio=try_convert_to_float(company_info.get('PriceToBookRatio'))
+            price_to_book_ratio=try_convert_to_float(company_info.get('PriceToBookRatio')),
+            ev_to_revenue=try_convert_to_float(company_info.get('EVToRevenue')),
+            ev_to_ebitda=try_convert_to_float(company_info.get('EVToEBITDA'))
         )
 
         stock_overview_repo.add_stock_overview_for_date(
-            date=Date(day=24, month=6, year=2023),
+            date=Date(day=25, month=6, year=2023),
             stock_overview=stock_overview
         )
 
