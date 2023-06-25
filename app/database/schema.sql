@@ -146,3 +146,34 @@ CREATE TABLE economic_indicator_time_series (
     registered_date TEXT NOT NULL,
     registered_date_ts INT NOT NULL
 );
+
+CREATE TABLE stock_overview (
+    symbol TEXT NOT NULL,
+    sector TEXT NOT NULL,
+    market_cap FLOAT,
+    ebitda FLOAT,
+    forward_pe_ratio FLOAT,
+    trailing_pe_ratio FLOAT,
+    peg_ratio FLOAT,
+    book_value FLOAT,
+    divided_per_share FLOAT,
+    dividend_yield FLOAT,
+    eps FLOAT,
+    revenue_per_share FLOAT,
+    profit_margins FLOAT,
+    operating_margins FLOAT,
+    return_on_assets FLOAT,
+    return_on_equity FLOAT,
+    revenue FLOAT,
+    gross_profit FLOAT,
+    earnings_growth FLOAT,
+    revenue_growth FLOAT,
+    target_price FLOAT,
+    beta FLOAT,
+    price_to_sales_ratio FLOAT,
+    price_to_book_ratio FLOAT,
+    ev_to_revenue FLOAT,
+    ev_to_ebitda FLOAT,
+    registered_date TEXT NOT NULL,
+    registered_date_ts INT NOT NULL
+)
