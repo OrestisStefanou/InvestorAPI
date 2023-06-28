@@ -28,7 +28,7 @@ with dependencies.get_db_conn() as conn:
             symbol,
             sector_name 
         FROM stocks_with_sector 
-        WHERE comp_rating BETWEEN 70 AND 80 AND registered_date = (
+        WHERE comp_rating BETWEEN 60 AND 70 AND registered_date = (
             SELECT registered_date
             FROM stocks_with_sector
             ORDER BY registered_date_ts DESC
