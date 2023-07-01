@@ -28,13 +28,7 @@ with dependencies.get_db_conn() as conn:
             symbol,
             sector_name 
         FROM stocks_with_sector 
-        WHERE comp_rating BETWEEN 30 AND 50 AND registered_date = (
-            SELECT registered_date
-            FROM stocks_with_sector
-            ORDER BY registered_date_ts DESC
-            LIMIT 1
-        )
-        ORDER BY comp_rating DESC
+        WHERE comp_rating BETWEEN 0 AND 10 AND registered_date = '23-06-2023'
     '''
     result = conn.execute(query)
     stock_overview_repo = StockOverviewRepo()
