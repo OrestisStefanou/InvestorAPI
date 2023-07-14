@@ -37,7 +37,7 @@ with dependencies.get_db_conn() as conn:
         )
         ORDER BY comp_rating DESC
         LIMIT 500
-        OFFSET 1000
+        OFFSET 1500
     '''
     result = conn.execute(query)
     stock_overview_repo = StockOverviewRepo()
