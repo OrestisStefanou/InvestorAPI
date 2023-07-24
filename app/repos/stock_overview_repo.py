@@ -81,7 +81,7 @@ class StockOverviewRepo(SqlRepo):
             price_to_book_ratio=row[26],
             ev_to_revenue=row[27],
             ev_to_ebitda=row[28],
-            outstanding_shares=29
+            outstanding_shares=row[29]
         )
     
     def add_stock_overview_for_date(
@@ -98,7 +98,8 @@ class StockOverviewRepo(SqlRepo):
 
     def get_stock_overview(
         self,
-        symbol: str
+        symbol: str,
+        date: Optional[Date] = None
     ) -> Optional[StockOverview]:
         cur  = self._db_conn.cursor()
         query = '''
@@ -138,9 +139,20 @@ class StockOverviewRepo(SqlRepo):
             FROM stock_overview
             WHERE symbol = ?
             ORDER BY registered_date_ts DESC
-            LIMIT 1
         '''
 
         query_params = (symbol, )
-        row = cur.execute(query, query_params).fetchone()
-        return self._create_model_from_row(row) if row else None
+        rows = cur.execute(query, query_params).fetchall()
+        
+        if len(rows) == 0:
+            return None
+
+        if date is None:
+            return self._create_model_from_row(rows[0])
+         
+        for row in rows:
+            registered_date = row[30]
+            if registered_date == date.date_string:
+                return self._create_model_from_row(row)
+
+        return None

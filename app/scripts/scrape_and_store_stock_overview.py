@@ -37,7 +37,6 @@ with dependencies.get_db_conn() as conn:
         )
         ORDER BY comp_rating DESC
         LIMIT 500
-        OFFSET 1500
     '''
     result = conn.execute(query)
     stock_overview_repo = StockOverviewRepo()
@@ -49,7 +48,7 @@ with dependencies.get_db_conn() as conn:
     for row in result:
         symbol = row[0]
 
-        overview = stock_overview_repo.get_stock_overview(symbol)
+        overview = stock_overview_repo.get_stock_overview(symbol, date=Date(day=now.day, month=now.month, year=now.year))
         if overview:
             continue
 
