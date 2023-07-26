@@ -37,7 +37,6 @@ with dependencies.get_db_conn() as conn:
         )
         ORDER BY comp_rating DESC
         LIMIT 500
-        OFFSET 500
     '''
     result = conn.execute(query)
     stock_overview_repo = StockOverviewRepo()
@@ -56,6 +55,13 @@ with dependencies.get_db_conn() as conn:
         print(f'Fetching for {symbol}')
 
         company_info = asyncio.run(av_client.get_company_overview(symbol))
+        if company_info.get('Sector') is None:
+            print(company_info)
+            print('DAY LIMIT:', DAY_LIMIT)
+            print('MINUTE LIMIT:', MINUTE_LIMIT)
+            break
+
+
         stock_overview = StockOverview(
             symbol=symbol,
             sector=company_info.get('Sector') if company_info.get('Sector') else '',
