@@ -181,3 +181,33 @@ CREATE TABLE stock_overview (
     registered_date TEXT NOT NULL,
     registered_date_ts INT NOT NULL
 )
+
+CREATE TABLE income_statement (
+    symbol TEXT NOT NULL,
+    fiscal_date_ending TEXT NOT NULL,
+    reported_currency TEXT,
+    gross_profit FLOAT,
+    total_revenue FLOAT,
+    cost_of_revenue FLOAT,
+    cost_of_goods_and_services_sold FLOAT,
+    operating_income FLOAT,
+    selling_general_and_administrative FLOAT,
+    research_and_development FLOAT,
+    operating_expenses FLOAT,
+    investment_income_net FLOAT,
+    net_interest_income FLOAT,
+    interest_income FLOAT,
+    interest_expense FLOAT,
+    non_interest_income FLOAT,
+    other_non_operating_income FLOAT,
+    depreciation FLOAT,
+    depreciation_and_amortization FLOAT,
+    income_before_tax FLOAT,
+    income_tax_expense FLOAT,
+    interest_and_debt_expense FLOAT,
+    net_income_from_continuing_operations FLOAT,
+    comprehensive_income_net_of_tax FLOAT,
+    ebit FLOAT,
+    ebitda FLOAT,
+    net_income FLOAT
+)

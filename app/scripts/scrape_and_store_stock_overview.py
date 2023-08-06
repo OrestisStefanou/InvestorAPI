@@ -8,7 +8,7 @@ from app.http.alpha_vantage_client import AlphaVantageClient
 from app.domain.stock_overview import StockOverview
 from app.domain.date import Date
 
-DAY_LIMIT = 500
+DAY_LIMIT = 100
 MINUTE_LIMIT = 5
 
 def try_convert_to_float(value):

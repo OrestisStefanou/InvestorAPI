@@ -70,3 +70,28 @@ class AlphaVantageClient(HttpClient):
             raise AlphaVantageRequestError(f"Call to get {symbol} overview failed, status: {response.status_code}, response {response.text}")
 
         return response.json()
+
+    async def get_company_income_statements(self, symbol: str) -> Dict[str, Any]:
+        """
+        Returns json response of income statement from alpha vantage.
+        Example response: https://www.alphavantage.co/query?function=INCOME_STATEMENT&symbol=IBM&apikey=demo
+        """
+        params = {
+            'function': 'INCOME_STATEMENT',
+            'symbol': symbol,
+            'apikey': self._token
+        }
+        try:
+            response = await self.get(
+                endpoint='',
+                params=params
+            )
+        except HttpRequestError as err:
+            logging.error(f"Call to get {symbol} income statement failed with error: {str(err)}")
+            raise AlphaVantageRequestError(f"Call to get {symbol} income statement failed with error: {str(err)}")
+        
+        if response.status_code != 200:
+            logging.error(f"Call to get {symbol} income statement failed with status: {response.status_code}")
+            raise AlphaVantageRequestError(f"Call to get {symbol} income statement failed, status: {response.status_code}, response {response.text}")
+
+        return response.json()
