@@ -1,8 +1,5 @@
-from datetime import datetime
-import time
 import asyncio
 
-from app import dependencies
 from app.repos.income_statement_repo import IncomeStatementRepo
 from app.http.alpha_vantage_client import AlphaVantageClient
 from app.domain.income_statement import IncomeStatement
