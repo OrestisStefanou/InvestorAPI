@@ -286,3 +286,13 @@ CREATE TABLE cash_flow(
     change_in_exchange_rate FLOAT,
     net_income FLOAT
 )
+
+CREATE TABLE earnings (
+    symbol TEXT NOT NULL,
+    fiscal_date_ending TEXT NOT NULL,
+    reported_date TEXT,
+    reported_eps FLOAT,
+    estimated_eps FLOAT,
+    surprise FLOAT,
+    surprise_percentage FLOAT
+)
