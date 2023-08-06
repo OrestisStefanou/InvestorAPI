@@ -1,7 +1,6 @@
 from typing import Tuple, Any, Optional, List
 
 from app.repos.sql_repo import SqlRepo
-from app.domain.date import Date
 from app.domain.balance_sheet import BalanceSheet
 
 class BalanceSheetRepo(SqlRepo):

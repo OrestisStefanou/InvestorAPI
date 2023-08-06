@@ -120,3 +120,28 @@ class AlphaVantageClient(HttpClient):
             raise AlphaVantageRequestError(f"Call to get {symbol} balance sheets failed, status: {response.status_code}, response {response.text}")
 
         return response.json()
+
+    async def get_company_cash_flows(self, symbol: str) -> Dict[str, Any]:
+        """
+        Returns json response of cash flow from alpha vantage.
+        Example response: https://www.alphavantage.co/query?function=CASH_FLOW&symbol=IBM&apikey=demo
+        """
+        params = {
+            'function': 'CASH_FLOW',
+            'symbol': symbol,
+            'apikey': self._token
+        }
+        try:
+            response = await self.get(
+                endpoint='',
+                params=params
+            )
+        except HttpRequestError as err:
+            logging.error(f"Call to get {symbol} cash flows failed with error: {str(err)}")
+            raise AlphaVantageRequestError(f"Call to get {symbol} cash flows failed with error: {str(err)}")
+        
+        if response.status_code != 200:
+            logging.error(f"Call to get {symbol} cash flows failed with status: {response.status_code}")
+            raise AlphaVantageRequestError(f"Call to get {symbol} cash flows failed, status: {response.status_code}, response {response.text}")
+
+        return response.json()
