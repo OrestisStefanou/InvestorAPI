@@ -253,3 +253,36 @@ CREATE TABLE balance_sheet (
     common_stock FLOAT,
     common_stock_shares_outstanding FLOAT
 )
+
+CREATE TABLE cash_flow(
+    symbol TEXT NOT NULL,
+    fiscal_date_ending TEXT NOT NULL,
+    reported_currency TEXT,
+    operating_cashflow FLOAT,
+    payments_for_operating_activities FLOAT,
+    proceeds_from_operating_activities FLOAT,
+    change_in_operating_liabilities FLOAT,
+    change_in_operating_assets FLOAT,
+    depreciation_depletion_and_amortization FLOAT,
+    capital_expenditures FLOAT,
+    change_in_receivables FLOAT,
+    change_in_inventory FLOAT,
+    profit_loss FLOAT,
+    cashflow_from_investment FLOAT,
+    cashflow_from_financing FLOAT,
+    proceeds_from_repayments_of_short_term_debt FLOAT,
+    payments_for_repurchase_of_common_stock FLOAT,
+    payments_for_repurchase_of_equity FLOAT,
+    payments_for_repurchase_of_preferred_stock FLOAT,
+    dividend_payout FLOAT,
+    dividend_payout_common_stock FLOAT,
+    dividend_payout_preferred_stock FLOAT,
+    proceeds_from_issuance_of_common_stock FLOAT,
+    proceeds_from_issuance_of_long_term_debt_and_capital_securities_net FLOAT,
+    proceeds_from_issuance_of_preferred_stock FLOAT,
+    proceeds_from_repurchase_of_equity FLOAT,
+    proceeds_from_sale_of_treasury_stock FLOAT,
+    change_in_cash_and_cash_equivalents FLOAT,
+    change_in_exchange_rate FLOAT,
+    net_income FLOAT
+)
