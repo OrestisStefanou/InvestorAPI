@@ -1,0 +1,11 @@
+from app.scripts.scrape_and_store_balance_sheets import fetch_and_store_balance_sheets_for_symbol
+from app.scripts.scrape_and_store_cash_flows import fetch_and_store_cash_flows_for_symbol
+from app.scripts.scrape_and_store_income_statements import fetch_and_store_income_statements_for_symbol
+from app.scripts.scrape_and_store_stock_overview import fetch_and_store_stock_overview_for_symbol
+
+
+def fetch_and_store_fundamental_data_for_symbol(symbol: str):
+    fetch_and_store_balance_sheets_for_symbol(symbol)
+    fetch_and_store_cash_flows_for_symbol(symbol)
+    fetch_and_store_income_statements_for_symbol(symbol)
+    fetch_and_store_stock_overview_for_symbol(symbol)

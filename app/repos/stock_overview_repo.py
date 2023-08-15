@@ -156,3 +156,11 @@ class StockOverviewRepo(SqlRepo):
                 return self._create_model_from_row(row)
 
         return None
+
+    def delete_stock_overview_for_symbol(self, symbol: str) -> None:
+        with self._db_conn as con:
+            con.execute(
+                '''
+                DELETE FROM stock_overview WHERE symbol = ?
+                ''', (symbol, )
+            )
