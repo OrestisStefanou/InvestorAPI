@@ -296,3 +296,15 @@ CREATE TABLE earnings (
     surprise FLOAT,
     surprise_percentage FLOAT
 )
+
+CREATE TABLE stock_time_series (
+    symbol TEXT NOT NULL,
+    open_price REAL NOT NULL,
+    high_price REAL NOT NULL,
+    low_price REAL NOT NULL,
+    close_price REAL NOT NULL,
+    volume REAL NOT NULL,
+    dividend_amount REAL NOT NULL,
+    registered_date TEXT NOT NULL,
+    registered_date_ts INT NOT NULL
+);

@@ -21,3 +21,13 @@ class IndexTimeSeriesEntry(TimeSeriesEntry):
 class EconomicIndicatorTimeSeriesEntry(TimeSeriesEntry):
     value: Price
     unit: str
+
+
+@dataclass(frozen=True)
+class StockTimeSeriesEntry(TimeSeriesEntry):
+    open_price: Price
+    high_price: Price
+    low_price: Price
+    close_price: Price
+    volume: float
+    dividend_amount: float
