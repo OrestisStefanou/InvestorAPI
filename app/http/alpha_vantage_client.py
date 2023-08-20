@@ -170,3 +170,28 @@ class AlphaVantageClient(HttpClient):
             raise AlphaVantageRequestError(f"Call to get {symbol} earnings failed, status: {response.status_code}, response {response.text}")
 
         return response.json()
+
+    async def get_company_monthly_time_series(self, symbol: str) -> Dict[str, Any]:
+        """
+        Returns json response of adjusted monthly time series from alpha vantage.
+        Example response: https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=IBM&apikey=demo
+        """
+        params = {
+            'function': 'TIME_SERIES_MONTHLY_ADJUSTED',
+            'symbol': symbol,
+            'apikey': self._token
+        }
+        try:
+            response = await self.get(
+                endpoint='',
+                params=params
+            )
+        except HttpRequestError as err:
+            logging.error(f"Call to get {symbol} monthly time series failed with error: {str(err)}")
+            raise AlphaVantageRequestError(f"Call to get {symbol} monthly time series failed with error: {str(err)}")
+        
+        if response.status_code != 200:
+            logging.error(f"Call to get {symbol} monthly time series failed with status: {response.status_code}")
+            raise AlphaVantageRequestError(f"Call to get {symbol} monthly time series failed, status: {response.status_code}, response {response.text}")
+
+        return response.json()
