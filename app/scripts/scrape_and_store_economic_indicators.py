@@ -11,5 +11,5 @@ async def scrape_and_store_economic_indicators_time_series():
     await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Unemployment)
     time.sleep(1)
     await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Global_Commodities_Index)
-    time.sleep(1)
-    await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Inflation)
+    # time.sleep(1)
+    # await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Inflation)
