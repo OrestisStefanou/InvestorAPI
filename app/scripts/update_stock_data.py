@@ -11,24 +11,14 @@ def get_symbols() -> List[str]:
     Modify this function logic to get the symbols from ibd data tables
     """
     return [
-        'AAPL',
-        'MSFT',
-        'SMCI',
-        'ACMR',
-        'DLO',
-        'HUBS',
-        'LSCC',
-        'WDAY',
-        'NOW',
-        'AXON',
-        'CRWD',
-        'CWAN',
-        'AAON',
-        'LULU',
-        'TEAM',
-        'STRL',
-        'ACLS',
-        'TOL',
+        'GOOGL',
+        'SLB',
+        'MOD',
+        'CELH',
+        'PFIE',
+        'WFRD',
+        'TDW',
+        'LI',
     ]
 
 
