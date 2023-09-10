@@ -35,11 +35,11 @@ def get_stock_fundamental_df(symbol: str) -> pd.DataFrame:
     # Fill NaN values with zero for the selected columns
     stock_df[columns_to_convert] = stock_df[columns_to_convert].fillna(0)
     
-    # Create news columns that will contain percentage change of the float columns
+    # Create news columns that will contain value change of the float columns
     for column in columns_to_convert:
         if column not in ['change_in_cash_and_cash_equivalents', 'change_in_exchange_rate']:
-            new_column_name = f'{column}_pct_change'
-            stock_df[new_column_name] = stock_df[column].pct_change() * 100
+            new_column_name = f'{column}_change'
+            stock_df[new_column_name] = stock_df[column] - stock_df[column].shift(1)
 
     return stock_df
 
@@ -205,7 +205,12 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     return stock_fundamental_df
 
 
-def create_feature_store_from_list_of_symbols(symbols: List[str]):
+def create_feature_store_from_list_of_symbols(symbols: Optional[List[str]] = None):
+    if not symbols:
+        query = 'SELECT DISTINCT symbol FROM income_statement'
+        rows = conn.execute(query).fetchall()
+        symbols = [row[0] for row in rows]
+
     stock_dfs = []
     for symbol in symbols:
         stock_df = get_final_stock_data_df(symbol)
