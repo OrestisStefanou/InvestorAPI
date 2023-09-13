@@ -205,7 +205,7 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     return stock_fundamental_df
 
 
-def create_feature_store_from_list_of_symbols(symbols: Optional[List[str]] = None):
+def create_feature_store(symbols: Optional[List[str]] = None):
     if not symbols:
         query = 'SELECT DISTINCT symbol FROM income_statement'
         rows = conn.execute(query).fetchall()
@@ -220,28 +220,5 @@ def create_feature_store_from_list_of_symbols(symbols: Optional[List[str]] = Non
     feature_store_df.to_sql('feature_store', conn, index=False, if_exists='replace')
 
 
-create_feature_store_from_list_of_symbols(
-    symbols=[
-        'META',
-        'NVDA',
-        'AAPL',
-        'MSFT',
-        'SMCI',
-        'ACMR',
-        'DLO',
-        'HUBS',
-        'LSCC',
-        'WDAY',
-        'NOW',
-        'AXON',
-        'CRWD',
-        'CWAN',
-        'AAON',
-        'LULU',
-        'TEAM',
-        'STRL',
-        'ACLS',
-        'TOL',
-    ]
-)
+create_feature_store()
 conn.close()
