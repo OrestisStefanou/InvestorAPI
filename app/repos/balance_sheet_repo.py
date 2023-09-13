@@ -157,6 +157,7 @@ class BalanceSheetRepo(SqlRepo):
                 common_stock_shares_outstanding
             FROM balance_sheet
             WHERE symbol = ?
+            ORDER BY DATE(fiscal_date_ending) DESC
         '''
 
         query_params = (symbol, )

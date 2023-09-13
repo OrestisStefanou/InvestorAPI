@@ -122,6 +122,7 @@ class IncomeStatementRepo(SqlRepo):
                 net_income
             FROM income_statement
             WHERE symbol = ?
+            ORDER BY DATE(fiscal_date_ending) DESC
         '''
 
         query_params = (symbol, )

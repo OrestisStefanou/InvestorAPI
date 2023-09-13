@@ -130,6 +130,7 @@ class CashFlowRepo(SqlRepo):
                 net_income
             FROM cash_flow
             WHERE symbol = ?
+            ORDER BY DATE(fiscal_date_ending) DESC
         '''
 
         query_params = (symbol, )
