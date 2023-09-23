@@ -8,6 +8,19 @@ from app.repos.balance_sheet_repo import BalanceSheetRepo
 
 
 def fetch_and_store_fundamental_data_for_symbol(symbol: str):
+    """
+    Funtion that makes 4 separate calls to our provider:
+    1. Fetch balance sheets
+    2. Fetch cash flows
+    3. Fetch income statements
+    4. Fetch company overview
+
+    We then store these data on our side.
+    In case we already have the latest data on our side we don't perform
+    any unnecessary calls.
+    Returns 1 in case a call to provider was made, 0 otherwise. In case we 
+    return 1 it means that 4 http calls were performed
+    """
     # Check if we already have the latest data for the symbol to avoid extra calls
     balance_sheet_repo = BalanceSheetRepo()
 
@@ -18,9 +31,11 @@ def fetch_and_store_fundamental_data_for_symbol(symbol: str):
         current_date = dt.datetime.now()
         months_difference = (current_date.year - latest_balance_sheet_date.year) * 12 + (current_date.month - latest_balance_sheet_date.month)
         if months_difference <= 3:
-            return
+            return 0
     
+    print("Fetching fundamental data for:", symbol)
     fetch_and_store_balance_sheets_for_symbol(symbol)
     fetch_and_store_cash_flows_for_symbol(symbol)
     fetch_and_store_income_statements_for_symbol(symbol)
     fetch_and_store_stock_overview_for_symbol(symbol)
+    return 1
