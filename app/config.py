@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     y_finance_base_url: str = 'https://query1.finance.yahoo.com/v7'
     # Alpha vantage
     alpha_vantage_base_url: str = 'https://www.alphavantage.co/query'
-    alpha_vantage_token: str = 'LQ2GKKKWRJI6WAM9'
+    alpha_vantage_token: str = 'KNPL6J9N740SLRRG'
 
     # App settings
     cache_time_minutes = 60 * 2
