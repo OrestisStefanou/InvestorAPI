@@ -24,10 +24,12 @@ def get_symbols() -> List[str]:
 
 def update_stock_data():
     api_calls_count = 0
-    errored_symbols = ['NESR','BBIG', 'TKO', 'CYXTQ',]
+    with open('errored_symbols.pkl', 'rb') as file:
+        errored_symbols = pickle.load(file)
+
 
     for symbol in get_symbols():
-        if symbol in ['NESR','BBIG', 'TKO', 'CYXTQ',]:
+        if symbol in errored_symbols:
             continue
         
         balance_sheet_repo = BalanceSheetRepo()
@@ -60,8 +62,8 @@ def update_stock_data():
             api_calls_count += 1
             print(f'Failed to fetch data for: {symbol} with error : {str(err)}')
     
-    with open('errored_symbols.pkl', 'wb') as file:
-        pickle.dump(errored_symbols, file)
+    # with open('errored_symbols.pkl', 'wb') as file:
+    #     pickle.dump(errored_symbols, file)
 
 
 update_stock_data()
