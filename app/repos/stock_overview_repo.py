@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Tuple, Any, Optional
 
 from app.repos.sql_repo import SqlRepo
@@ -164,3 +165,22 @@ class StockOverviewRepo(SqlRepo):
                 DELETE FROM stock_overview WHERE symbol = ?
                 ''', (symbol, )
             )
+
+    def get_latest_registered_datetime_for_symbol(self, symbol: str) -> datetime:
+        cur  = self._db_conn.cursor()
+        query = '''
+            SELECT
+                registered_date_ts
+            FROM stock_overview
+            WHERE symbol = ?
+            ORDER BY registered_date_ts DESC
+        '''
+
+        query_params = (symbol, )
+        rows = cur.execute(query, query_params).fetchall()
+        
+        if len(rows) == 0:
+            return None
+
+        registered_date_ts = rows[0][0]       
+        return datetime.fromtimestamp(registered_date_ts)
