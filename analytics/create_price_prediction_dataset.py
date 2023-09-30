@@ -205,7 +205,7 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     return stock_fundamental_df
 
 
-def create_feature_store(symbols: Optional[List[str]] = None):
+def create_dataset(symbols: Optional[List[str]] = None):
     if not symbols:
         query = 'SELECT DISTINCT symbol FROM income_statement'
         rows = conn.execute(query).fetchall()
@@ -216,9 +216,9 @@ def create_feature_store(symbols: Optional[List[str]] = None):
         stock_df = get_final_stock_data_df(symbol)
         stock_dfs.append(stock_df)
 
-    feature_store_df = pd.concat(stock_dfs)
-    feature_store_df.to_sql('feature_store', conn, index=False, if_exists='replace')
+    dataset_df = pd.concat(stock_dfs)
+    dataset_df.to_sql('price_prediction_dataset', conn, index=False, if_exists='replace')
 
 
-create_feature_store()
+create_dataset()
 conn.close()
