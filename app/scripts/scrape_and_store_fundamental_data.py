@@ -82,27 +82,27 @@ def fetch_and_store_fundamental_data_for_symbol(symbol: str, dry_run: bool = Fal
     stock_overview_repo = StockOverviewRepo()
 
     if _have_latest_balance_sheets(symbol, balance_sheet_repo) is False:
-        print("Fetching balance sheets for symbol:", symbol)
         if dry_run is False:
+            print("Fetching balance sheets for symbol:", symbol)
             fetch_and_store_balance_sheets_for_symbol(symbol)
-        api_calls_count += 1
+            api_calls_count += 1
     
     if _have_latest_cash_flow(symbol, cash_flow_repo) is False:
-        print("Fetching cash flows for symbol:", symbol)
         if dry_run is False:
+            print("Fetching cash flows for symbol:", symbol)
             fetch_and_store_cash_flows_for_symbol(symbol)
-        api_calls_count += 1
+            api_calls_count += 1
     
     if _have_latest_income_statements(symbol, income_statement_repo) is False:
-        print("Fetching income statements for symbol:", symbol)
         if dry_run is False:
+            print("Fetching income statements for symbol:", symbol)
             fetch_and_store_income_statements_for_symbol(symbol)
-        api_calls_count += 1
+            api_calls_count += 1
     
     if _have_latest_stock_overview(symbol, stock_overview_repo) is False:
-        print("Fetching stock overview for symbol:", symbol)
         if dry_run is False:
+            print("Fetching stock overview for symbol:", symbol)
             fetch_and_store_stock_overview_for_symbol(symbol)
-        api_calls_count += 1
+            api_calls_count += 1
     
     return api_calls_count

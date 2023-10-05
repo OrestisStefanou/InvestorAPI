@@ -16,9 +16,15 @@ def get_symbols() -> List[str]:
     """
     Read the symbols from the source csv file
     """
-    df = pd.read_csv('app/database/symbols.csv')
-    stock_symbols = df['product_id'].to_list()
-    return stock_symbols
+    # df = pd.read_csv('app/database/symbols.csv')
+    # stock_symbols = df['product_id'].to_list()
+    # return stock_symbols
+    from app.dependencies import get_db_conn
+    conn = get_db_conn()
+    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date = '29-09-2023'").fetchall()
+    return [
+        row[0] for row in rows
+    ]
 
 
 def update_stock_data():
