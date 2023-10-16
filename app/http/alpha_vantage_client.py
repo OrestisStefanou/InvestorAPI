@@ -23,7 +23,16 @@ class AlphaVantageClient(HttpClient):
             EconomicIndicator.Treasury_Yield: 'TREASURY_YIELD',
             EconomicIndicator.Interest_Rate: 'FEDERAL_FUNDS_RATE',
             EconomicIndicator.Inflation: 'INFLATION',
-            EconomicIndicator.Unemployment: 'UNEMPLOYMENT'
+            EconomicIndicator.Unemployment: 'UNEMPLOYMENT',
+            EconomicIndicator.Natural_Gas: 'NATURAL_GAS',
+            EconomicIndicator.Crude_Oil: 'WTI',
+            EconomicIndicator.Copper: 'COPPER',
+            EconomicIndicator.Aluminum: 'ALUMINUM',
+            EconomicIndicator.Wheat: 'WHEAT',
+            EconomicIndicator.Corn: 'CORN',
+            EconomicIndicator.Cotton: 'COTTON',
+            EconomicIndicator.Sugar: 'SUGAR',
+            EconomicIndicator.Coffee: 'COFFEE'
         }
 
         params = {
