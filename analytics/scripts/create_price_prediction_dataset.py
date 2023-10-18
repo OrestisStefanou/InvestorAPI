@@ -34,13 +34,6 @@ def get_stock_fundamental_df(symbol: str) -> pd.DataFrame:
     stock_df[columns_to_convert] = stock_df[columns_to_convert].astype(float)
     # Fill NaN values with zero for the selected columns
     stock_df[columns_to_convert] = stock_df[columns_to_convert].fillna(0)
-    
-    # Create news columns that will contain value change of the float columns
-    for column in columns_to_convert:
-        if column not in ['change_in_cash_and_cash_equivalents', 'change_in_exchange_rate']:
-            new_column_name = f'{column}_change'
-            stock_df[new_column_name] = stock_df[column] - stock_df[column].shift(1)
-
     return stock_df
 
 
@@ -93,6 +86,18 @@ def get_inflation_df() -> pd.DataFrame:
     SELECT  *
     FROM economic_indicator_time_series
     WHERE indicator_name = 'Inflation'
+    ORDER BY registered_date_ts DESC
+    '''
+
+    inflation_df = pd.read_sql(query, conn)
+    return inflation_df
+
+
+def get_natural_gas_df() -> pd.DataFrame:
+    query = '''
+    SELECT  *
+    FROM economic_indicator_time_series
+    WHERE indicator_name = 'Natural_Gas'
     ORDER BY registered_date_ts DESC
     '''
 
@@ -155,6 +160,7 @@ treasury_yield_df = get_treasury_yield_df()
 commodities_index_df = get_commodities_index_df()
 unemployment_df = get_unemployment_df()
 inflation_df = get_inflation_df()
+natural_gas_df = get_natural_gas_df()
 
 
 def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
@@ -173,6 +179,12 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         time_series_df=treasury_yield_df,
     )
 
+    stock_fundamental_df['avg_natural_gas_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='value',
+        time_series_df=natural_gas_df,
+    )
+
     stock_fundamental_df['avg_unemployment_rate'] = stock_fundamental_df['fiscal_date_ending'].apply(
         calculate_time_series_avg_value,
         target_column='value',
@@ -188,12 +200,6 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     stock_fundamental_df['inflation'] = stock_fundamental_df['fiscal_date_ending'].apply(
         get_inflation_value_by_date,
         inflation_df=inflation_df,
-    )
-
-    stock_fundamental_df['avg_volume'] = stock_fundamental_df['fiscal_date_ending'].apply(
-        calculate_time_series_avg_value,
-        target_column='volume',
-        time_series_df=stock_time_series_df,
     )
 
     stock_fundamental_df['price'] = stock_fundamental_df['fiscal_date_ending'].apply(
