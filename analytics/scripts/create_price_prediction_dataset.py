@@ -45,7 +45,7 @@ def get_interest_rate_df() -> pd.DataFrame:
     '''
 
     interest_rate_df = pd.read_sql(query, conn)
-    return interest_rate_df  
+    return interest_rate_df
 
 
 def get_treasury_yield_df() -> pd.DataFrame:
@@ -98,6 +98,18 @@ def get_natural_gas_df() -> pd.DataFrame:
     SELECT  *
     FROM economic_indicator_time_series
     WHERE indicator_name = 'Natural_Gas'
+    ORDER BY registered_date_ts DESC
+    '''
+
+    inflation_df = pd.read_sql(query, conn)
+    return inflation_df
+
+
+def get_oil_df() -> pd.DataFrame:
+    query = '''
+    SELECT  *
+    FROM economic_indicator_time_series
+    WHERE indicator_name = 'Crude_Oil'
     ORDER BY registered_date_ts DESC
     '''
 
@@ -161,6 +173,7 @@ commodities_index_df = get_commodities_index_df()
 unemployment_df = get_unemployment_df()
 inflation_df = get_inflation_df()
 natural_gas_df = get_natural_gas_df()
+oil_df = get_oil_df()
 
 
 def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
@@ -183,6 +196,12 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         calculate_time_series_avg_value,
         target_column='value',
         time_series_df=natural_gas_df,
+    )
+
+    stock_fundamental_df['avg_oil_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='value',
+        time_series_df=oil_df,
     )
 
     stock_fundamental_df['avg_unemployment_rate'] = stock_fundamental_df['fiscal_date_ending'].apply(
