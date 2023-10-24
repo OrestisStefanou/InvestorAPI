@@ -3,7 +3,12 @@ import datetime as dt
 import sqlite3
 
 import pandas as pd
+from sklearn.preprocessing import (
+    OneHotEncoder,
+    MinMaxScaler
+)
 
+from analytics.machine_learning.utils import preprocessing
 
 def get_dataset(
     db_conn = None
@@ -16,6 +21,11 @@ def get_dataset(
     stocks_df = pd.read_sql(query, db_conn)
     db_conn.close()
 
+    # Drop rows that contain null values
+    columns_with_null = stocks_df.columns[stocks_df.isna().any()].tolist()
+    stocks_df.dropna(subset=columns_with_null, inplace=True)
+    stocks_df.reset_index(inplace=True)
+
     return stocks_df
 
 
@@ -23,7 +33,7 @@ def split_data_to_train_and_test(
     df: pd.DataFrame,
     cutoff_date: dt.datetime,
     cutoff_date_column_name: str = "fiscal_date_ending"
-) -> Tuple[pd.DataFrame, pd.DataFrame]:
+) -> Tuple[pd.DataFrame]:
     """
     Returns (train_set_df, test_set_df)
     """
@@ -39,3 +49,72 @@ def split_data_to_train_and_test(
     test_set = test_set.reset_index(drop=True)
 
     return train_set, test_set 
+
+
+def split_into_input_and_target(
+    train_set: pd.DataFrame,
+    test_set: pd.DataFrame
+) -> Tuple[pd.DataFrame]:
+    """
+    Returns (X_train, y_train, X_test, Y_test)
+    """
+    y_train = train_set['price']
+    X_train = train_set.drop(['price'], axis=1)
+
+    y_test = test_set['price']
+    X_test = test_set.drop(['price'], axis=1)
+
+    return (X_train, y_train, X_test, y_test)
+
+
+def transform_input(
+    X: pd.DataFrame,
+    one_hot_encoder: OneHotEncoder,
+    min_max_scaler: MinMaxScaler,
+    fit: bool = False
+) -> pd.DataFrame:
+    """
+    Performs one hot encoding and min max scaling
+    on X input set. Parameter fit should be True 
+    when X param is the training set.
+    """
+    one_hot_encoded_train_set = preprocessing.perform_one_hot_encoding(
+        df=X,
+        categorical_columns=['sector'],
+        encoder=one_hot_encoder,
+        fit=fit
+    )
+
+    float_columns = X.select_dtypes(include=['float64'])
+    columns_to_scale = list(float_columns.columns)
+
+    scaled_train_set = preprocessing.perform_min_max_scaling(
+        df=one_hot_encoded_train_set,
+        min_max_scaler=min_max_scaler,
+        fit=True,
+        columns_to_scale=columns_to_scale
+    )
+
+    return scaled_train_set
+
+
+def tranform_target(
+    y: pd.Series,
+    min_max_scaler: MinMaxScaler,
+    inverse: bool = False,
+    fit: bool = False
+) -> pd.Series:
+    """
+    Performs min max scaling on y target.
+    Parameter fit should be True if target is
+    used for training otherwise False.
+    Parameter inverse should be True in case
+    that we want to transform the scaled value back
+    to it's normal scale 
+    """
+    return preprocessing.min_max_scale_transformation_on_target(
+        target=y,
+        min_max_scaler=min_max_scaler,
+        inverse=inverse,
+        fit=fit
+    )

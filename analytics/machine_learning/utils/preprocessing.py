@@ -67,3 +67,26 @@ def perform_min_max_scaling(
         scaled_df[columns_to_scale] = min_max_scaler.transform(df[columns_to_scale])
 
     return scaled_df
+
+
+def min_max_scale_transformation_on_target(
+    target: pd.Series,
+    min_max_scaler: MinMaxScaler,
+    inverse: bool = False,
+    fit: bool = False
+) -> pd.Series:
+    if fit:
+        min_max_scaler.fit(target.values.reshape(-1, 1))
+    
+    if inverse:
+        return pd.Series(
+            min_max_scaler.inverse_transform(
+                target.values.reshape(-1, 1)
+            ).flatten()
+        )
+    
+    return pd.Series(
+        min_max_scaler.transform(
+            target.values.reshape(-1, 1)
+        ).flatten()
+    )
