@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 import datetime as dt
 import sqlite3
 
@@ -24,7 +24,7 @@ def get_dataset(
     # Drop rows that contain null values
     columns_with_null = stocks_df.columns[stocks_df.isna().any()].tolist()
     stocks_df.dropna(subset=columns_with_null, inplace=True)
-    stocks_df.reset_index(inplace=True)
+    stocks_df.reset_index(inplace=True, drop=True)
 
     return stocks_df
 
@@ -56,7 +56,7 @@ def split_into_input_and_target(
     test_set: pd.DataFrame
 ) -> Tuple[pd.DataFrame]:
     """
-    Returns (X_train, y_train, X_test, Y_test)
+    Returns (X_train, y_train, X_test, y_test)
     """
     y_train = train_set['price']
     X_train = train_set.drop(['price'], axis=1)
@@ -70,7 +70,7 @@ def split_into_input_and_target(
 def transform_input(
     X: pd.DataFrame,
     one_hot_encoder: OneHotEncoder,
-    min_max_scaler: MinMaxScaler,
+    min_max_scaler: Optional[MinMaxScaler] = None,
     fit: bool = False
 ) -> pd.DataFrame:
     """
@@ -78,6 +78,9 @@ def transform_input(
     on X input set. Parameter fit should be True 
     when X param is the training set.
     """
+    # Drop useless columns
+    X.drop(['symbol', 'fiscal_date_ending', 'reported_currency'], axis=1, inplace=True)
+    
     one_hot_encoded_train_set = preprocessing.perform_one_hot_encoding(
         df=X,
         categorical_columns=['sector'],
@@ -85,17 +88,19 @@ def transform_input(
         fit=fit
     )
 
-    float_columns = X.select_dtypes(include=['float64'])
-    columns_to_scale = list(float_columns.columns)
+    if min_max_scaler:
+        float_columns = X.select_dtypes(include=['float64'])
+        columns_to_scale = list(float_columns.columns)
 
-    scaled_train_set = preprocessing.perform_min_max_scaling(
-        df=one_hot_encoded_train_set,
-        min_max_scaler=min_max_scaler,
-        fit=True,
-        columns_to_scale=columns_to_scale
-    )
+        scaled_train_set = preprocessing.perform_min_max_scaling(
+            df=one_hot_encoded_train_set,
+            min_max_scaler=min_max_scaler,
+            fit=True,
+            columns_to_scale=columns_to_scale
+        )
+        return scaled_train_set.reset_index(drop=True)
 
-    return scaled_train_set
+    return one_hot_encoded_train_set
 
 
 def tranform_target(
