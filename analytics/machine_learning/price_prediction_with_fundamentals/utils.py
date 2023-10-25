@@ -123,3 +123,15 @@ def tranform_target(
         inverse=inverse,
         fit=fit
     )
+
+
+def calculate_avg_pct_loss(
+    y_pred: pd.Series,
+    y_actual: pd.Series
+) -> float:
+    total_pct_loss = 0
+    for i in range(len(y_pred)):
+        pct_loss = (abs(y_pred[i] - y_actual[i]) / y_pred[i]) * 100
+        total_pct_loss += pct_loss
+    
+    return float(total_pct_loss / len(y_pred))
