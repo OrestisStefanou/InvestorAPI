@@ -1,4 +1,9 @@
-from typing import Tuple, Optional
+from typing import (
+    Tuple,
+    Optional,
+    Dict,
+    List
+)
 import datetime as dt
 import sqlite3
 
@@ -11,11 +16,15 @@ from sklearn.preprocessing import (
 from analytics.machine_learning.utils import preprocessing
 
 def get_dataset(
-    db_conn = None
+    db_conn = None,
+    sector: Optional[str] = None
 ) -> pd.DataFrame:
     if db_conn is None:
         db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
     
+    if sector:
+        query = f"SELECT * FROM price_prediction_dataset WHERE sector='{sector}' ORDER BY DATE(fiscal_date_ending)"
+
     query = "SELECT * FROM price_prediction_dataset ORDER BY DATE(fiscal_date_ending)"
 
     stocks_df = pd.read_sql(query, db_conn)
@@ -135,3 +144,81 @@ def calculate_avg_pct_loss(
         total_pct_loss += pct_loss
     
     return float(total_pct_loss / len(y_pred))
+
+
+def calculate_avg_pct_loss_per_sector(
+    y_pred: pd.Series,
+    y_actual: pd.Series,
+    sector_series: pd.Series
+) -> Dict[str, float]:
+    sector_total_pct_loss_dict = dict()
+    sector_pred_count_dict = dict()
+    for i in range(len(y_pred)):
+        pct_loss = (abs(y_pred[i] - y_actual[i]) / y_pred[i]) * 100
+        sector = sector_series[i]
+        if sector in sector_total_pct_loss_dict:
+            sector_total_pct_loss_dict[sector] += pct_loss
+            sector_pred_count_dict[sector] += 1
+        else:
+            sector_total_pct_loss_dict[sector] = pct_loss
+            sector_pred_count_dict[sector] = 1
+    
+    avg_pct_loss_per_sector_dict = dict() 
+    for sector in sector_total_pct_loss_dict:
+        avg_pct_loss_per_sector_dict[sector] = sector_total_pct_loss_dict[sector] / sector_pred_count_dict[sector]
+
+    return avg_pct_loss_per_sector_dict
+
+
+def calculate_avg_pct_loss_per_price_bucket(
+    y_pred: pd.Series,
+    y_actual: pd.Series,
+    buckets: List[Tuple[float, float]]
+):
+    def get_price_bucket(price: float) -> int:
+        """
+        Returns the bucket index that the price belongs to or
+        -1 in case the price doesn't belong to any bucket
+        """
+        for i in range(len(buckets)):
+            if price > buckets[i][0] and price < buckets[i][1]:
+                return i
+
+        return -1
+
+    def create_string_key_for_bucket(bucket_index: int) -> str:
+        if bucket_index == -1:
+            return f"{buckets[bucket_index][1]}+"
+
+        return f"{buckets[bucket_index][0]} - {buckets[bucket_index][1]}"
+
+    bucket_total_pct_loss_dict = dict()
+    bucket_pred_count_dict = dict()
+    for i in range(len(y_pred)):
+        pct_loss = (abs(y_pred[i] - y_actual[i]) / y_pred[i]) * 100
+        bucket_index = get_price_bucket(y_actual[i])
+        bucket_name = create_string_key_for_bucket(bucket_index)
+        if bucket_name in bucket_total_pct_loss_dict:
+            bucket_total_pct_loss_dict[bucket_name] += pct_loss
+            bucket_pred_count_dict[bucket_name] += 1
+        else:
+            bucket_total_pct_loss_dict[bucket_name] = pct_loss
+            bucket_pred_count_dict[bucket_name] = 1
+    
+    avg_pct_loss_per_bucket_dict = dict() 
+    for bucket in bucket_total_pct_loss_dict:
+        avg_pct_loss_per_bucket_dict[bucket] = bucket_total_pct_loss_dict[bucket] / bucket_pred_count_dict[bucket]
+
+    return avg_pct_loss_per_bucket_dict
+
+
+def get_feature_importance_sorted(
+    feature_importance_scores: List[float],
+    feature_names: List[str]
+) -> List[Tuple[str, float]]:
+    feature_name_with_score_list = list()
+    for i in range(len(feature_importance_scores)):
+        feature_name = feature_names[i]
+        feature_name_with_score_list.append((feature_name, feature_importance_scores[i]))
+    
+    return sorted(feature_name_with_score_list, key=lambda x: x[1], reverse=True)
