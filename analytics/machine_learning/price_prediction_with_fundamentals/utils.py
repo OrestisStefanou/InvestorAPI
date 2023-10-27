@@ -10,7 +10,8 @@ import sqlite3
 import pandas as pd
 from sklearn.preprocessing import (
     OneHotEncoder,
-    MinMaxScaler
+    MinMaxScaler,
+    StandardScaler
 )
 
 from analytics.machine_learning.utils import preprocessing
@@ -79,7 +80,7 @@ def split_into_input_and_target(
 def transform_input(
     X: pd.DataFrame,
     one_hot_encoder: OneHotEncoder,
-    min_max_scaler: Optional[MinMaxScaler] = None,
+    scaler: Optional[MinMaxScaler | StandardScaler] = None,
     fit: bool = False
 ) -> pd.DataFrame:
     """
@@ -97,13 +98,13 @@ def transform_input(
         fit=fit
     )
 
-    if min_max_scaler:
+    if scaler:
         float_columns = X.select_dtypes(include=['float64'])
         columns_to_scale = list(float_columns.columns)
 
-        scaled_train_set = preprocessing.perform_min_max_scaling(
+        scaled_train_set = preprocessing.perform_scaling(
             df=one_hot_encoded_train_set,
-            min_max_scaler=min_max_scaler,
+            scaler=scaler,
             fit=True,
             columns_to_scale=columns_to_scale
         )

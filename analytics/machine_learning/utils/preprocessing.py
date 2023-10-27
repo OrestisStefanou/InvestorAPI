@@ -3,7 +3,8 @@ from typing import List, Optional
 import pandas as pd
 from sklearn.preprocessing import (
     OneHotEncoder,
-    MinMaxScaler
+    MinMaxScaler,
+    StandardScaler
 )
 
 
@@ -40,15 +41,15 @@ def perform_one_hot_encoding(
     return final_df.reset_index(drop=True)
 
 
-def perform_min_max_scaling(
+def perform_scaling(
     df: pd.DataFrame,
-    min_max_scaler: MinMaxScaler,
+    scaler: MinMaxScaler | StandardScaler,
     fit: bool = False,
     columns_to_scale: Optional[List[str]] = None
 ) -> pd.DataFrame:
     """
     Given a dataframe with numerical columns this function will return a new dataframe
-    that will perform min max scaling on these columns and will leave the rest
+    that will perform  scaling on these columns and will leave the rest
     of the columns unchanged.
     params:
     - fit -> If fit is True then fit_transform is called , otherwise only transform
@@ -62,31 +63,31 @@ def perform_min_max_scaling(
     scaled_df = df.copy()
     # Scale the specified columns
     if fit:
-        scaled_df[columns_to_scale] = min_max_scaler.fit_transform(df[columns_to_scale])
+        scaled_df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
     else:
-        scaled_df[columns_to_scale] = min_max_scaler.transform(df[columns_to_scale])
+        scaled_df[columns_to_scale] = scaler.transform(df[columns_to_scale])
 
     return scaled_df
 
 
-def min_max_scale_transformation_on_target(
+def scale_transformation_on_target(
     target: pd.Series,
-    min_max_scaler: MinMaxScaler,
+    scaler: MinMaxScaler | StandardScaler,
     inverse: bool = False,
     fit: bool = False
 ) -> pd.Series:
     if fit:
-        min_max_scaler.fit(target.values.reshape(-1, 1))
+        scaler.fit(target.values.reshape(-1, 1))
     
     if inverse:
         return pd.Series(
-            min_max_scaler.inverse_transform(
+            scaler.inverse_transform(
                 target.values.reshape(-1, 1)
             ).flatten()
         )
     
     return pd.Series(
-        min_max_scaler.transform(
+        scaler.transform(
             target.values.reshape(-1, 1)
         ).flatten()
     )
