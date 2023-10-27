@@ -3,7 +3,7 @@ from typing import Optional, List
 
 import pandas as pd
 
-PREDICTION_TIMEWINDOW_DAYS = 90
+PREDICTION_TIMEWINDOW_DAYS = 95
 
 conn = sqlite3.connect('app/database/ibd.db')
 
@@ -34,6 +34,12 @@ def get_stock_fundamental_df(symbol: str) -> pd.DataFrame:
     stock_df[columns_to_convert] = stock_df[columns_to_convert].astype(float)
     # Fill NaN values with zero for the selected columns
     stock_df[columns_to_convert] = stock_df[columns_to_convert].fillna(0)
+
+    for column in columns_to_convert:
+        if column not in ['change_in_cash_and_cash_equivalents', 'change_in_exchange_rate']:
+            new_column_name = f'{column}_value_change'
+            stock_df[new_column_name] = stock_df[column] - stock_df[column].shift(1)
+
     return stock_df
 
 
@@ -139,9 +145,12 @@ def calculate_time_series_avg_value(
     Given a start calculate what was the avg value
     between <start_date> and <start_date> + <days> time
     """
-    lower_bound = pd.Timestamp(start_date)
-    
-    upper_bound = lower_bound + pd.DateOffset(days=days)
+    if days < 0:
+        lower_bound = pd.Timestamp(start_date) - pd.DateOffset(days=abs(days))
+        upper_bound = pd.Timestamp(start_date) 
+    else:
+        lower_bound = pd.Timestamp(start_date)
+        upper_bound = lower_bound + pd.DateOffset(days=days)
     
     # Filter the DataFrame
     filtered_df = time_series_df[(time_series_df['registered_date_ts'] >= lower_bound.timestamp()) & (time_series_df['registered_date_ts'] <= upper_bound.timestamp())]
@@ -221,7 +230,14 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         inflation_df=inflation_df,
     )
 
-    stock_fundamental_df['price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+    stock_fundamental_df['avg_three_months_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+        days=-PREDICTION_TIMEWINDOW_DAYS
+    )
+
+    stock_fundamental_df['avg_next_three_months_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
         calculate_time_series_avg_value,
         target_column='close_price',
         time_series_df=stock_time_series_df,

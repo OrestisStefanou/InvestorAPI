@@ -18,7 +18,9 @@ from analytics.machine_learning.utils import preprocessing
 
 def get_dataset(
     db_conn = None,
-    sector: Optional[str] = None
+    sector: Optional[str] = None,
+    only_value_change_columns: bool = False,
+    only_value_columns: bool = True
 ) -> pd.DataFrame:
     if db_conn is None:
         db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
@@ -35,6 +37,28 @@ def get_dataset(
     columns_with_null = stocks_df.columns[stocks_df.isna().any()].tolist()
     stocks_df.dropna(subset=columns_with_null, inplace=True)
     stocks_df.reset_index(inplace=True, drop=True)
+
+    economic_indicators_cols = [
+        'avg_interest_rate',                 
+        'avg_treasury_yield',                
+        'avg_natural_gas_price',             
+        'avg_oil_price',                     
+        'avg_unemployment_rate',             
+        'avg_global_commodities_index_value',
+        'inflation',                           
+    ]
+
+    value_change_cols = ['change_in_cash_and_cash_equivalents', 'change_in_exchange_rate']
+    for col_name in stocks_df.columns:
+        if '_value_change' in col_name:
+            value_change_cols.append(col_name)
+
+    if only_value_change_columns:    
+        columnss_to_keep = value_change_cols + economic_indicators_cols + ['sector', 'avg_three_months_price', 'avg_next_three_months_price']    
+        return stocks_df[columnss_to_keep]
+
+    if only_value_columns:
+        return stocks_df.drop(value_change_cols, axis=1)
 
     return stocks_df
 
