@@ -152,9 +152,13 @@ def calculate_time_series_avg_value(
         lower_bound = pd.Timestamp(start_date)
         upper_bound = lower_bound + pd.DateOffset(days=days)
     
+    time_series_df['registered_date_ts'] = pd.to_datetime(time_series_df['registered_date_ts'], unit='s')
     # Filter the DataFrame
-    filtered_df = time_series_df[(time_series_df['registered_date_ts'] >= lower_bound.timestamp()) & (time_series_df['registered_date_ts'] <= upper_bound.timestamp())]
-    
+    filtered_df = time_series_df[
+        (time_series_df['registered_date_ts'] >= lower_bound) & 
+        (time_series_df['registered_date_ts'] <= upper_bound)
+    ]
+
     if len(filtered_df) == 0:
         return None
 
@@ -258,8 +262,8 @@ def create_dataset(symbols: Optional[List[str]] = None):
         stock_dfs.append(stock_df)
 
     dataset_df = pd.concat(stock_dfs)
-    dataset_df.to_sql('price_prediction_dataset', conn, index=False, if_exists='replace')
+    dataset_df.to_sql('price_prediction_dataset_test', conn, index=False, if_exists='replace')
 
 
-create_dataset()
+create_dataset(['NVDA'])
 conn.close()

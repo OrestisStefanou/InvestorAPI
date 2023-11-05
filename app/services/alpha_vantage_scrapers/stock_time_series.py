@@ -12,7 +12,7 @@ class StockTimeSeriesScraper:
     def _convert_json_to_domain_model(cls, json: Dict[str, Any]) -> List[StockTimeSeriesEntry]:
         time_series = []
 
-        for date, data in json['Monthly Adjusted Time Series'].items():
+        for date, data in json['Weekly Adjusted Time Series'].items():
             # Convert datetime string to object
             date_time_obj = dt.datetime.strptime(date, '%Y-%m-%d')
 
@@ -37,7 +37,7 @@ class StockTimeSeriesScraper:
     @classmethod
     async def scrape_stock_time_series(cls, symbol: str) -> List[StockTimeSeriesEntry]:
         av_client = alpha_vantage_client.AlphaVantageClient()
-        json_response = await av_client.get_company_monthly_time_series(symbol)
+        json_response = await av_client.get_company_time_series(symbol)
 
         try:
             time_series = cls._convert_json_to_domain_model(json_response)

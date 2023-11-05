@@ -180,13 +180,13 @@ class AlphaVantageClient(HttpClient):
 
         return response.json()
 
-    async def get_company_monthly_time_series(self, symbol: str) -> Dict[str, Any]:
+    async def get_company_time_series(self, symbol: str) -> Dict[str, Any]:
         """
-        Returns json response of adjusted monthly time series from alpha vantage.
-        Example response: https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=IBM&apikey=demo
+        Returns json response of adjusted weekly time series from alpha vantage.
+        Example response: https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY_ADJUSTED&symbol=IBM&apikey=demo
         """
         params = {
-            'function': 'TIME_SERIES_MONTHLY_ADJUSTED',
+            'function': 'TIME_SERIES_WEEKLY_ADJUSTED',
             'symbol': symbol,
             'apikey': self._token
         }
