@@ -19,8 +19,8 @@ async def fetch_and_store_stock_time_series(symbol: str) -> int:
         latest_timestamp = time_series[0].registered_date.date_ts
         latest_time_series_date = dt.datetime.fromtimestamp(latest_timestamp)
         current_date = dt.datetime.now()
-        months_difference = (current_date.year - latest_time_series_date.year) * 12 + (current_date.month - latest_time_series_date.month)
-        if months_difference < 1:
+        weeks_difference = (current_date - latest_time_series_date).days // 7
+        if weeks_difference < 2:
             return 0
 
     print("Fetching time series for:", symbol)
