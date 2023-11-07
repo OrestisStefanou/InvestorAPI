@@ -3,7 +3,7 @@ from typing import Optional, List
 
 import pandas as pd
 
-PREDICTION_TIMEWINDOW_DAYS = 95
+PREDICTION_TIMEWINDOW_DAYS = 90
 
 conn = sqlite3.connect('app/database/ibd.db')
 
@@ -262,8 +262,8 @@ def create_dataset(symbols: Optional[List[str]] = None):
         stock_dfs.append(stock_df)
 
     dataset_df = pd.concat(stock_dfs)
-    dataset_df.to_sql('price_prediction_dataset_test', conn, index=False, if_exists='replace')
+    dataset_df.to_sql('price_prediction_dataset', conn, index=False, if_exists='replace')
 
 
-create_dataset(['NVDA'])
+create_dataset()
 conn.close()
