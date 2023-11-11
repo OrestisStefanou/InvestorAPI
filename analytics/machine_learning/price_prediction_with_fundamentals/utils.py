@@ -54,7 +54,7 @@ def get_dataset(
             value_change_cols.append(col_name)
 
     if only_value_change_columns:    
-        columnss_to_keep = value_change_cols + economic_indicators_cols + ['sector', 'avg_three_months_price', 'avg_next_three_months_price']    
+        columnss_to_keep = value_change_cols + economic_indicators_cols + ['symbol', 'reported_currency', 'fiscal_date_ending', 'sector', 'avg_three_months_price', 'avg_next_three_months_price']    
         return stocks_df[columnss_to_keep]
 
     if only_value_columns:
