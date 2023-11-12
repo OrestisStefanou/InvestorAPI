@@ -139,7 +139,7 @@ def transform_input(
 
 def tranform_target(
     y: pd.Series,
-    min_max_scaler: MinMaxScaler,
+    scaler: MinMaxScaler,
     inverse: bool = False,
     fit: bool = False
 ) -> pd.Series:
@@ -151,9 +151,9 @@ def tranform_target(
     that we want to transform the scaled value back
     to it's normal scale 
     """
-    return preprocessing.min_max_scale_transformation_on_target(
+    return preprocessing.scale_transformation_on_target(
         target=y,
-        min_max_scaler=min_max_scaler,
+        scaler=scaler,
         inverse=inverse,
         fit=fit
     )
