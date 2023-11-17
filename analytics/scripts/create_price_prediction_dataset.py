@@ -263,6 +263,7 @@ def create_dataset(symbols: Optional[List[str]] = None):
 
     dataset_df = pd.concat(stock_dfs)
     dataset_df.to_sql('price_prediction_dataset', conn, index=False, if_exists='replace')
+    dataset_df.to_csv('price_prediction_dataset.csv')
 
 
 create_dataset()
