@@ -195,6 +195,14 @@ def calculate_avg_pct_loss_per_sector(
     return avg_pct_loss_per_sector_dict
 
 
+def calculate_avg_pct_loss_per_sector_v2(
+    y_pred: pd.Series,
+    y_actual: pd.Series,
+    sector_series: pd.Series
+) -> Dict[str, float]:
+    # Use mean_absolute_percentage_error of sklearn
+    pass
+
 def calculate_avg_pct_loss_per_price_bucket(
     y_pred: pd.Series,
     y_actual: pd.Series,
