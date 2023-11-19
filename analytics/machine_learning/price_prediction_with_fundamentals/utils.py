@@ -13,6 +13,7 @@ from sklearn.preprocessing import (
     MinMaxScaler,
     StandardScaler
 )
+from sklearn.metrics import mean_absolute_percentage_error
 
 from analytics.machine_learning.utils import preprocessing
 
@@ -176,32 +177,27 @@ def calculate_avg_pct_loss_per_sector(
     y_actual: pd.Series,
     sector_series: pd.Series
 ) -> Dict[str, float]:
-    sector_total_pct_loss_dict = dict()
-    sector_pred_count_dict = dict()
+    predictions_per_sector: Dict[str, List] = dict()
+    actual_values_per_sector: Dict[str, List] = dict()
+
     for i in range(len(y_pred)):
-        pct_loss = (abs(y_pred[i] - y_actual[i]) / y_pred[i]) * 100
         sector = sector_series[i]
-        if sector in sector_total_pct_loss_dict:
-            sector_total_pct_loss_dict[sector] += pct_loss
-            sector_pred_count_dict[sector] += 1
+        if sector in predictions_per_sector:
+            predictions_per_sector[sector].append(y_pred[i])
+            actual_values_per_sector[sector].append(y_actual[i])
         else:
-            sector_total_pct_loss_dict[sector] = pct_loss
-            sector_pred_count_dict[sector] = 1
+            predictions_per_sector[sector] = [y_pred[i], ]
+            actual_values_per_sector[sector] = [y_actual[i], ]
     
-    avg_pct_loss_per_sector_dict = dict() 
-    for sector in sector_total_pct_loss_dict:
-        avg_pct_loss_per_sector_dict[sector] = sector_total_pct_loss_dict[sector] / sector_pred_count_dict[sector]
+    avg_pct_loss_per_sector = dict()
+    for sector in predictions_per_sector:
+        avg_pct_loss_per_sector[sector] = mean_absolute_percentage_error(
+            y_true=actual_values_per_sector[sector],
+            y_pred=predictions_per_sector[sector]
+        )
 
-    return avg_pct_loss_per_sector_dict
+    return avg_pct_loss_per_sector
 
-
-def calculate_avg_pct_loss_per_sector_v2(
-    y_pred: pd.Series,
-    y_actual: pd.Series,
-    sector_series: pd.Series
-) -> Dict[str, float]:
-    # Use mean_absolute_percentage_error of sklearn
-    pass
 
 def calculate_avg_pct_loss_per_price_bucket(
     y_pred: pd.Series,
