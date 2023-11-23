@@ -9,14 +9,19 @@ conn = sqlite3.connect('app/database/ibd.db')
 
 def get_stock_fundamental_df(symbol: str) -> pd.DataFrame:
     query = f'''
-        SELECT income_statement.*, balance_sheet.*, cash_flow.*, stock_overview.sector
+        SELECT 
+            income_statement.*,
+            balance_sheet.*,
+            cash_flow.*,
+            stock_overview.sector,
+            stock_overview.industry
         FROM income_statement
         INNER JOIN balance_sheet
-        ON income_statement.fiscal_date_ending = balance_sheet.fiscal_date_ending  AND balance_sheet.symbol = '{symbol}'
+            ON income_statement.fiscal_date_ending = balance_sheet.fiscal_date_ending  AND balance_sheet.symbol = '{symbol}'
         INNER JOIN cash_flow
-        ON income_statement.fiscal_date_ending = cash_flow.fiscal_date_ending  AND cash_flow.symbol = '{symbol}'
+            ON income_statement.fiscal_date_ending = cash_flow.fiscal_date_ending  AND cash_flow.symbol = '{symbol}'
         INNER JOIN stock_overview
-        ON income_statement.symbol = stock_overview.symbol  AND stock_overview.symbol = '{symbol}'
+            ON income_statement.symbol = stock_overview.symbol  AND stock_overview.symbol = '{symbol}'
         WHERE income_statement.symbol = '{symbol}'
         ORDER BY DATE(income_statement.fiscal_date_ending)
     '''
@@ -27,7 +32,7 @@ def get_stock_fundamental_df(symbol: str) -> pd.DataFrame:
 
     # List of columns to convert to float
     columns_to_convert = stock_df.columns.difference(
-        ['symbol', 'fiscal_date_ending', 'reported_currency', 'sector']
+        ['symbol', 'fiscal_date_ending', 'reported_currency', 'sector', 'industry']
     )
 
     # Convert selected columns to float
@@ -123,6 +128,50 @@ def get_oil_df() -> pd.DataFrame:
     return inflation_df
 
 
+def get_s_p_500_time_series_df() -> pd.DataFrame:
+    query = '''
+    SELECT *
+    FROM world_indices_time_series
+    WHERE index_name = 'S&P 500'
+    ORDER BY registered_date_ts DESC
+    '''
+    s_p_500_df = pd.read_sql(query, conn)
+    return s_p_500_df
+
+
+def get_dow_jones_time_series_df() -> pd.DataFrame:
+    query = '''
+    SELECT *
+    FROM world_indices_time_series
+    WHERE index_name = 'Dow Jones Industrial Average'
+    ORDER BY registered_date_ts DESC
+    '''
+    dow_jones_df = pd.read_sql(query, conn)
+    return dow_jones_df
+
+
+def get_nasdaq_time_series_df() -> pd.DataFrame:
+    query = '''
+    SELECT *
+    FROM world_indices_time_series
+    WHERE index_name = 'NASDAQ Composite'
+    ORDER BY registered_date_ts DESC
+    '''
+    nasdaq_df = pd.read_sql(query, conn)
+    return nasdaq_df
+
+
+def get_nyse_time_series_df() -> pd.DataFrame:
+    query = '''
+    SELECT *
+    FROM world_indices_time_series
+    WHERE index_name = 'NYSE COMPOSITE'
+    ORDER BY registered_date_ts DESC
+    '''
+    nyse_df = pd.read_sql(query, conn)
+    return nyse_df
+
+
 def get_stock_time_series_df(symbol: str) -> pd.DataFrame:
     query = f'''
     SELECT  *
@@ -162,8 +211,49 @@ def calculate_time_series_avg_value(
     if len(filtered_df) == 0:
         return None
 
+    # Sort the filtered DataFrame by timestamp
+    filtered_df = filtered_df.sort_values(by='registered_date_ts')
+
     average_value = filtered_df[target_column].mean()
     return average_value
+
+
+def calculate_time_series_value_change(
+    start_date: str,
+    time_series_df: pd.DataFrame,
+    target_column: str,
+    days: int = PREDICTION_TIMEWINDOW_DAYS
+) -> Optional[int]:
+    """
+    Given a start calculate what was the value change
+    between <start_date> and <start_date> + <days> time
+    """
+    if days < 0:
+        lower_bound = pd.Timestamp(start_date) - pd.DateOffset(days=abs(days))
+        upper_bound = pd.Timestamp(start_date) 
+    else:
+        lower_bound = pd.Timestamp(start_date)
+        upper_bound = lower_bound + pd.DateOffset(days=days)
+    
+    time_series_df['registered_date_ts'] = pd.to_datetime(time_series_df['registered_date_ts'], unit='s')
+    # Filter the DataFrame
+    filtered_df = time_series_df[
+        (time_series_df['registered_date_ts'] >= lower_bound) & 
+        (time_series_df['registered_date_ts'] <= upper_bound)
+    ]
+
+    if len(filtered_df) == 0:
+        return None
+
+    # Sort the filtered DataFrame by timestamp
+    filtered_df = filtered_df.sort_values(by='registered_date_ts')
+
+    # Calculate the value change between the first and last values
+    first_value = filtered_df[target_column].iloc[0]
+    last_value = filtered_df[target_column].iloc[-1]
+    value_change = last_value - first_value
+
+    return value_change
 
 
 def get_inflation_value_by_date(date_string: str, inflation_df: pd.DataFrame) -> Optional[float]:
@@ -187,6 +277,10 @@ unemployment_df = get_unemployment_df()
 inflation_df = get_inflation_df()
 natural_gas_df = get_natural_gas_df()
 oil_df = get_oil_df()
+s_p_500_df = get_s_p_500_time_series_df()
+dow_jones_df = get_dow_jones_time_series_df()
+nasdaq_df = get_nasdaq_time_series_df()
+nyse_df = get_nyse_time_series_df()
 
 
 def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
@@ -229,6 +323,30 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         time_series_df=commodities_index_df,
     )
 
+    stock_fundamental_df['avg_s_p_500_index_value'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=s_p_500_df,
+    )
+
+    stock_fundamental_df['avg_dow_jones_index_value'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=dow_jones_df,
+    )
+
+    stock_fundamental_df['avg_nasdaq_index_value'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=nasdaq_df,
+    )
+
+    stock_fundamental_df['avg_nyse_index_value'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=nyse_df,
+    )
+
     stock_fundamental_df['inflation'] = stock_fundamental_df['fiscal_date_ending'].apply(
         get_inflation_value_by_date,
         inflation_df=inflation_df,
@@ -245,6 +363,66 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         calculate_time_series_avg_value,
         target_column='close_price',
         time_series_df=stock_time_series_df,
+    )
+
+    stock_fundamental_df['interest_rate_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='value',
+        time_series_df=interest_rate_df,
+    )
+
+    stock_fundamental_df['treasury_yield_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='value',
+        time_series_df=treasury_yield_df,
+    )
+
+    stock_fundamental_df['natural_gas_price_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='value',
+        time_series_df=natural_gas_df,
+    )
+
+    stock_fundamental_df['oil_price_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='value',
+        time_series_df=oil_df,
+    )
+
+    stock_fundamental_df['unemployment_rate_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='value',
+        time_series_df=unemployment_df,
+    )
+
+    stock_fundamental_df['global_commodities_index_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='value',
+        time_series_df=commodities_index_df,
+    )
+
+    stock_fundamental_df['s_p_500_index_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='close_price',
+        time_series_df=s_p_500_df,
+    )
+
+    stock_fundamental_df['dow_jones_index_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='close_price',
+        time_series_df=dow_jones_df,
+    )
+
+    stock_fundamental_df['nasdaq_index_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='close_price',
+        time_series_df=nasdaq_df,
+    )
+
+    stock_fundamental_df['nyse_index_value_change'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_value_change,
+        target_column='close_price',
+        time_series_df=nyse_df,
     )
 
     return stock_fundamental_df
