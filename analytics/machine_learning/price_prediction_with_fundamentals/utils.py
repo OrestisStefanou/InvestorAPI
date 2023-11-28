@@ -27,9 +27,18 @@ def get_dataset(
         db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
     
     if sector:
-        query = f"SELECT * FROM price_prediction_dataset WHERE sector='{sector}' ORDER BY DATE(fiscal_date_ending)"
+        query = f'''
+            SELECT * 
+            FROM price_prediction_dataset 
+            WHERE sector='{sector}' AND DATE(fiscal_date_ending) <= date('now', '-3 months')
+            ORDER BY DATE(fiscal_date_ending)'''
 
-    query = "SELECT * FROM price_prediction_dataset ORDER BY DATE(fiscal_date_ending)"
+    query = '''
+        SELECT * 
+        FROM price_prediction_dataset 
+        WHERE DATE(fiscal_date_ending) <= date('now', '-3 months')
+        ORDER BY DATE(fiscal_date_ending)
+    '''
 
     stocks_df = pd.read_sql(query, db_conn)
     db_conn.close()
