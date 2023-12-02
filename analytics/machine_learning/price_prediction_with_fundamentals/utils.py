@@ -19,19 +19,9 @@ from analytics.machine_learning.utils import preprocessing
 
 def get_dataset(
     db_conn = None,
-    sector: Optional[str] = None,
-    only_value_change_columns: bool = False,
-    only_value_columns: bool = False
 ) -> pd.DataFrame:
     if db_conn is None:
         db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
-    
-    if sector:
-        query = f'''
-            SELECT * 
-            FROM price_prediction_dataset 
-            WHERE sector='{sector}' AND DATE(fiscal_date_ending) <= date('now', '-3 months')
-            ORDER BY DATE(fiscal_date_ending)'''
 
     query = '''
         SELECT * 
@@ -48,32 +38,43 @@ def get_dataset(
     stocks_df.dropna(subset=columns_with_null, inplace=True)
     stocks_df.reset_index(inplace=True, drop=True)
 
+    world_indices_value_change_cols = [
+        's_p_500_index_value_change',
+        'dow_jones_index_value_change',
+        'nasdaq_index_value_change',
+        'nyse_index_value_change'
+    ]
+
+    economic_indicators_avg_value_cols = [
+        'avg_interest_rate',
+        'avg_treasury_yield',
+        'avg_natural_gas_price',
+        'avg_oil_price',
+        'avg_unemployment_rate',
+        'avg_global_commodities_index_value',
+        'inflation'
+    ]
+
+    economic_indicators_value_change_cols = [
+        'interest_rate_value_change',
+        'treasury_yield_value_change',
+        'natural_gas_price_value_change',
+        'oil_price_value_change',
+        'unemployment_rate_value_change',
+        'global_commodities_index_value_change',
+    ]
+
+
     value_change_cols = ['change_in_cash_and_cash_equivalents', 'change_in_exchange_rate']
     for col_name in stocks_df.columns:
         if '_value_change' in col_name:
-            value_change_cols.append(col_name)
+            if col_name not in world_indices_value_change_cols and col_name not in economic_indicators_value_change_cols:
+                value_change_cols.append(col_name)
 
-    if only_value_change_columns:
-        economic_indicators_value_change_cols = [
-            'interest_rate_value_change',
-            'treasury_yield_value_change',
-            'natural_gas_price_value_change',
-            'oil_price_value_change',
-            'unemployment_rate_value_change',
-            'global_commodities_index_value_change',
-            's_p_500_index_value_change',
-            'dow_jones_index_value_change',
-            'nasdaq_index_value_change',
-            'nyse_index_value_change',
-            'inflation'
-        ] 
-        columnss_to_keep = value_change_cols + economic_indicators_value_change_cols + ['symbol', 'reported_currency', 'fiscal_date_ending', 'sector', 'avg_three_months_price', 'avg_next_three_months_price']    
-        return stocks_df[columnss_to_keep]
 
-    if only_value_columns:
-        return stocks_df.drop(value_change_cols, axis=1)
+    columnss_to_keep = value_change_cols + economic_indicators_avg_value_cols + ['symbol', 'fiscal_date_ending', 'sector', 'avg_three_months_price', 'avg_next_three_months_price']
 
-    return stocks_df
+    return stocks_df[columnss_to_keep]
 
 
 def split_data_to_train_and_test(
