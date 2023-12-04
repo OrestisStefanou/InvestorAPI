@@ -21,7 +21,7 @@ def get_symbols() -> List[str]:
     # return stock_symbols
     from app.dependencies import get_db_conn
     conn = get_db_conn()
-    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date = '24-11-2023'").fetchall()
+    rows = conn.execute("SELECT DISTINCT symbol FROM income_statement").fetchall()
     return [
         row[0] for row in rows
     ]
