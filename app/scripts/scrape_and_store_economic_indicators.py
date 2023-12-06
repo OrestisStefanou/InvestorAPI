@@ -31,3 +31,5 @@ async def scrape_and_store_economic_indicators_time_series():
     await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Sugar)
     time.sleep(1)
     await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Coffee)
+    time.sleep(1)
+    await TimeSeriesService.scrape_and_store_economic_indicator_time_series(EconomicIndicator.Real_GDP)

@@ -32,7 +32,8 @@ class AlphaVantageClient(HttpClient):
             EconomicIndicator.Corn: 'CORN',
             EconomicIndicator.Cotton: 'COTTON',
             EconomicIndicator.Sugar: 'SUGAR',
-            EconomicIndicator.Coffee: 'COFFEE'
+            EconomicIndicator.Coffee: 'COFFEE',
+            EconomicIndicator.Real_GDP: 'REAL_GDP'
         }
 
         params = {
@@ -40,6 +41,10 @@ class AlphaVantageClient(HttpClient):
             'interval': 'monthly',
             'apikey': self._token
         }
+
+        if indicator == EconomicIndicator.Real_GDP:
+            params['interval'] = 'quarterly'
+
         try:
             response = await self.get(
                 endpoint='',

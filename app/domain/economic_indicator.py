@@ -6,6 +6,7 @@ class EconomicIndicator(str, enum.Enum):
     Interest_Rate = 'Interest_Rate'
     Inflation = 'Inflation'
     Unemployment = 'Unemployment'
+    Real_GDP = 'Real_GDP'
     Natural_Gas = 'Natural_Gas'
     Crude_Oil = 'Crude_Oil'
     Copper = 'Copper'
