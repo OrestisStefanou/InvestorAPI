@@ -17,11 +17,71 @@ from sklearn.metrics import mean_absolute_percentage_error
 
 from analytics.machine_learning.utils import preprocessing
 
+
+def get_features(
+    db_conn = None,
+    features_categories: List[str] = None,
+) -> pd.DataFrame:
+    """
+    Params:
+        - db_conn: Database connection object
+        - features_cagories: A list with the categories of features to keep.
+            Available feature categories: 'arctan_ratio', 'arctan_pct_change', 'pct_change'
+    """
+    if db_conn is None:
+        db_conn = sqlite3.connect('/home/orestis/code/Orestis/InvestorAPI/app/database/ibd.db')
+
+    query = '''
+        SELECT * 
+        FROM price_prediction_features 
+        WHERE DATE(fiscal_date_ending) <= date('now', '-3 months')
+        ORDER BY DATE(fiscal_date_ending)
+    '''
+
+    features_df = pd.read_sql(query, db_conn)
+    db_conn.close()
+
+    # Drop rows that contain null values
+    columns_with_null = features_df.columns[features_df.isna().any()].tolist()
+    features_df.dropna(subset=columns_with_null, inplace=True)
+    features_df.reset_index(inplace=True, drop=True)
+
+    if features_categories:
+        valid_feature_categories = ['arctan_ratio', 'arctan_pct_change', 'pct_change']
+        invalid_categories = [category for category in features_categories if category not in valid_feature_categories]
+        if invalid_categories:
+            raise ValueError(f"Available categories are: {', '.join(valid_feature_categories)}")
+
+        columns_to_keep = [
+            'symbol', 
+            'sector', 
+            'fiscal_date_ending', 
+            'avg_interest_rate', 
+            'avg_treasury_yield',
+            'avg_unemployment_rate',
+            'inflation',
+            'price_avg_pct_change_three_months',
+            'price_volatility_three_months',
+            'price_avg_pct_change_next_three_months'
+        ]
+        for col_name in features_df.columns:
+            for category in features_categories:
+                if str(col_name).endswith(f'_{category}'):
+                    if category == 'pct_change' and str(col_name).endswith(f'_arctan_pct_change'):
+                        continue
+
+                    columns_to_keep.append(col_name)
+
+        return features_df[columns_to_keep]
+
+    return features_df
+
+
 def get_dataset(
     db_conn = None,
 ) -> pd.DataFrame:
     if db_conn is None:
-        db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
+        db_conn = sqlite3.connect('/home/orestis/code/Orestis/InvestorAPI/app/database/ibd.db')
 
     query = '''
         SELECT * 
