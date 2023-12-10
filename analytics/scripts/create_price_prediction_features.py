@@ -176,6 +176,41 @@ def calculate_time_series_avg_pct_change(
     return avg_pct_change
 
 
+def calculate_time_series_pct_change(
+    start_date: str,
+    time_series_df: pd.DataFrame,
+    target_column: str,
+    days: int = PREDICTION_TIMEWINDOW_DAYS
+) -> Optional[int]:
+    """
+    Given a start calculate what was the pct change
+    between <start_date> and <start_date> + <days> time
+    """
+    if days < 0:
+        lower_bound = pd.Timestamp(start_date) - pd.DateOffset(days=abs(days))
+        upper_bound = pd.Timestamp(start_date) 
+    else:
+        lower_bound = pd.Timestamp(start_date)
+        upper_bound = lower_bound + pd.DateOffset(days=days)
+    
+    time_series_df['registered_date_ts'] = pd.to_datetime(time_series_df['registered_date_ts'], unit='s')
+    # Filter the DataFrame
+    filtered_df = time_series_df[
+        (time_series_df['registered_date_ts'] >= lower_bound) & 
+        (time_series_df['registered_date_ts'] <= upper_bound)
+    ]
+
+    if len(filtered_df) == 0:
+        return None
+
+    # Sort the filtered DataFrame by timestamp
+    filtered_df = filtered_df.sort_values(by='registered_date_ts')
+
+    # Calculate pct change between first and last row
+    pct_change = ((filtered_df[target_column].iloc[-1] - filtered_df[target_column].iloc[0]) / filtered_df[target_column].iloc[0])
+    return pct_change
+
+
 def calculate_time_series_avg_value(
     start_date: str,
     time_series_df: pd.DataFrame,
@@ -298,6 +333,13 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         days=-PREDICTION_TIMEWINDOW_DAYS
     )
 
+    stock_fundamental_df['price_pct_change_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_pct_change,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+        days=-PREDICTION_TIMEWINDOW_DAYS
+    )
+
     stock_fundamental_df['price_volatility_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(
         calculate_time_series_volatility,
         target_column='close_price',
@@ -310,6 +352,26 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         target_column='close_price',
         time_series_df=stock_time_series_df,
     )
+
+    stock_fundamental_df['price_pct_change_next_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_pct_change,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+    )
+
+    stock_fundamental_df['avg_three_months_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+        days=-PREDICTION_TIMEWINDOW_DAYS
+    )
+
+    stock_fundamental_df['avg_next_three_months_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+    )
+
 
     return stock_fundamental_df
 

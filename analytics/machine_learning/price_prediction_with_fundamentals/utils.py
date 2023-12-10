@@ -29,7 +29,7 @@ def get_features(
             Available feature categories: 'arctan_ratio', 'arctan_pct_change', 'pct_change'
     """
     if db_conn is None:
-        db_conn = sqlite3.connect('/home/orestis/code/Orestis/InvestorAPI/app/database/ibd.db')
+        db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
 
     query = '''
         SELECT * 
