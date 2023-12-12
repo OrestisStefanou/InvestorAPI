@@ -115,7 +115,41 @@ def get_unemployment_df() -> pd.DataFrame:
     '''
 
     unemployment_df = pd.read_sql(query, conn)
-    return unemployment_df  
+    return unemployment_df
+
+
+def get_commodities_index_df() -> pd.DataFrame:
+    query = '''
+    SELECT  *
+    FROM economic_indicator_time_series
+    WHERE indicator_name = 'Global_Commodities_Index'
+    '''
+
+    commodities_index_df = pd.read_sql(query, conn)
+    return commodities_index_df
+
+def get_natural_gas_df() -> pd.DataFrame:
+    query = '''
+    SELECT  *
+    FROM economic_indicator_time_series
+    WHERE indicator_name = 'Natural_Gas'
+    ORDER BY registered_date_ts DESC
+    '''
+
+    natural_gas_df = pd.read_sql(query, conn)
+    return natural_gas_df
+
+
+def get_oil_df() -> pd.DataFrame:
+    query = '''
+    SELECT  *
+    FROM economic_indicator_time_series
+    WHERE indicator_name = 'Crude_Oil'
+    ORDER BY registered_date_ts DESC
+    '''
+
+    oil_df = pd.read_sql(query, conn)
+    return oil_df
 
 
 def get_inflation_df() -> pd.DataFrame:
@@ -141,39 +175,6 @@ def get_stock_time_series_df(symbol: str) -> pd.DataFrame:
     stock_time_series_df = pd.read_sql(query, conn)
     return stock_time_series_df
 
-
-def calculate_time_series_avg_pct_change(
-    start_date: str,
-    time_series_df: pd.DataFrame,
-    target_column: str,
-    days: int = PREDICTION_TIMEWINDOW_DAYS
-) -> Optional[int]:
-    """
-    Given a start calculate what was the avg pct change
-    between <start_date> and <start_date> + <days> time
-    """
-    if days < 0:
-        lower_bound = pd.Timestamp(start_date) - pd.DateOffset(days=abs(days))
-        upper_bound = pd.Timestamp(start_date) 
-    else:
-        lower_bound = pd.Timestamp(start_date)
-        upper_bound = lower_bound + pd.DateOffset(days=days)
-    
-    time_series_df['registered_date_ts'] = pd.to_datetime(time_series_df['registered_date_ts'], unit='s')
-    # Filter the DataFrame
-    filtered_df = time_series_df[
-        (time_series_df['registered_date_ts'] >= lower_bound) & 
-        (time_series_df['registered_date_ts'] <= upper_bound)
-    ]
-
-    if len(filtered_df) == 0:
-        return None
-
-    # Sort the filtered DataFrame by timestamp
-    filtered_df = filtered_df.sort_values(by='registered_date_ts')
-
-    avg_pct_change = filtered_df[target_column].pct_change().mean()
-    return avg_pct_change
 
 
 def calculate_time_series_pct_change(
@@ -297,6 +298,9 @@ interest_rate_df = get_interest_rate_df()
 treasury_yield_df = get_treasury_yield_df()
 unemployment_df = get_unemployment_df()
 inflation_df = get_inflation_df()
+natural_gas_df = get_natural_gas_df()
+oil_df = get_oil_df()
+commodities_index_df = get_commodities_index_df()
 
 
 def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
@@ -315,6 +319,24 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         time_series_df=treasury_yield_df,
     )
 
+    stock_fundamental_df['avg_natural_gas_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='value',
+        time_series_df=natural_gas_df,
+    )
+
+    stock_fundamental_df['avg_oil_price'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='value',
+        time_series_df=oil_df,
+    )
+
+    stock_fundamental_df['avg_global_commodities_index_value'] = stock_fundamental_df['fiscal_date_ending'].apply(
+        calculate_time_series_avg_value,
+        target_column='value',
+        time_series_df=commodities_index_df,
+    )
+
     stock_fundamental_df['avg_unemployment_rate'] = stock_fundamental_df['fiscal_date_ending'].apply(
         calculate_time_series_avg_value,
         target_column='value',
@@ -324,13 +346,6 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     stock_fundamental_df['inflation'] = stock_fundamental_df['fiscal_date_ending'].apply(
         get_inflation_value_by_date,
         inflation_df=inflation_df,
-    )
-
-    stock_fundamental_df['price_avg_pct_change_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(
-        calculate_time_series_avg_pct_change,
-        target_column='close_price',
-        time_series_df=stock_time_series_df,
-        days=-PREDICTION_TIMEWINDOW_DAYS
     )
 
     stock_fundamental_df['price_pct_change_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(
@@ -345,12 +360,6 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         target_column='close_price',
         time_series_df=stock_time_series_df,
         days=-PREDICTION_TIMEWINDOW_DAYS
-    )
-
-    stock_fundamental_df['price_avg_pct_change_next_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(
-        calculate_time_series_avg_pct_change,
-        target_column='close_price',
-        time_series_df=stock_time_series_df,
     )
 
     stock_fundamental_df['price_pct_change_next_three_months'] = stock_fundamental_df['fiscal_date_ending'].apply(

@@ -21,19 +21,22 @@ from analytics.machine_learning.utils import preprocessing
 def get_features(
     db_conn = None,
     features_categories: List[str] = None,
+    target: str = 'price_pct_change_next_three_months'
 ) -> pd.DataFrame:
     """
     Params:
         - db_conn: Database connection object
         - features_cagories: A list with the categories of features to keep.
             Available feature categories: 'arctan_ratio', 'arctan_pct_change', 'pct_change'
+        - target: Name of the target column
+            Available targets: 'avg_next_three_months_price', 'price_pct_change_next_three_months'
     """
     if db_conn is None:
-        db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
+        db_conn = sqlite3.connect('/home/orestis/code/Orestis/InvestorAPI/app/database/ibd.db')
 
     query = '''
         SELECT * 
-        FROM price_prediction_features 
+        FROM price_prediction_features
         WHERE DATE(fiscal_date_ending) <= date('now', '-3 months')
         ORDER BY DATE(fiscal_date_ending)
     '''
@@ -59,11 +62,18 @@ def get_features(
             'avg_interest_rate', 
             'avg_treasury_yield',
             'avg_unemployment_rate',
+            'avg_global_commodities_index_value',
+            'avg_oil_price',
+            'avg_natural_gas_price',
             'inflation',
-            'price_avg_pct_change_three_months',
             'price_volatility_three_months',
-            'price_avg_pct_change_next_three_months'
         ]
+
+        if target == 'price_pct_change_next_three_months':
+            columns_to_keep = columns_to_keep + ['price_pct_change_three_months', 'price_pct_change_next_three_months']
+        else:
+            columns_to_keep = columns_to_keep + ['avg_three_months_price', 'avg_next_three_months_price']
+
         for col_name in features_df.columns:
             for category in features_categories:
                 if str(col_name).endswith(f'_{category}'):
