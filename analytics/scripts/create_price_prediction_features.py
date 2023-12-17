@@ -70,10 +70,6 @@ def get_stock_fundamental_df(symbol: str) -> pd.DataFrame:
 
     # Feature engineering
     for column in columns_to_convert:
-        # arctan ratio
-        log_ration_column_name = f'{column}_arctan_ratio'
-        stock_df[log_ration_column_name] = np.arctan(stock_df[column] / stock_df[column].shift(1))
-
         # arctan percentage change
         log_pct_change_column_name = f'{column}_arctan_pct_change'
         stock_df[log_pct_change_column_name] = np.arctan(stock_df[column].pct_change())
