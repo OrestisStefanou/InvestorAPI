@@ -8,6 +8,7 @@ import datetime as dt
 import sqlite3
 
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import (
     OneHotEncoder,
     MinMaxScaler,
@@ -32,7 +33,7 @@ def get_features(
             Available targets: 'avg_next_three_months_price', 'price_pct_change_next_three_months'
     """
     if db_conn is None:
-        db_conn = sqlite3.connect('/home/orestis/code/Orestis/InvestorAPI/app/database/ibd.db')
+        db_conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db')
 
     query = '''
         SELECT * 
@@ -334,3 +335,29 @@ def get_feature_importance_sorted(
         feature_name_with_score_list.append((feature_name, feature_importance_scores[i]))
     
     return sorted(feature_name_with_score_list, key=lambda x: x[1], reverse=True)
+
+
+def get_high_prob_predictions_with_ground_truth_labels(
+    predicted_probabilities: np.ndarray,
+    y_pred: np.ndarray,
+    y_test: np.ndarray,
+    threshold: float = 0.7
+):
+    """
+    Returns the predictions along with the ground truth labels
+    only for the predictions where the predicted probability is
+    higher than the threshold
+    Returns: (y_pred_high_prob, y_test)
+    """
+    high_probability_predictions = []
+    ground_truth_labels =[]
+    for i in range(len(y_pred)):
+        predicted_label = y_pred[i]
+        predicted_probability = predicted_probabilities[i][predicted_label]
+        if predicted_probability >= threshold:
+            high_probability_predictions.append(predicted_label)
+            ground_truth_labels.append(y_test[i])
+        else:
+            continue
+    
+    return high_probability_predictions, ground_truth_labels
