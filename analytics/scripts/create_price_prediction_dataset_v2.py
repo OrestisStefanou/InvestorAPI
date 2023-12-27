@@ -274,9 +274,6 @@ def find_latest_financials_data(
     """
     Returns the most recent financials data of a stock from 'start_date'(Going backwards)
     """
-    lower_bound = start_date
-    upper_bound = lower_bound + pd.DateOffset(days=days)
-
     upper_bound = start_date
     lower_bound = start_date - pd.DateOffset(days=days)
     
