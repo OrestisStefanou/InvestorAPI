@@ -326,28 +326,28 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         find_time_series_most_recent_value,
         target_column='value',
         time_series_df=interest_rate_df,
-        days=-90
+        days=-93
     )
 
     final_stock_time_series_df['treasury_yield'] = final_stock_time_series_df['Date'].apply(
         find_time_series_most_recent_value,
         target_column='value',
         time_series_df=treasury_yield_df,
-        days=-90
+        days=-93
     )
 
     final_stock_time_series_df['price_pct_change_last_six_months'] = final_stock_time_series_df['Date'].apply(
         calculate_time_series_pct_change,
         target_column='close_price',
         time_series_df=stock_time_series_df,
-        days=-180
+        days=-186
     )
 
     final_stock_time_series_df['price_pct_change_last_three_months'] = final_stock_time_series_df['Date'].apply(
         calculate_time_series_pct_change,
         target_column='close_price',
         time_series_df=stock_time_series_df,
-        days=-90
+        days=-93
     )
 
     final_stock_time_series_df['price_pct_change_last_month'] = final_stock_time_series_df['Date'].apply(
@@ -361,14 +361,14 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         calculate_time_series_volatility,
         target_column='close_price',
         time_series_df=stock_time_series_df,
-        days=-180
+        days=-186
     )
 
     final_stock_time_series_df['price_volatility_last_three_months'] = final_stock_time_series_df['Date'].apply(
         calculate_time_series_volatility,
         target_column='close_price',
         time_series_df=stock_time_series_df,
-        days=-90
+        days=-93
     )
 
     final_stock_time_series_df['price_volatility_last_month'] = final_stock_time_series_df['Date'].apply(
@@ -382,14 +382,14 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
         calculate_time_series_pct_change,
         target_column='close_price',
         time_series_df=stock_time_series_df,
-        days=180
+        days=186
     )
 
     final_stock_time_series_df['price_pct_change_next_three_months'] = final_stock_time_series_df['Date'].apply(
         calculate_time_series_pct_change,
         target_column='close_price',
         time_series_df=stock_time_series_df,
-        days=90
+        days=93
     )
 
     final_stock_time_series_df['price_pct_change_next_month'] = final_stock_time_series_df['Date'].apply(
@@ -402,13 +402,13 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     final_stock_time_series_df['sector_pct_change_last_six_months'] = final_stock_time_series_df['Date'].apply(
         calculate_sector_pct_change,
         time_series_df=sector_time_series_df,
-        days=-180
+        days=-186
     )
 
     final_stock_time_series_df['sector_pct_change_last_three_months'] = final_stock_time_series_df['Date'].apply(
         calculate_sector_pct_change,
         time_series_df=sector_time_series_df,
-        days=-90
+        days=-93
     )
 
     final_stock_time_series_df['sector_pct_change_last_month'] = final_stock_time_series_df['Date'].apply(
