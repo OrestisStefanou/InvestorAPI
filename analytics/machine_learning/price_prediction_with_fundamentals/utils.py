@@ -1,7 +1,8 @@
 from typing import (
     Tuple,
     Dict,
-    List
+    List,
+    Optional
 )
 import datetime as dt
 import sqlite3
@@ -10,7 +11,13 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_percentage_error
 
-def get_stock_fundamental_df(symbol: str, conn: sqlite3.Connection) -> pd.DataFrame:
+def get_stock_fundamental_df(
+    symbol: str,
+    conn: Optional[sqlite3.Connection] = None
+) -> pd.DataFrame:
+    if conn is None:
+        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+
     query = f'''
         SELECT 
             income_statement.total_revenue,

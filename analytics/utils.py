@@ -4,7 +4,10 @@ from typing import Optional
 
 import pandas as pd
 
-def get_interest_rate_df(conn: sqlite3.Connection) -> pd.DataFrame:
+def get_interest_rate_df(conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
+    if conn is None:
+        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+
     query = '''
     SELECT  *
     FROM economic_indicator_time_series
@@ -15,7 +18,10 @@ def get_interest_rate_df(conn: sqlite3.Connection) -> pd.DataFrame:
     return interest_rate_df
 
 
-def get_treasury_yield_df(conn: sqlite3.Connection) -> pd.DataFrame:
+def get_treasury_yield_df(conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
+    if conn is None:
+        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+
     query = '''
     SELECT  *
     FROM economic_indicator_time_series
@@ -26,7 +32,10 @@ def get_treasury_yield_df(conn: sqlite3.Connection) -> pd.DataFrame:
     return treasury_yield_df
 
 
-def get_stock_time_series_df(symbol: str, conn: sqlite3.Connection) -> pd.DataFrame:
+def get_stock_time_series_df(symbol: str, conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
+    if conn is None:
+        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+
     query = f'''
     SELECT  *
     FROM stock_time_series
@@ -38,7 +47,10 @@ def get_stock_time_series_df(symbol: str, conn: sqlite3.Connection) -> pd.DataFr
     return stock_time_series_df
 
 
-def get_sector_time_series_df(sector: str, conn: sqlite3.Connection) -> pd.DataFrame:
+def get_sector_time_series_df(sector: str, conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
+    if conn is None:
+        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+
     query = f'''
     SELECT AVG(sts.close_price) AS sector_price, substr(sts.registered_date, 4, 7) AS month_year
     FROM stock_time_series as sts
