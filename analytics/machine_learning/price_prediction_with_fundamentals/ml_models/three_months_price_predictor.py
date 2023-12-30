@@ -3,6 +3,7 @@ from typing import Dict
 
 import joblib
 import pandas as pd
+import shap
 
 from analytics.utils import (
     get_interest_rate_df,
@@ -39,9 +40,12 @@ class ThreeMonthsPriceMovementPredictor:
     factors(shap values) that lead to the model's prediction
     """
     _ml_model = joblib.load('/Users/orestis/MyProjects/InvestorAPI/analytics/machine_learning/price_prediction_with_fundamentals/ml_models/rf_three_months_prediction_model.joblib')
+    _classifier = _ml_model.steps[1][1]
+    _prediction_input_transformer = _ml_model.steps[0][1]
+    _explainer = shap.TreeExplainer(_classifier)
 
     @classmethod
-    def get_prediction_probabilities(cls, symbol) -> Dict[str, float]:
+    def get_prediction_probabilities(cls, symbol: str) -> Dict[str, float]:
         """
         Returns a dictionary with the predicted probabilities for the 
         price of the symbol's stock. Example:
@@ -56,6 +60,20 @@ class ThreeMonthsPriceMovementPredictor:
             "down": prediction_probabilites[0][0],
             "up": prediction_probabilites[0][1]
         }
+
+    @classmethod
+    def get_prediction_factors(cls, symbol: str,  predicted_class: int):
+        prediction_input = cls._create_stock_prediction_input_data(symbol)
+        shap_values = cls._explainer.shap_values(cls._prediction_input_transformer.transform(prediction_input))
+        features = cls._prediction_input_transformer.get_feature_names_out()
+        features_with_shap_values = list()
+
+        for i in range(len(features)):
+            feature_name = features[i]
+            shap_value = shap_values[predicted_class][0][i]
+            features_with_shap_values.append((feature_name, shap_value))
+        
+        return sorted(features_with_shap_values, key=lambda x: x[1], reverse=True)
 
     @classmethod
     def _create_stock_prediction_input_data(cls, symbol: str) -> pd.DataFrame:
@@ -153,5 +171,4 @@ class ThreeMonthsPriceMovementPredictor:
             financials_time_series_df=stock_fundamental_df,
         )
 
-        return stock_prediction_data_df
-
+        return stock_prediction_data_df#.drop(['symbol', 'Date'], axis=1, inplace=True)
