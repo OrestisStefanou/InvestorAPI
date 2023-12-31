@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Dict
+from typing import Dict, List
 
 import joblib
 import pandas as pd
@@ -33,6 +33,50 @@ sectors_time_series = {
     'ENERGY & TRANSPORTATION': get_sector_time_series_df('ENERGY & TRANSPORTATION')
 }
 
+features_map = {
+    'onehotencoder__sector_ENERGY & TRANSPORTATION': 'Stock Sector',
+    'onehotencoder__sector_FINANCE': 'Stock Sector',
+    'onehotencoder__sector_LIFE SCIENCES': 'Stock Sector',
+    'onehotencoder__sector_MANUFACTURING': 'Stock Sector',
+    'onehotencoder__sector_REAL ESTATE & CONSTRUCTION': 'Stock Sector',
+    'onehotencoder__sector_TECHNOLOGY': 'Stock Sector',
+    'onehotencoder__sector_TRADE & SERVICES': 'Stock Sector',
+    'remainder__interest_rate': 'Interest Rates', 
+    'remainder__treasury_yield': 'Treasury Yield',
+    'remainder__price_pct_change_last_six_months': 'Stock returns last 6 months',
+    'remainder__price_pct_change_last_three_months': 'Stock returns last 3 months',
+    'remainder__price_pct_change_last_month': 'Stock returns last 1 month',
+    'remainder__price_volatility_last_six_months': 'Stock price volatility last 6 months',
+    'remainder__price_volatility_last_three_months': 'Stock price volatility last 3 months',
+    'remainder__price_volatility_last_month': 'Stock price volatility last 1 month',
+    'remainder__sector_pct_change_last_six_months': 'Stock Sector performance last 6 months',
+    'remainder__sector_pct_change_last_three_months': 'Stock Sector performance last 3 months',
+    'remainder__sector_pct_change_last_month': 'Stock Sector performance last 1 month',
+    'remainder__capital_expenditures_arctan_pct_change': 'Capital expenditure change quarter over quarter',
+    'remainder__cash_and_cash_equivalents_at_carrying_value_arctan_pct_change': 'Cash and Cash Equivalents quarter over quarter',
+    'remainder__cashflow_from_financing_arctan_pct_change': 'Cashflow from financing change quarter over quarter',
+    'remainder__cashflow_from_investment_arctan_pct_change': 'Cashflow from investment change quarter over quarter',
+    'remainder__current_net_receivables_arctan_pct_change': 'Current net receivables change quarter over quarter',
+    'remainder__dividend_payout_arctan_pct_change': 'Dividend payout change quarter over quarter',
+    'remainder__ebitda_arctan_pct_change': 'EBITDA change quarter over quarter',
+    'remainder__gross_profit_arctan_pct_change': 'Gross profit change quarter over quarter',
+    'remainder__inventory_arctan_pct_change': 'Inventory change quarter over quarter',
+    'remainder__long_term_debt_arctan_pct_change': 'Long term debt change quarter over quarter',
+    'remainder__net_income_arctan_pct_change': 'Net income change quaerter over quarter',
+    'remainder__net_interest_income_arctan_pct_change': 'Net interest income change quaerter over quarter',
+    'remainder__operating_cashflow_arctan_pct_change': 'Operating cashflow change quarter over quarter',
+    'remainder__operating_income_arctan_pct_change': 'Operating income change quarter over quarter',
+    'remainder__payments_for_repurchase_of_equity_arctan_pct_change': 'Payments for repurchase of equity change quarter over quarter',
+    'remainder__proceeds_from_issuance_of_long_term_debt_and_capital_securities_net_arctan_pct_change': 'Net proceeds from long-term debt and capital securities issuance change quarter over quarter',
+    'remainder__property_plant_equipment_arctan_pct_change': 'Property plant equipment change quarter over quarter',
+    'remainder__total_assets_arctan_pct_change': 'Total assets change quarter over quarter',
+    'remainder__total_current_assets_arctan_pct_change': 'Total current assets change quarter over quarter',
+    'remainder__total_current_liabilities_arctan_pct_change': 'Total current liabilities change quarter over quarter',
+    'remainder__total_liabilities_arctan_pct_change': 'Total liabilities change quarter over quarter',
+    'remainder__total_revenue_arctan_pct_change': 'Total revenue change quarter over quarter',
+    'remainder__total_shareholder_equity_arctan_pct_change': 'Total shareholder equity change quarter over quarter'
+}
+
 class ThreeMonthsPriceMovementPredictor:
     """
     This class is used to predict if the price of a
@@ -62,7 +106,7 @@ class ThreeMonthsPriceMovementPredictor:
         }
 
     @classmethod
-    def get_prediction_factors(cls, symbol: str,  predicted_class: int):
+    def get_prediction_factors(cls, symbol: str,  predicted_class: int) -> List[str]:
         prediction_input = cls._create_stock_prediction_input_data(symbol)
         shap_values = cls._explainer.shap_values(cls._prediction_input_transformer.transform(prediction_input))
         features = cls._prediction_input_transformer.get_feature_names_out()
@@ -71,9 +115,17 @@ class ThreeMonthsPriceMovementPredictor:
         for i in range(len(features)):
             feature_name = features[i]
             shap_value = shap_values[predicted_class][0][i]
-            features_with_shap_values.append((feature_name, shap_value))
+            if shap_value > 0:
+                features_with_shap_values.append((feature_name, shap_value))
         
-        return sorted(features_with_shap_values, key=lambda x: x[1], reverse=True)
+        return {
+            features_map[x[0]] 
+            for x in sorted(features_with_shap_values, key=lambda x: x[1], reverse=True)
+        }
+
+    @classmethod
+    def get_high_probabilities_predictions(cls, threshold: 0.70):
+        pass
 
     @classmethod
     def _create_stock_prediction_input_data(cls, symbol: str) -> pd.DataFrame:
@@ -171,4 +223,4 @@ class ThreeMonthsPriceMovementPredictor:
             financials_time_series_df=stock_fundamental_df,
         )
 
-        return stock_prediction_data_df#.drop(['symbol', 'Date'], axis=1, inplace=True)
+        return stock_prediction_data_df
