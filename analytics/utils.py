@@ -1,6 +1,6 @@
 import datetime as dt
 import sqlite3
-from typing import Optional
+from typing import Optional, List
 
 import pandas as pd
 
@@ -212,6 +212,7 @@ def find_latest_financials_data(
     lower_bound = start_date - pd.DateOffset(days=days)
     
     financials_time_series_df['fiscal_date_ending'] = pd.to_datetime(financials_time_series_df['fiscal_date_ending'], format='%Y-%m-%d')
+    columns_to_return = [col_name for col_name in financials_time_series_df.columns if str(col_name).endswith('_arctan_pct_change')]
     # Filter the DataFrame
     filtered_df = financials_time_series_df[
         (financials_time_series_df['fiscal_date_ending'] >= lower_bound) & 
@@ -224,5 +225,14 @@ def find_latest_financials_data(
     # Sort the filtered DataFrame by timestamp
     filtered_df = filtered_df.sort_values(by='fiscal_date_ending')
 
-    columns_to_return = [col_name for col_name in filtered_df.columns if str(col_name).endswith('_arctan_pct_change')]    
     return filtered_df[columns_to_return].iloc[-1]
+
+
+def get_stock_symbols(conn: Optional[sqlite3.Connection] = None) -> List[str]:
+    if conn is None:
+        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+
+    rows = conn.execute("SELECT DISTINCT symbol FROM income_statement").fetchall()
+    return [
+        row[0] for row in rows
+    ]

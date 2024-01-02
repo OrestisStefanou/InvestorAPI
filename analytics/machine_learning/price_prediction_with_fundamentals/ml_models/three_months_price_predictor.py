@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import Dict, List
+from typing import Dict, List, Set, Any, Optional
 
 import joblib
 import pandas as pd
@@ -14,7 +14,8 @@ from analytics.utils import (
     calculate_time_series_pct_change,
     calculate_time_series_volatility,
     find_latest_financials_data,
-    find_time_series_most_recent_value
+    find_time_series_most_recent_value,
+    get_stock_symbols
 )
 from analytics.machine_learning.price_prediction_with_fundamentals.utils import (
     get_stock_fundamental_df
@@ -106,7 +107,7 @@ class ThreeMonthsPriceMovementPredictor:
         }
 
     @classmethod
-    def get_prediction_factors(cls, symbol: str,  predicted_class: int) -> List[str]:
+    def get_prediction_factors(cls, symbol: str,  predicted_class: int) -> Set[str]:
         prediction_input = cls._create_stock_prediction_input_data(symbol)
         shap_values = cls._explainer.shap_values(cls._prediction_input_transformer.transform(prediction_input))
         features = cls._prediction_input_transformer.get_feature_names_out()
@@ -124,17 +125,68 @@ class ThreeMonthsPriceMovementPredictor:
         }
 
     @classmethod
-    def get_high_probabilities_predictions(cls, threshold: 0.70):
-        pass
+    def get_high_probabilities_predictions(cls, threshold: 0.70) -> List[Dict[str, Any]]:
+        """
+        Returns the predictions with probability above the given threshold.
+        Example response
+        [
+            {
+                'symbol': 'NVDA',
+                'prediction_probability': 0.75,
+                'prediction': 'up'
+            },
+        ]
+        """
+        high_probabilities_predictions = list()
+        labels_map = {
+            0: 'down',
+            1: 'up'
+        }
+        # 1. Get all the stock symbols we have
+        symbols = get_stock_symbols()
+        # 2. Create the prediction input
+        for symbol in symbols:
+            prediction_input = cls._create_stock_prediction_input_data(symbol)
+            try:
+                cls._validate_prediction_input(prediction_input)
+            except Exception:
+                continue
+
+            predicted_label = cls._ml_model.predict(prediction_input)[0]
+            prediction_probabilities = cls._ml_model.predict_proba(prediction_input)[0]
+            if prediction_probabilities[predicted_label] >= threshold:
+                high_probabilities_predictions.append({
+                    'symbol': symbol,
+                    'prediction_probability': prediction_probabilities[predicted_label],
+                    'prediction': labels_map[predicted_label]
+                })
+
+        return high_probabilities_predictions
 
     @classmethod
-    def _create_stock_prediction_input_data(cls, symbol: str) -> pd.DataFrame:
+    def _validate_prediction_input(cls, prediction_input: pd.DataFrame) -> None:
+        if prediction_input is None:
+            raise Exception('Prediction data not available') # Make a custom exception for this case
+
+        nan_columns = prediction_input.columns[prediction_input.isna().any()].tolist()
+        if len(nan_columns) > 0:
+            raise Exception("Prediction data not available")
+
+    @classmethod
+    def _create_stock_prediction_input_data(cls, symbol: str) -> Optional[pd.DataFrame]:
+        print("Creating prediction input for symbol:", symbol)
         stock_fundamental_df = get_stock_fundamental_df(symbol)
+        if stock_fundamental_df.empty:
+            return None
+
         stock_time_series_df = get_stock_time_series_df(symbol)
 
         stock_sector = stock_fundamental_df.iloc[0, stock_fundamental_df.columns.get_loc('sector')]
         sector_time_series_df = sectors_time_series.get(stock_sector)
 
+        if sector_time_series_df is None:
+            return None
+        
         # Create stock prediction data
         current_date = dt.datetime.today()
         stock_prediction_data_df = pd.DataFrame([
@@ -218,6 +270,12 @@ class ThreeMonthsPriceMovementPredictor:
         )
 
         financial_statements_columns = [col_name for col_name in stock_fundamental_df.columns if str(col_name).endswith('_arctan_pct_change')]
+        if find_latest_financials_data(
+            start_date=current_date,
+            financials_time_series_df=stock_fundamental_df
+        ) is None:
+            return None
+
         stock_prediction_data_df[financial_statements_columns] = stock_prediction_data_df['Date'].apply(
             find_latest_financials_data,
             financials_time_series_df=stock_fundamental_df,
