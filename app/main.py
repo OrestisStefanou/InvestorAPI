@@ -8,7 +8,8 @@ from app.api.routers import (
     world_indices,
     collections,
     sectors,
-    stocks
+    stocks,
+    machine_learning
 )
 
 app = FastAPI()
@@ -20,6 +21,7 @@ app.include_router(world_indices.router)
 app.include_router(collections.router)
 app.include_router(sectors.router)
 app.include_router(stocks.router)
+app.include_router(machine_learning.router)
 
 
 @app.on_event("shutdown")

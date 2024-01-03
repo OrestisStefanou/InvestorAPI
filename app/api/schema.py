@@ -151,3 +151,18 @@ class StockHistoricalPerformance(pydantic.BaseModel):
     name: str
     sector: Sector
     historical_performance: List[StockHistoricalPerformanceEntry]
+
+
+class PredictionProbabilities(pydantic.BaseModel):
+    up: float
+    down: float
+
+
+class PredictionFactors(pydantic.BaseModel):
+    up: List[str]
+    down: List[str]
+
+
+class FundamentalsPricePrediction(pydantic.BaseModel):
+    prediction_probabilites: PredictionProbabilities
+    prediction_factors: PredictionFactors
