@@ -6,33 +6,16 @@ import pandas as pd
 import shap
 
 from analytics.utils import (
-    get_interest_rate_df,
-    get_sector_time_series_df,
+    get_sectors_time_series,
     get_stock_time_series_df,
-    get_treasury_yield_df,
-    calculate_sector_pct_change,
-    calculate_time_series_pct_change,
-    calculate_time_series_volatility,
-    find_latest_financials_data,
-    find_time_series_most_recent_value,
     get_stock_symbols
 )
 from analytics.machine_learning.price_prediction_with_fundamentals.utils import (
-    get_stock_fundamental_df
+    get_stock_fundamental_df,
+    add_timeseries_features
 )
 
-interest_rate_df = get_interest_rate_df()
-treasury_yield_df = get_treasury_yield_df()
-
-sectors_time_series = {
-    'LIFE SCIENCES': get_sector_time_series_df('LIFE SCIENCES'),
-    'TECHNOLOGY': get_sector_time_series_df('TECHNOLOGY'),
-    'TRADE & SERVICES': get_sector_time_series_df('TRADE & SERVICES'),
-    'FINANCE': get_sector_time_series_df('FINANCE'),
-    'REAL ESTATE & CONSTRUCTION': get_sector_time_series_df('REAL ESTATE & CONSTRUCTION'),
-    'MANUFACTURING': get_sector_time_series_df('MANUFACTURING'),
-    'ENERGY & TRANSPORTATION': get_sector_time_series_df('ENERGY & TRANSPORTATION')
-}
+sectors_time_series = get_sectors_time_series()
 
 features_map = {
     'onehotencoder__sector_ENERGY & TRANSPORTATION': 'Stock Sector',
@@ -100,6 +83,7 @@ class ThreeMonthsPriceMovementPredictor:
         }
         """
         prediction_input = cls._create_stock_prediction_input_data(symbol)
+        cls._validate_prediction_input(prediction_input)
         prediction_probabilites = cls._ml_model.predict_proba(prediction_input)
         return {
             "down": prediction_probabilites[0][0],
@@ -109,6 +93,7 @@ class ThreeMonthsPriceMovementPredictor:
     @classmethod
     def get_prediction_factors(cls, symbol: str,  predicted_class: int) -> Set[str]:
         prediction_input = cls._create_stock_prediction_input_data(symbol)
+        cls._validate_prediction_input(prediction_input)
         shap_values = cls._explainer.shap_values(cls._prediction_input_transformer.transform(prediction_input))
         features = cls._prediction_input_transformer.get_feature_names_out()
         features_with_shap_values = list()
@@ -125,7 +110,7 @@ class ThreeMonthsPriceMovementPredictor:
         }
 
     @classmethod
-    def get_high_probabilities_predictions(cls, threshold: 0.70) -> List[Dict[str, Any]]:
+    def get_high_probabilities_predictions(cls, threshold:float = 0.70) -> List[Dict[str, Any]]:
         """
         Returns the predictions with probability above the given threshold.
         Example response
@@ -170,11 +155,10 @@ class ThreeMonthsPriceMovementPredictor:
 
         nan_columns = prediction_input.columns[prediction_input.isna().any()].tolist()
         if len(nan_columns) > 0:
-            raise Exception("Prediction data not available")
+            raise Exception(f"Features with NaN values: {nan_columns}")
 
     @classmethod
     def _create_stock_prediction_input_data(cls, symbol: str) -> Optional[pd.DataFrame]:
-        print("Creating prediction input for symbol:", symbol)
         stock_fundamental_df = get_stock_fundamental_df(symbol)
         if stock_fundamental_df.empty:
             return None
@@ -195,90 +179,14 @@ class ThreeMonthsPriceMovementPredictor:
         stock_prediction_data_df['symbol'] = symbol
         stock_prediction_data_df['sector'] = stock_sector
 
-        stock_prediction_data_df['interest_rate'] = stock_prediction_data_df['Date'].apply(
-            find_time_series_most_recent_value,
-            target_column='value',
-            time_series_df=interest_rate_df,
-            days=-93
+        return add_timeseries_features(
+            stock_prediction_data_df=stock_prediction_data_df,
+            stock_fundamental_df=stock_fundamental_df,
+            stock_time_series_df=stock_time_series_df,
+            sector_time_series_df=sector_time_series_df
         )
 
-        stock_prediction_data_df['treasury_yield'] = stock_prediction_data_df['Date'].apply(
-            find_time_series_most_recent_value,
-            target_column='value',
-            time_series_df=treasury_yield_df,
-            days=-93
-        )
 
-        stock_prediction_data_df['price_pct_change_last_six_months'] = stock_prediction_data_df['Date'].apply(
-            calculate_time_series_pct_change,
-            target_column='close_price',
-            time_series_df=stock_time_series_df,
-            days=-186
-        )
-
-        stock_prediction_data_df['price_pct_change_last_three_months'] = stock_prediction_data_df['Date'].apply(
-            calculate_time_series_pct_change,
-            target_column='close_price',
-            time_series_df=stock_time_series_df,
-            days=-93
-        )
-
-        stock_prediction_data_df['price_pct_change_last_month'] = stock_prediction_data_df['Date'].apply(
-            calculate_time_series_pct_change,
-            target_column='close_price',
-            time_series_df=stock_time_series_df,
-            days=-33
-        )
-
-        stock_prediction_data_df['price_volatility_last_six_months'] = stock_prediction_data_df['Date'].apply(
-            calculate_time_series_volatility,
-            target_column='close_price',
-            time_series_df=stock_time_series_df,
-            days=-186
-        )
-
-        stock_prediction_data_df['price_volatility_last_three_months'] = stock_prediction_data_df['Date'].apply(
-            calculate_time_series_volatility,
-            target_column='close_price',
-            time_series_df=stock_time_series_df,
-            days=-93
-        )
-
-        stock_prediction_data_df['price_volatility_last_month'] = stock_prediction_data_df['Date'].apply(
-            calculate_time_series_volatility,
-            target_column='close_price',
-            time_series_df=stock_time_series_df,
-            days=-33
-        )
-
-        stock_prediction_data_df['sector_pct_change_last_six_months'] = stock_prediction_data_df['Date'].apply(
-            calculate_sector_pct_change,
-            time_series_df=sector_time_series_df,
-            days=-186
-        )
-
-        stock_prediction_data_df['sector_pct_change_last_three_months'] = stock_prediction_data_df['Date'].apply(
-            calculate_sector_pct_change,
-            time_series_df=sector_time_series_df,
-            days=-93
-        )
-
-        stock_prediction_data_df['sector_pct_change_last_month'] = stock_prediction_data_df['Date'].apply(
-            calculate_sector_pct_change,
-            time_series_df=sector_time_series_df,
-            days=-33
-        )
-
-        financial_statements_columns = [col_name for col_name in stock_fundamental_df.columns if str(col_name).endswith('_arctan_pct_change')]
-        if find_latest_financials_data(
-            start_date=current_date,
-            financials_time_series_df=stock_fundamental_df
-        ) is None:
-            return None
-
-        stock_prediction_data_df[financial_statements_columns] = stock_prediction_data_df['Date'].apply(
-            find_latest_financials_data,
-            financials_time_series_df=stock_fundamental_df,
-        )
-
-        return stock_prediction_data_df
+predictor = ThreeMonthsPriceMovementPredictor()
+high_prob_predictions = predictor.get_prediction_probabilities('MSFT')
+print(high_prob_predictions)

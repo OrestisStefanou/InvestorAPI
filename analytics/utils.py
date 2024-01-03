@@ -1,6 +1,6 @@
 import datetime as dt
 import sqlite3
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 import pandas as pd
 
@@ -110,6 +110,11 @@ def calculate_sector_pct_change(
     Given a start calculate what was the pct change
     between <start_date> and <start_date> +/- <days> time
     """
+    start_date = dt.datetime(
+        year=start_date.year,
+        month=start_date.month,
+        day=1
+    )
     if days < 0:
         lower_bound = start_date - pd.DateOffset(days=abs(days))
         upper_bound = start_date 
@@ -189,7 +194,6 @@ def calculate_time_series_volatility(
         (time_series_df['registered_date_ts'] >= lower_bound) & 
         (time_series_df['registered_date_ts'] <= upper_bound)
     ]
-
     if len(filtered_df) == 0:
         return None
 
@@ -203,6 +207,7 @@ def calculate_time_series_volatility(
 def find_latest_financials_data(
     start_date,
     financials_time_series_df: pd.DataFrame,
+    target_column: str,
     days: int = 30 * 6
 ):
     """
@@ -212,7 +217,6 @@ def find_latest_financials_data(
     lower_bound = start_date - pd.DateOffset(days=days)
     
     financials_time_series_df['fiscal_date_ending'] = pd.to_datetime(financials_time_series_df['fiscal_date_ending'], format='%Y-%m-%d')
-    columns_to_return = [col_name for col_name in financials_time_series_df.columns if str(col_name).endswith('_arctan_pct_change')]
     # Filter the DataFrame
     filtered_df = financials_time_series_df[
         (financials_time_series_df['fiscal_date_ending'] >= lower_bound) & 
@@ -225,7 +229,7 @@ def find_latest_financials_data(
     # Sort the filtered DataFrame by timestamp
     filtered_df = filtered_df.sort_values(by='fiscal_date_ending')
 
-    return filtered_df[columns_to_return].iloc[-1]
+    return filtered_df[target_column].iloc[-1]
 
 
 def get_stock_symbols(conn: Optional[sqlite3.Connection] = None) -> List[str]:
@@ -236,3 +240,19 @@ def get_stock_symbols(conn: Optional[sqlite3.Connection] = None) -> List[str]:
     return [
         row[0] for row in rows
     ]
+
+
+def get_sectors_time_series() -> Dict[str, pd.DataFrame]:
+    """
+    Returns a dictionary with key the name of the sector and value
+    the sector time series
+    """
+    return {
+        'LIFE SCIENCES': get_sector_time_series_df('LIFE SCIENCES'),
+        'TECHNOLOGY': get_sector_time_series_df('TECHNOLOGY'),
+        'TRADE & SERVICES': get_sector_time_series_df('TRADE & SERVICES'),
+        'FINANCE': get_sector_time_series_df('FINANCE'),
+        'REAL ESTATE & CONSTRUCTION': get_sector_time_series_df('REAL ESTATE & CONSTRUCTION'),
+        'MANUFACTURING': get_sector_time_series_df('MANUFACTURING'),
+        'ENERGY & TRANSPORTATION': get_sector_time_series_df('ENERGY & TRANSPORTATION')
+}

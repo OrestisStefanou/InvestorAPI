@@ -3,3 +3,6 @@
 *.pyc
 *.DS_Store
 **/.ipynb_checkpoints/
+app/.DS_Store
+app/database/ibd.db
+analytics/machine_learning/price_prediction_with_fundamentals/ml_models/**

@@ -11,6 +11,20 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_percentage_error
 
+from analytics.utils import (
+    get_interest_rate_df,
+    get_treasury_yield_df,
+    calculate_sector_pct_change,
+    calculate_time_series_pct_change,
+    calculate_time_series_volatility,
+    find_latest_financials_data,
+    find_time_series_most_recent_value,
+)
+
+interest_rate_df = get_interest_rate_df()
+treasury_yield_df = get_treasury_yield_df()
+
+
 def get_stock_fundamental_df(
     symbol: str,
     conn: Optional[sqlite3.Connection] = None
@@ -175,3 +189,94 @@ def get_high_prob_predictions_with_ground_truth_labels(
             continue
     
     return high_probability_predictions, ground_truth_labels
+
+
+def add_timeseries_features(
+    stock_prediction_data_df: pd.DataFrame,
+    stock_fundamental_df: pd.DataFrame,
+    stock_time_series_df: pd.DataFrame,
+    sector_time_series_df: pd.DataFrame
+) -> pd.DataFrame:
+        stock_prediction_data_df['interest_rate'] = stock_prediction_data_df['Date'].apply(
+            find_time_series_most_recent_value,
+            target_column='value',
+            time_series_df=interest_rate_df,
+            days=-93
+        )
+
+        stock_prediction_data_df['treasury_yield'] = stock_prediction_data_df['Date'].apply(
+            find_time_series_most_recent_value,
+            target_column='value',
+            time_series_df=treasury_yield_df,
+            days=-93
+        )
+
+        stock_prediction_data_df['price_pct_change_last_six_months'] = stock_prediction_data_df['Date'].apply(
+            calculate_time_series_pct_change,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-186
+        )
+
+        stock_prediction_data_df['price_pct_change_last_three_months'] = stock_prediction_data_df['Date'].apply(
+            calculate_time_series_pct_change,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-93
+        )
+
+        stock_prediction_data_df['price_pct_change_last_month'] = stock_prediction_data_df['Date'].apply(
+            calculate_time_series_pct_change,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-33
+        )
+
+        stock_prediction_data_df['price_volatility_last_six_months'] = stock_prediction_data_df['Date'].apply(
+            calculate_time_series_volatility,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-186
+        )
+
+        stock_prediction_data_df['price_volatility_last_three_months'] = stock_prediction_data_df['Date'].apply(
+            calculate_time_series_volatility,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-93
+        )
+
+        stock_prediction_data_df['price_volatility_last_month'] = stock_prediction_data_df['Date'].apply(
+            calculate_time_series_volatility,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-33
+        )
+
+        stock_prediction_data_df['sector_pct_change_last_six_months'] = stock_prediction_data_df['Date'].apply(
+            calculate_sector_pct_change,
+            time_series_df=sector_time_series_df,
+            days=-186
+        )
+
+        stock_prediction_data_df['sector_pct_change_last_three_months'] = stock_prediction_data_df['Date'].apply(
+            calculate_sector_pct_change,
+            time_series_df=sector_time_series_df,
+            days=-93
+        )
+
+        stock_prediction_data_df['sector_pct_change_last_month'] = stock_prediction_data_df['Date'].apply(
+            calculate_sector_pct_change,
+            time_series_df=sector_time_series_df,
+            days=-33
+        )
+
+        financial_statements_columns = [col_name for col_name in stock_fundamental_df.columns if str(col_name).endswith('_arctan_pct_change')]
+        for column in financial_statements_columns:
+            stock_prediction_data_df[column] = stock_prediction_data_df['Date'].apply(
+                find_latest_financials_data,
+                financials_time_series_df=stock_fundamental_df,
+                target_column=column
+            )
+
+        return stock_prediction_data_df
