@@ -12,10 +12,9 @@ from analytics.utils import (
 )
 from analytics.machine_learning.price_prediction_with_fundamentals.utils import (
     get_stock_fundamental_df,
-    add_timeseries_features
+    add_timeseries_features,
+    get_sector_time_series
 )
-
-sectors_time_series = get_sectors_time_series()
 
 features_map = {
     'onehotencoder__sector_ENERGY & TRANSPORTATION': 'Stock Sector',
@@ -75,29 +74,42 @@ class PriceMovementPredictor:
     _ml_model: Pipeline = None
 
     @classmethod
-    def get_prediction_probabilities(cls, symbol: str) -> Dict[str, float]:
+    def get_prediction_probabilities_with_prediction_factors(cls, symbol: str) -> Dict[str, Any]:
         """
         Returns a dictionary with the predicted probabilities for the 
         price of the symbol's stock. Example:
         {
-            "up": 0.75,
-            "down": 0.25
+            "prediction_probabilities": {
+                "up": 0.75,
+                "down": 0.25
+            },
+            "prediction_factors": {
+                "up": ['Stock Sector', 'Net interest income change quaerter over quarter',],
+                "down": ['Interest Rates', 'Total liabilities change quarter over quarter']
+            }
         }
         """
         prediction_input = cls._create_stock_prediction_input_data(symbol)
         cls._validate_prediction_input(prediction_input)
         prediction_probabilites = cls._ml_model.predict_proba(prediction_input)
+        down_prediction_factors = cls._get_prediction_factors(prediction_input, 0)
+        up_prediction_factors = cls._get_prediction_factors(prediction_input, 1)
         return {
-            "down": prediction_probabilites[0][0],
-            "up": prediction_probabilites[0][1]
+            'prediction_probabilities':{
+                'down': prediction_probabilites[0][0],
+                'up': prediction_probabilites[0][1]
+            },
+            'prediction_factors': {
+                'down': list(down_prediction_factors),
+                'up': list(up_prediction_factors)
+            }
         }
 
     @classmethod
-    def get_prediction_factors(cls, symbol: str,  predicted_class: int) -> Set[str]:
+    def _get_prediction_factors(cls, prediction_input: pd.DataFrame, predicted_class: int) -> Set[str]:
         classifier = cls._ml_model.steps[1][1]
         explainer = shap.TreeExplainer(classifier)
         prediction_input_transformer = cls._ml_model.steps[0][1]
-        prediction_input = cls._create_stock_prediction_input_data(symbol)
         cls._validate_prediction_input(prediction_input)
         shap_values = explainer.shap_values(prediction_input_transformer.transform(prediction_input))
         features = prediction_input_transformer.get_feature_names_out()
@@ -171,7 +183,7 @@ class PriceMovementPredictor:
         stock_time_series_df = get_stock_time_series_df(symbol)
 
         stock_sector = stock_fundamental_df.iloc[0, stock_fundamental_df.columns.get_loc('sector')]
-        sector_time_series_df = sectors_time_series.get(stock_sector)
+        sector_time_series_df = get_sector_time_series(stock_sector)
 
         if sector_time_series_df is None:
             return None

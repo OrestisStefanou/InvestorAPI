@@ -19,12 +19,13 @@ from analytics.utils import (
     calculate_time_series_volatility,
     find_latest_financials_data,
     find_time_series_most_recent_value,
+    get_sectors_time_series
 )
 from app import settings
 
 interest_rate_df = get_interest_rate_df()
 treasury_yield_df = get_treasury_yield_df()
-
+sectors_time_series = get_sectors_time_series()
 
 def get_stock_fundamental_df(
     symbol: str,
@@ -193,6 +194,10 @@ def get_high_prob_predictions_with_ground_truth_labels(
     return high_probability_predictions, ground_truth_labels
 
 
+def get_sector_time_series(sector: str) -> Optional[pd.DataFrame]:
+    return sectors_time_series.get(sector)
+
+
 def add_timeseries_features(
     stock_prediction_data_df: pd.DataFrame,
     stock_fundamental_df: pd.DataFrame,
@@ -252,7 +257,7 @@ def add_timeseries_features(
             calculate_time_series_volatility,
             target_column='close_price',
             time_series_df=stock_time_series_df,
-            days=-33
+            days=-35
         )
 
         stock_prediction_data_df['sector_pct_change_last_six_months'] = stock_prediction_data_df['Date'].apply(

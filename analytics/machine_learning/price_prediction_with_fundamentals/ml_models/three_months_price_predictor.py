@@ -5,3 +5,7 @@ from analytics.machine_learning.price_prediction_with_fundamentals.ml_models.bas
 
 class ThreeMonthsPriceMovementPredictor(PriceMovementPredictor):
     _ml_model = joblib.load('/Users/orestis/MyProjects/InvestorAPI/analytics/machine_learning/price_prediction_with_fundamentals/ml_models/rf_three_months_prediction_model.joblib')
+
+
+predictor = ThreeMonthsPriceMovementPredictor()
+print(predictor.get_prediction_probabilities_with_prediction_factors('NVDA'))
