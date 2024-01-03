@@ -6,7 +6,6 @@ import shap
 from sklearn.pipeline import Pipeline
 
 from analytics.utils import (
-    get_sectors_time_series,
     get_stock_time_series_df,
     get_stock_symbols
 )
