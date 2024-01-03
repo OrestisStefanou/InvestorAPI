@@ -20,6 +20,7 @@ from analytics.utils import (
     find_latest_financials_data,
     find_time_series_most_recent_value,
 )
+from app import settings
 
 interest_rate_df = get_interest_rate_df()
 treasury_yield_df = get_treasury_yield_df()
@@ -30,7 +31,7 @@ def get_stock_fundamental_df(
     conn: Optional[sqlite3.Connection] = None
 ) -> pd.DataFrame:
     if conn is None:
-        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+        conn = sqlite3.connect(settings.db_path)
 
     query = f'''
         SELECT 
@@ -101,6 +102,7 @@ def get_stock_fundamental_df(
         pct_change_column_name = f'{column}_pct_change'
         stock_df[pct_change_column_name] = stock_df[column].pct_change()
 
+    conn.close()
     return stock_df
 
 

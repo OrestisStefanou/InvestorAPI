@@ -5,4 +5,5 @@
 **/.ipynb_checkpoints/
 app/.DS_Store
 app/database/ibd.db
-analytics/machine_learning/price_prediction_with_fundamentals/ml_models/**
+analytics/machine_learning/price_prediction_with_fundamentals/ml_models/rf_three_months_prediction_model.joblib
+analytics/machine_learning/price_prediction_with_fundamentals/ml_models/rf_six_months_prediction_model.joblib

@@ -4,9 +4,11 @@ from typing import Optional, List, Dict
 
 import pandas as pd
 
+from app import settings
+
 def get_interest_rate_df(conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
     if conn is None:
-        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+        conn = sqlite3.connect(settings.db_path)
 
     query = '''
     SELECT  *
@@ -15,12 +17,13 @@ def get_interest_rate_df(conn: Optional[sqlite3.Connection] = None) -> pd.DataFr
     '''
 
     interest_rate_df = pd.read_sql(query, conn)
+    conn.close()
     return interest_rate_df
 
 
 def get_treasury_yield_df(conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
     if conn is None:
-        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+        conn = sqlite3.connect(settings.db_path)
 
     query = '''
     SELECT  *
@@ -29,12 +32,13 @@ def get_treasury_yield_df(conn: Optional[sqlite3.Connection] = None) -> pd.DataF
     '''
 
     treasury_yield_df = pd.read_sql(query, conn)
+    conn.close()
     return treasury_yield_df
 
 
 def get_stock_time_series_df(symbol: str, conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
     if conn is None:
-        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+        conn = sqlite3.connect(settings.db_path)
 
     query = f'''
     SELECT  *
@@ -44,12 +48,13 @@ def get_stock_time_series_df(symbol: str, conn: Optional[sqlite3.Connection] = N
     '''
     
     stock_time_series_df = pd.read_sql(query, conn)
+    conn.close()
     return stock_time_series_df
 
 
 def get_sector_time_series_df(sector: str, conn: Optional[sqlite3.Connection] = None) -> pd.DataFrame:
     if conn is None:
-        conn = sqlite3.connect('/Users/orestis/MyProjects/InvestorAPI/app/database/ibd.db') # FIX THE PATH HERE
+        conn = sqlite3.connect(settings.db_path)
 
     query = f'''
     SELECT AVG(sts.close_price) AS sector_price, substr(sts.registered_date, 4, 7) AS month_year
@@ -63,6 +68,7 @@ def get_sector_time_series_df(sector: str, conn: Optional[sqlite3.Connection] = 
 
     sector_df = pd.read_sql(query, conn)
     sector_df['Date'] = pd.to_datetime(sector_df['month_year'], format='%m-%Y')
+    conn.close()
     return sector_df
 
 

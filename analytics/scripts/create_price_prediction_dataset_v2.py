@@ -3,7 +3,6 @@ import sqlite3
 from typing import Optional, List
 
 import pandas as pd
-import numpy as np
 
 PREDICTION_TIMEWINDOW_DAYS = 90
 
@@ -12,7 +11,6 @@ conn = sqlite3.connect('app/database/ibd.db')
 from analytics.utils import (
     get_sectors_time_series,
     get_stock_time_series_df,
-    get_stock_symbols
 )
 from analytics.machine_learning.price_prediction_with_fundamentals.utils import (
     get_stock_fundamental_df,
