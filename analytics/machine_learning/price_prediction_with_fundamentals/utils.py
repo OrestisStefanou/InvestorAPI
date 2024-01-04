@@ -42,6 +42,7 @@ def get_stock_fundamental_df(
             income_statement.net_income,
             income_statement.ebitda,
             income_statement.net_interest_income,
+            income_statement.cost_of_goods_and_services_sold,
 
             balance_sheet.total_assets,
             balance_sheet.total_liabilities,
@@ -53,6 +54,8 @@ def get_stock_fundamental_df(
             balance_sheet.current_net_receivables,
             balance_sheet.inventory,
             balance_sheet.property_plant_equipment,
+            balance_sheet.common_stock_shares_outstanding,
+            balance_sheet.current_debt,
             
             cash_flow.operating_cashflow,
             cash_flow.capital_expenditures,
@@ -98,13 +101,33 @@ def get_stock_fundamental_df(
         # arctan percentage change
         log_pct_change_column_name = f'{column}_arctan_pct_change'
         stock_df[log_pct_change_column_name] = np.arctan(stock_df[column].pct_change())
+    
+    # Financial ratios
+    stock_df['eps'] = stock_df['net_income'] / stock_df['common_stock_shares_outstanding']
+    stock_df['book_value_per_share'] = stock_df['total_shareholder_equity'] / stock_df['common_stock_shares_outstanding']
+    stock_df['revenue_per_share'] = stock_df['total_revenue'] / stock_df['common_stock_shares_outstanding']
+    stock_df['gross_profit_margin'] = (stock_df['total_revenue'] - stock_df['cost_of_goods_and_services_sold']) / stock_df['total_revenue']
+    stock_df['operating_profit_margin'] = stock_df['operating_income'] / stock_df['total_revenue']
+    stock_df['return_on_assets'] = stock_df['net_income'] / stock_df['total_assets']
+    stock_df['return_on_equity'] = stock_df['net_income'] / stock_df['total_shareholder_equity']
+    stock_df['cash_to_debt_ratio'] = stock_df['cash_and_cash_equivalents_at_carrying_value'] / stock_df['current_debt']
+    stock_df['assets_to_liabilities_ratio'] = stock_df['total_current_assets'] / stock_df['total_current_liabilities']
 
-        # Plain percentage change
-        pct_change_column_name = f'{column}_pct_change'
-        stock_df[pct_change_column_name] = stock_df[column].pct_change()
+    arctan_pct_change_columns = [col_name for col_name in stock_df.columns if str(col_name).endswith('_arctan_pct_change')]
+    financial_ratios_columns = [
+        'eps',
+        'revenue_per_share',
+        'book_value_per_share',
+        'gross_profit_margin',
+        'operating_profit_margin',
+        'return_on_assets',
+        'return_on_equity',
+        'cash_to_debt_ratio',
+        'assets_to_liabilities_ratio',
+    ]
 
     conn.close()
-    return stock_df
+    return stock_df[arctan_pct_change_columns + financial_ratios_columns]
 
 
 def split_data_to_train_and_test(
@@ -278,12 +301,22 @@ def add_timeseries_features(
             days=-33
         )
 
-        financial_statements_columns = [col_name for col_name in stock_fundamental_df.columns if str(col_name).endswith('_arctan_pct_change')]
-        for column in financial_statements_columns:
+        stock_prediction_data_df['latest_price'] = stock_prediction_data_df['Date'].apply(
+            find_time_series_most_recent_value,
+            target_column='close_price',
+            time_series_df=stock_time_series_df,
+            days=-33
+        )
+
+        for column in stock_fundamental_df.columns:
             stock_prediction_data_df[column] = stock_prediction_data_df['Date'].apply(
                 find_latest_financials_data,
                 financials_time_series_df=stock_fundamental_df,
                 target_column=column
             )
 
+        # Price financial ratios
+        stock_prediction_data_df['pe_ratio'] = stock_prediction_data_df['latest_price'] / stock_prediction_data_df['eps']
+        stock_prediction_data_df['price_to_book_ratio'] = stock_prediction_data_df['latest_price'] / stock_prediction_data_df['book_value_per_share']
+        stock_prediction_data_df['price_to_sales_ratio'] = stock_prediction_data_df['latest_price'] / stock_prediction_data_df['revenue_per_share']
         return stock_prediction_data_df
