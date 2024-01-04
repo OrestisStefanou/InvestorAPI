@@ -83,3 +83,16 @@ async def get_six_months_price_prediction_with_fundamentals(symbol: str):
             down=predictions_with_factors['prediction_factors']['down'],
         )
     )
+
+
+@router.post(
+    "/support/add_symbol",
+    tags=["Support"],
+    status_code=200,
+)
+async def add_symbol_data(symbol: str):
+    """
+    In case we don't have data for a symbol we use this
+    endpoint to add them.
+    """
+    pass
