@@ -14,6 +14,10 @@ from analytics.machine_learning.price_prediction_with_fundamentals.utils import 
     add_timeseries_features,
     get_sector_time_series
 )
+from analytics.errors import (
+    PredictionDataNotFound,
+    InvalidPredictionInput
+)
 
 features_map = {
     'onehotencoder__sector_ENERGY & TRANSPORTATION': 'Stock Sector',
@@ -167,11 +171,11 @@ class PriceMovementPredictor:
     @classmethod
     def _validate_prediction_input(cls, prediction_input: pd.DataFrame) -> None:
         if prediction_input is None:
-            raise Exception('Prediction data not available') # Make a custom exception for this case
+            raise PredictionDataNotFound('Prediction data not available')
 
         nan_columns = prediction_input.columns[prediction_input.isna().any()].tolist()
         if len(nan_columns) > 0:
-            raise Exception(f"Features with NaN values: {nan_columns}")
+            raise InvalidPredictionInput(f"Features with NaN values: {nan_columns}")
 
     @classmethod
     def _create_stock_prediction_input_data(cls, symbol: str) -> Optional[pd.DataFrame]:
