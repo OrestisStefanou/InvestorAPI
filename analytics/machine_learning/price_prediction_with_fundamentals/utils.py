@@ -79,6 +79,7 @@ def get_stock_fundamental_df(
         ORDER BY DATE(income_statement.fiscal_date_ending)
     '''
     stock_df = pd.read_sql(query, conn)
+    conn.close()
     
     # Drop columns with duplicated names
     stock_df = stock_df.loc[:, ~stock_df.columns.duplicated()]
@@ -99,8 +100,8 @@ def get_stock_fundamental_df(
     # Feature engineering
     for column in columns_to_convert:
         # arctan percentage change
-        log_pct_change_column_name = f'{column}_arctan_pct_change'
-        stock_df[log_pct_change_column_name] = np.arctan(stock_df[column].pct_change())
+        arctan_pct_change_column_name = f'{column}_arctan_pct_change'
+        stock_df[arctan_pct_change_column_name] = np.arctan(stock_df[column].pct_change())
     
     # Financial ratios
     stock_df['eps'] = stock_df['net_income'] / stock_df['common_stock_shares_outstanding']
@@ -125,9 +126,8 @@ def get_stock_fundamental_df(
         'cash_to_debt_ratio',
         'assets_to_liabilities_ratio',
     ]
-
-    conn.close()
-    return stock_df[arctan_pct_change_columns + financial_ratios_columns]
+    cols_to_return = arctan_pct_change_columns + financial_ratios_columns + ['symbol', 'fiscal_date_ending', 'sector']
+    return stock_df[cols_to_return]
 
 
 def split_data_to_train_and_test(

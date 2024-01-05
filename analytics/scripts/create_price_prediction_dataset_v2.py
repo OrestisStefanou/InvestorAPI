@@ -11,6 +11,7 @@ conn = sqlite3.connect('app/database/ibd.db')
 from analytics.utils import (
     get_sectors_time_series,
     get_stock_time_series_df,
+    calculate_time_series_pct_change
 )
 from analytics.machine_learning.price_prediction_with_fundamentals.utils import (
     get_stock_fundamental_df,
@@ -32,6 +33,28 @@ def get_final_stock_data_df(symbol: str) -> pd.DataFrame:
     final_stock_time_series_df = pd.DataFrame(pd.date_range(start=start_date, end=end_date, freq='MS'), columns=['Date'])
     final_stock_time_series_df['symbol'] = symbol
     final_stock_time_series_df['sector'] = stock_sector
+
+    # Add target columns
+    final_stock_time_series_df['price_pct_change_next_six_months'] = final_stock_time_series_df['Date'].apply(
+        calculate_time_series_pct_change,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+        days=186
+    )
+
+    final_stock_time_series_df['price_pct_change_next_three_months'] = final_stock_time_series_df['Date'].apply(
+        calculate_time_series_pct_change,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+        days=93
+    )
+
+    final_stock_time_series_df['price_pct_change_next_month'] = final_stock_time_series_df['Date'].apply(
+        calculate_time_series_pct_change,
+        target_column='close_price',
+        time_series_df=stock_time_series_df,
+        days=33
+    )
 
     return add_timeseries_features(
         stock_prediction_data_df=final_stock_time_series_df,
@@ -56,8 +79,7 @@ def create_dataset(symbols: Optional[List[str]] = None):
             continue
 
     dataset_df = pd.concat(stock_dfs)
-    dataset_df.to_sql('price_prediction_dataset_v2', conn, index=False, if_exists='replace')
-    dataset_df.to_csv('price_prediction_dataset_v2.csv')
+    dataset_df.to_sql('price_prediction_dataset_v3', conn, index=False, if_exists='replace')
 
 
 create_dataset()
