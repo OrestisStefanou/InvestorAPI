@@ -60,7 +60,23 @@ features_map = {
     'remainder__total_current_liabilities_arctan_pct_change': 'Total current liabilities change quarter over quarter',
     'remainder__total_liabilities_arctan_pct_change': 'Total liabilities change quarter over quarter',
     'remainder__total_revenue_arctan_pct_change': 'Total revenue change quarter over quarter',
-    'remainder__total_shareholder_equity_arctan_pct_change': 'Total shareholder equity change quarter over quarter'
+    'remainder__total_shareholder_equity_arctan_pct_change': 'Total shareholder equity change quarter over quarter',
+    'remainder__current_debt_arctan_pct_change': 'Current debt change quarter over quarter',
+    'remainder__cost_of_goods_and_services_sold_arctan_pct_change': 'Cost of services sold change quarter over quarter',
+    'remainder__current_debt_arctan_pct_change': 'Current debt change quarter over quarter',
+    'remainder__common_stock_shares_outstanding_arctan_pct_change': 'Common stock shares outstanding change quarter over quarter',
+    'remainder__eps': 'Earnings per share',
+    'remainder__revenue_per_share': 'Revenue per share',
+    'remainder__book_value_per_share': 'Book value per share',
+    'remainder__gross_profit_margin': 'Gross profit margin',
+    'remainder__operating_profit_margin': 'Operating profit margin',
+    'remainder__return_on_assets': 'Return on assets',
+    'remainder__return_on_equity': 'Return on equity',
+    'remainder__cash_to_debt_ratio': 'Cash to debt ratio',
+    'remainder__assets_to_liabilities_ratio': 'Assets to liabilities ratio',
+    'remainder__pe_ratio': 'Price to earnings ratio',
+    'remainder__price_to_book_ratio': 'Price to book ratio',
+    'remainder__price_to_sales_ratio': 'Price to sales ratio',
 }
 
 class PriceMovementPredictor:
