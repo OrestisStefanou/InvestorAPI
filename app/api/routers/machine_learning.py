@@ -51,6 +51,30 @@ async def get_three_months_price_prediction_with_fundamentals(symbol: str):
 
 
 @router.get(
+    "/fundamentals_models/three_months_prediction/model_info",
+    tags=["Machine Learning"],
+    status_code=200,
+    response_model=None
+)
+async def get_three_months_price_prediction_model_info():
+    return {
+        'data': {
+            'training_data_date_range': '2011-07-01 to 2023-08-01',
+            'test_data_date_range': '2023-08-01 to 2023-09-31',
+        },
+        'overall_accuracy': {
+            'down': '62%',
+            'up': '65%',
+        },
+        'high_probabilities_accuracy': {
+            'down': '76%',
+            'up': '98%',
+            'probability_threshold': '>= 75%'
+        }
+    }
+
+
+@router.get(
     "/fundamentals_models/six_months_prediction",
     tags=["Machine Learning"],
     status_code=200,
@@ -83,6 +107,30 @@ async def get_six_months_price_prediction_with_fundamentals(symbol: str):
             down=predictions_with_factors['prediction_factors']['down'],
         )
     )
+
+
+@router.get(
+    "/fundamentals_models/six_months_prediction/model_info",
+    tags=["Machine Learning"],
+    status_code=200,
+    response_model=None
+)
+async def get_six_months_price_prediction_model_info():
+    return {
+        'data': {
+            'training_data_date_range': '2011-07-01 to 2023-05-01',
+            'test_data_date_range': '2023-05-01 to 2023-06-31',
+        },
+        'overall_accuracy': {
+            'down': '74%',
+            'up': '72%',
+        },
+        'high_probabilities_accuracy': {
+            'down': '90%',
+            'up': '91%',
+            'probability_threshold': '>= 75%'
+        }
+    }
 
 
 @router.post(
