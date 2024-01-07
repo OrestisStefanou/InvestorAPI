@@ -75,6 +75,7 @@ def create_dataset(symbols: Optional[List[str]] = None):
         try:
             stock_df = get_final_stock_data_df(symbol)
             stock_dfs.append(stock_df)
+            print("Created dataset for symbol:", symbol)
         except Exception:
             continue
 
