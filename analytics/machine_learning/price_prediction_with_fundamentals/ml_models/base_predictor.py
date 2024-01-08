@@ -39,7 +39,7 @@ features_map = {
     'remainder__sector_pct_change_last_three_months': 'Stock Sector performance last 3 months',
     'remainder__sector_pct_change_last_month': 'Stock Sector performance last 1 month',
     'remainder__capital_expenditures_arctan_pct_change': 'Capital expenditure change quarter over quarter',
-    'remainder__cash_and_cash_equivalents_at_carrying_value_arctan_pct_change': 'Cash and Cash Equivalents quarter over quarter',
+    'remainder__cash_and_cash_equivalents_at_carrying_value_arctan_pct_change': 'Cash and Cash Equivalents change quarter over quarter',
     'remainder__cashflow_from_financing_arctan_pct_change': 'Cashflow from financing change quarter over quarter',
     'remainder__cashflow_from_investment_arctan_pct_change': 'Cashflow from investment change quarter over quarter',
     'remainder__current_net_receivables_arctan_pct_change': 'Current net receivables change quarter over quarter',
