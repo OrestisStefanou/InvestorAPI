@@ -68,3 +68,30 @@ async def get_stock_historical_performance(
         )
 
     return serializers.serialize_stock_historical_performance(stock_performance_data)
+
+
+@router.get(
+    "/stocks/{symbol}/financials",
+    tags=["Stock Financials"],
+    status_code=200,
+    response_model=schema.StockFinancialsQuarterly
+)
+async def get_stock_financials(
+    symbol: str = Path(
+        title="The symbol of the stock to get the financials",
+        min_length=1,
+        max_length=6,
+        regex='^[A-Z]+$'
+    ),
+    db_session = Depends(create_db_conn)
+):
+    service = StocksService(db_session)
+    stock_financials = service.get_stock_financials(symbol)
+
+    if not any(stock_financials.values()):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail=f"Financials for stock with symbol {symbol} not found"
+        )
+
+    return serializers.serialize_stock_financials(stock_financials)
