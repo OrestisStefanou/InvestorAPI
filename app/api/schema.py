@@ -166,3 +166,137 @@ class PredictionFactors(pydantic.BaseModel):
 class FundamentalsPricePrediction(pydantic.BaseModel):
     prediction_probabilites: PredictionProbabilities
     prediction_factors: PredictionFactors
+
+
+class IncomeStatement(pydantic.BaseModel):
+    fiscal_date_ending: str
+    reported_currency: str
+    gross_profit: float
+    total_revenue:float
+    cost_of_revenue:float
+    cost_of_goods_and_services_sold:float
+    operating_income:float
+    selling_general_and_administrative:float
+    research_and_development:float
+    operating_expenses:float
+    investment_income_net:float
+    net_interest_income:float
+    interest_income:float
+    interest_expense:float
+    non_interest_income:float
+    other_non_operating_income:float
+    depreciation:float
+    depreciation_and_amortization:float
+    income_before_tax:float
+    income_tax_expense:float
+    interest_and_debt_expense:float
+    net_income_from_continuing_operations:float
+    comprehensive_income_net_of_tax:float
+    ebit:float
+    ebitda:float
+    net_income:float
+
+    @pydantic.root_validator(pre=True)
+    def check_none_values(cls, values):
+        for key in values.keys():
+            if key not in ['fiscal_date_ending', 'reported_currency']:
+                if values[key] is None:
+                    values[key] = 0.0
+
+        return values
+
+
+class BalanceSheet(pydantic.BaseModel):
+    fiscal_date_ending: str
+    reported_currency: str
+    total_assets: float
+    total_current_assets: float
+    cash_and_cash_equivalents_at_carrying_value: float
+    cash_and_short_term_investments: float
+    inventory: float
+    current_net_receivables: float
+    total_non_current_assets: float
+    property_plant_equipment: float
+    accumulated_depreciation_amortization_ppe: float
+    intangible_assets: float
+    intangible_assets_excluding_goodwill: float
+    goodwill: float
+    investments: float
+    long_term_investments: float
+    short_term_investments: float
+    other_current_assets: float
+    other_non_current_assets: float
+    total_liabilities: float
+    total_current_liabilities: float
+    current_accounts_payable: float
+    deferred_revenue: float
+    current_debt: float
+    short_term_debt: float
+    total_non_current_liabilities: float
+    capital_lease_obligations: float
+    long_term_debt: float
+    current_long_term_debt: float
+    long_term_debt_noncurrent: float
+    short_long_term_debt_total: float
+    other_current_liabilities: float
+    other_non_current_liabilities: float
+    total_shareholder_equity: float
+    treasury_stock: float
+    retained_earnings: float
+    common_stock: float
+    common_stock_shares_outstanding: float
+
+    @pydantic.root_validator(pre=True)
+    def check_none_values(cls, values):
+        for key in values.keys():
+            if key not in ['fiscal_date_ending', 'reported_currency']:
+                if values[key] is None:
+                    values[key] = 0.0
+
+        return values
+
+
+class CashFlow(pydantic.BaseModel):
+    fiscal_date_ending: str
+    reported_currency: str
+    payments_for_operating_activities: float
+    operating_cashflow: float
+    proceeds_from_operating_activities: float
+    change_in_operating_liabilities: float
+    change_in_operating_assets: float
+    depreciation_depletion_and_amortization: float
+    capital_expenditures: float
+    change_in_receivables: float
+    change_in_inventory: float
+    profit_loss: float
+    cashflow_from_investment: float
+    cashflow_from_financing: float
+    proceeds_from_repayments_of_short_term_debt: float
+    payments_for_repurchase_of_common_stock: float
+    payments_for_repurchase_of_equity: float
+    payments_for_repurchase_of_preferred_stock: float
+    dividend_payout: float
+    dividend_payout_common_stock: float
+    dividend_payout_preferred_stock: float
+    proceeds_from_issuance_of_common_stock: float
+    proceeds_from_issuance_of_long_term_debt_and_capital_securities_net: float
+    proceeds_from_issuance_of_preferred_stock: float
+    proceeds_from_repurchase_of_equity: float
+    proceeds_from_sale_of_treasury_stock: float
+    change_in_cash_and_cash_equivalents: float
+    change_in_exchange_rate: float
+    net_income: float
+
+    @pydantic.root_validator(pre=True)
+    def check_none_values(cls, values):
+        for key in values.keys():
+            if key not in ['fiscal_date_ending', 'reported_currency']:
+                if values[key] is None:
+                    values[key] = 0.0
+
+        return values
+
+class StockFinancialsQuarterly(pydantic.BaseModel):
+    balance_sheets: List[BalanceSheet]
+    income_statements: List[IncomeStatement]
+    cash_flows: List[CashFlow]

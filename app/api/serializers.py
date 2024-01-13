@@ -1,4 +1,5 @@
-from typing import List
+from dataclasses import asdict
+from typing import List, Dict, Any
 
 from app.api import schema
 from app.domain.time_series import EconomicIndicatorTimeSeriesEntry
@@ -8,6 +9,9 @@ from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.composite_stock import CompositeStock
 from app.domain.sector_performance import SectorPerformance
 from app.domain.sector import Sector
+from app.domain.income_statement import IncomeStatement
+from app.domain.balance_sheet import BalanceSheet
+from app.domain.cash_flow import CashFlow
 
 
 def _sector_domain_model_to_schema(sector: Sector) -> schema.Sector:
@@ -123,4 +127,27 @@ def serialize_stock_historical_performance(stock_data: List[CompositeStock]) -> 
         name=name,
         sector=sector,
         historical_performance=historical_performance
+    )
+
+
+def serialize_stock_financials(stock_financials: Dict[str, Any]) -> schema.StockFinancialsQuarterly:
+    balance_sheets = [
+        schema.BalanceSheet(**asdict(balance_sheet))
+        for balance_sheet in stock_financials['balance_sheets']
+    ]
+    
+    income_statements = [
+        schema.IncomeStatement(**asdict(income_statement))
+        for income_statement in stock_financials['income_statements']
+    ]
+
+    cash_flows = [
+        schema.CashFlow(**asdict(cash_flow))
+        for cash_flow in stock_financials['cash_flows']
+    ]
+
+    return schema.StockFinancialsQuarterly(
+        balance_sheets=balance_sheets,
+        income_statements=income_statements,
+        cash_flows=cash_flows
     )
