@@ -15,7 +15,7 @@ REQUESTS_PER_MINUTE_LIMIT = 30  # Provider limitation
 
 def get_symbols() -> List[str]:
     conn = get_db_conn()
-    rows = conn.execute("SELECT DISTINCT symbol FROM income_statement").fetchall()
+    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date='12-01-2024'").fetchall()
     return [
         row[0] for row in rows
     ]
@@ -24,7 +24,7 @@ def get_symbols() -> List[str]:
 def update_stock_data():
     api_calls_count = 0
 
-    for symbol in get_symbols():        
+    for symbol in get_symbols():
         calls_needed = fetch_and_store_fundamental_data_for_symbol(symbol, dry_run=True)    # Returns the number of calls fetch_and_store_fundamental_data_for_symbol will make without actually making them
         if api_calls_count + calls_needed > REQUESTS_PER_MINUTE_LIMIT:
             time.sleep(65)
