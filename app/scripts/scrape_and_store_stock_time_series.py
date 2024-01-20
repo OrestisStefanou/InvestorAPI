@@ -20,7 +20,7 @@ async def fetch_and_store_stock_time_series(symbol: str) -> int:
         latest_time_series_date = dt.datetime.fromtimestamp(latest_timestamp)
         current_date = dt.datetime.now()
         weeks_difference = (current_date - latest_time_series_date).days // 7
-        if weeks_difference < 2:
+        if weeks_difference < 1:
             return 0
 
     print("Fetching time series for:", symbol)
