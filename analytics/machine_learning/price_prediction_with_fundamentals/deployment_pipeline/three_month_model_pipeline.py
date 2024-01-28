@@ -2,17 +2,24 @@ import datetime as dt
 import sqlite3
 
 import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.compose import make_column_transformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix
+import joblib
 
 from app import settings
 from analytics.machine_learning.price_prediction_with_fundamentals import utils
 
 class ThreeMonthModelPipeline:
+    def __init__(self) -> None:
+        self._label_mapping = {0: 'down', 1: 'up'}
+        self._labels = ['down', 'up']
+        self._true_negative_threshold = 0.6
+        self._true_positive_threshold = 0.6
 
-    labels = ['down', 'up']
-    label_mapping = {0: 'down', 1: 'up'}
-
-    @classmethod
-    def get_dataset() -> pd.DataFrame:
+    def get_dataset(self) -> pd.DataFrame:
         db_conn = sqlite3.connect(settings.db_path)
 
         query = f'''
@@ -26,6 +33,8 @@ class ThreeMonthModelPipeline:
         dataset.dropna(inplace=True)
         db_conn.close()
 
+        print("Latest date in dataset:", dataset['Date'].iloc[-1])
+        
         # Create categorical target
         bins = [-float('inf'), 0, float('inf')]
         dataset['price_movement'] = pd.cut(
@@ -35,13 +44,19 @@ class ThreeMonthModelPipeline:
             right=False
         )
 
+        print("Target value counts")
+        print(dataset['price_movement'].value_counts())
+
         return dataset
 
-    @classmethod
-    def split_data_to_train_and_test(dataset: pd.DataFrame, training_cutoff_date: dt.datetime):
+    def split_data_to_train_and_test(self, dataset: pd.DataFrame):
+        today = dt.datetime.today()
+        four_months_ago = today - dt.timedelta(days=4 * 31)
+        cutoff_date = dt.datetime(day=1, month=four_months_ago.month, year=four_months_ago.year)
+        print("Cutoff date:", cutoff_date)
         train_set, test_set = utils.split_data_to_train_and_test(
             df=dataset,
-            cutoff_date=training_cutoff_date,
+            cutoff_date=cutoff_date,
             cutoff_date_column_name='Date'
         )
 
@@ -56,25 +71,99 @@ class ThreeMonthModelPipeline:
 
         return X_train, y_train, X_test, y_test
 
-    @classmethod
-    def train_model(train_set: pd.DataFrame):
+    def train_model(self, X_train: pd.DataFrame, y_train: pd.DataFrame) -> Pipeline:
         """
-        This should return the model artifact(sklearn Pipeline)
+        Train and return model artifact(sklearn Pipeline)
         """
-        pass
+        column_transformer = make_column_transformer(
+            (
+                OneHotEncoder(), ['sector']
+            ),
+            remainder='passthrough'
+        )
 
-    @classmethod
-    def test_performance(model, test_set: pd.DataFrame):
-        """
-        Compare the performance against the existing model
-        """
-        pass
+        rf_three_months_classifier = make_pipeline(
+            column_transformer,
+            RandomForestClassifier()
+        )
 
-    @classmethod
-    def deploy_model(model):
-        pass
+        rf_three_months_classifier.fit(X_train, y_train)
+        return rf_three_months_classifier
 
-    
-    @classmethod
-    def start_pipeline():
-        pass
+    def get_current_model_performance_metrics(self, X_test: pd.DataFrame, y_test: pd.DataFrame) -> tuple[float]:
+        """
+        Returns existing model performance metrics(true negatives, true positives) 
+        against the given test set
+        """
+        current_model = joblib.load('/Users/orestis/MyProjects/InvestorAPI/analytics/machine_learning/price_prediction_with_fundamentals/ml_models/rf_three_months_prediction_model.joblib')
+        y_pred_current_model = current_model.predict(X_test)
+        y_pred_current_model_labels = [self._label_mapping[y] for y in y_pred_current_model]
+        y_test_labels = [self._label_mapping[y] for y in y_test]
+        current_model_conf_matrix = confusion_matrix(
+            y_true=y_test_labels,
+            y_pred=y_pred_current_model_labels,
+            labels=self._labels,
+            normalize='true'
+        )
+        current_model_true_negative = current_model_conf_matrix[0][0]
+        current_model_true_positive = current_model_conf_matrix[1][1]
+        return (current_model_true_negative, current_model_true_positive)
+
+    def _passes_thresholds(self, true_negatives: float, true_positives: float) -> bool:
+        return true_negatives >= self._true_negative_threshold and true_positives >= self._true_positive_threshold
+
+    def get_model_performance_metrics(
+        self,
+        model: Pipeline,
+        X_test: pd.DataFrame,
+        y_test: pd.DataFrame
+    ) -> tuple[float]:
+        """
+        Returns the performance metrics of the model we trained in this 
+        pipeline
+        """
+        y_test_labels = [self._label_mapping[y] for y in y_test]
+        y_pred = model.predict(X_test)
+        y_pred_labels = [self._label_mapping[y] for y in y_pred]
+        conf_matrix = confusion_matrix(y_test_labels, y_pred_labels, labels=self._labels, normalize='true')
+        true_negatives = conf_matrix[0][0]
+        true_positives = conf_matrix[1][1]
+        return (true_negatives, true_positives)
+
+    def deploy_model(self, model: Pipeline):
+        joblib.dump(model, '/Users/orestis/MyProjects/InvestorAPI/analytics/machine_learning/price_prediction_with_fundamentals/ml_models/rf_three_months_prediction_model.joblib')
+
+    def start_pipeline(self):
+        dataset = self.get_dataset()
+        X_train, y_train, X_test, y_test = self.split_data_to_train_and_test(dataset)
+        new_model = self.train_model(X_train, y_train)
+        new_model_true_negatives, new_model_true_positives = self.get_model_performance_metrics(
+            model=new_model,
+            X_test=X_test,
+            y_test=y_test
+        )
+
+        current_model_true_negatives, current_model_true_positives = self.get_current_model_performance_metrics(
+            X_test=X_test,
+            y_test=y_test
+        )
+
+        print("New model true negatives:", new_model_true_negatives)
+        print("New model true positives:", new_model_true_positives)
+        print("Current model true negatives:", current_model_true_negatives)
+        print("Current model true positives:", current_model_true_positives)
+
+        if not self._passes_thresholds(
+            true_negatives=new_model_true_negatives, 
+            true_positives=new_model_true_positives
+        ) and not self._passes_thresholds(
+            true_negatives=current_model_true_negatives,
+            true_positives=current_model_true_positives
+        ):
+            raise Exception("Both models failed to pass thresholds")
+        
+        if new_model_true_negatives > current_model_true_negatives and new_model_true_positives > current_model_true_positives:
+            print("Deploying new model")
+            self.deploy_model(new_model)
+        else:
+            print("Keeping current model")
