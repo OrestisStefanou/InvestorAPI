@@ -10,12 +10,12 @@ from app.scripts.scrape_and_store_stock_time_series import fetch_and_store_stock
 from app.scripts.scrape_and_store_earnings import fetch_and_store_earnings_for_symbol
 from app.dependencies import get_db_conn
 
-REQUESTS_PER_MINUTE_LIMIT = 30  # Provider limitation
+REQUESTS_PER_MINUTE_LIMIT = 70  # Provider limitation
 
 
 def get_symbols() -> List[str]:
     conn = get_db_conn()
-    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date='12-01-2024'").fetchall()
+    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date='07-06-2024'").fetchall()
     return [
         row[0] for row in rows
     ]

@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     # Alpha vantage
     alpha_vantage_base_url: str = 'https://www.alphavantage.co/query'
     alpha_vantage_token: str = 'KNPL6J9N740SLRRG'
-
+    # OPENAI
+    openai_key: str = 'sk-proj-2GiJdBdzto6RDdJoaOvOT3BlbkFJLPlzQISLitP2dIAgwgbU'
     # App settings
     cache_time_minutes = 60 * 2
