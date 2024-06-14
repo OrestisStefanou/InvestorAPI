@@ -1,10 +1,10 @@
 from langchain_community.chat_message_histories import SQLChatMessageHistory
 from langchain_community.utilities import SQLDatabase
 
-db = SQLDatabase.from_uri(f"sqlite:///sqlite.db")
+from app import settings
+
+chatbot_db = SQLDatabase.from_uri(f"sqlite:///{settings.chatbot_db_path}")
 
 chat_message_history = SQLChatMessageHistory(
-    session_id="test_session_id", connection=db._engine
+    session_id="test_session_id_2", connection=chatbot_db._engine
 )
-
-print(chat_message_history)
