@@ -14,6 +14,7 @@ from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_openai import ChatOpenAI
+from langchain_community.chat_message_histories import SQLChatMessageHistory
 
 from app import settings
 
@@ -353,23 +354,31 @@ agent = create_sql_agent(
     max_iterations=5
 )
 
-first_question = "What is the latest balance sheet of AAPL? Show the most important fields please."
+chatbot_db = SQLDatabase.from_uri(f"sqlite:///{settings.chatbot_db_path}")
+
+chat_message_history = SQLChatMessageHistory(
+    session_id="test_session_id_5", connection=chatbot_db._engine
+)
+
+first_question = "Can you find the balance sheets of 'AAPL' and 'GOOGL' in 2023? Please return only the most important fields"
 demo_ephemeral_chat_history = ChatMessageHistory()
-response = agent.invoke(    {
+response = agent.invoke(
+    {
         "input": first_question,
         "top_k": 5,
         "dialect": "SQLite",
         "context": context,
         "agent_scratchpad": [],
         "messages": [],
-    })
+    },
+)
 
 print("RESPONSE:")
 print(response['output'])
 
-demo_ephemeral_chat_history.add_user_message(first_question)
-demo_ephemeral_chat_history.add_ai_message(response['output'])
-demo_ephemeral_chat_history.add_user_message("Can you compare it with the one of META?")
+chat_message_history.add_user_message(first_question)
+chat_message_history.add_ai_message(response['output'])
+chat_message_history.add_user_message("Can you compare them with these of MSFT? Only the most important fields you returned above")
 
 response = agent.invoke(    {
         "input": first_question,
@@ -377,15 +386,15 @@ response = agent.invoke(    {
         "dialect": "SQLite",
         "context": context,
         "agent_scratchpad": [],
-        "messages": demo_ephemeral_chat_history.messages,
+        "messages": chat_message_history.messages,
 })
 
 print("RESPONSE 2:")
 print(response['output'])
 
 
-demo_ephemeral_chat_history.add_ai_message(response['output'])
-demo_ephemeral_chat_history.add_user_message("Purely based on the data above if you were a value investor in which of the two stocks would you invest?")
+chat_message_history.add_ai_message(response['output'])
+chat_message_history.add_user_message("Purely based on the data above if you were a value investor in which stock would you invest?")
 
 response = agent.invoke(    {
         "input": first_question,
@@ -393,11 +402,11 @@ response = agent.invoke(    {
         "dialect": "SQLite",
         "context": context,
         "agent_scratchpad": [],
-        "messages": demo_ephemeral_chat_history.messages,
+        "messages": chat_message_history.messages,
 })
 
 print("RESPONSE 3:")
 print(response['output'])
-demo_ephemeral_chat_history.add_ai_message(response['output'])
+chat_message_history.add_ai_message(response['output'])
 
-print(demo_ephemeral_chat_history.messages)
+print(chat_message_history.messages)
