@@ -3,9 +3,10 @@ from pydantic import BaseSettings
 # TODO Create a .env file and read these values from there
 class Settings(BaseSettings):
     # Ibd
-    ibd_base_url: str = "https://www.investors.com/data-tables"
+    ibd_base_url: str = 'https://www.investors.com/data-tables'
     # SQLite
-    db_path = "app/database/ibd.db"
+    db_path: str = 'app/database/ibd.db'
+    chatbot_db_path: str = 'analytics/chatbot/chatbot.db'
     # Yahoo finance
     y_finance_base_url: str = 'https://query1.finance.yahoo.com/v7'
     # Alpha vantage
