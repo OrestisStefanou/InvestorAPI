@@ -1,5 +1,4 @@
 from langchain_community.utilities import SQLDatabase
-from langchain_community.agent_toolkits import create_sql_agent
 from langchain_community.vectorstores import FAISS
 from langchain_core.example_selectors import SemanticSimilarityExampleSelector
 from langchain_openai import OpenAIEmbeddings
@@ -10,19 +9,9 @@ from langchain_core.prompts import (
     PromptTemplate,
     SystemMessagePromptTemplate,
 )
-from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_community.chat_message_histories import ChatMessageHistory
-from langchain_openai import ChatOpenAI
-from langchain_community.chat_message_histories import SQLChatMessageHistory
 
 from app import settings
 
-llm = ChatOpenAI(
-    model="gpt-3.5-turbo-0125",
-    temperature=0.4, 
-    openai_api_key=settings.openai_key
-)
 db = SQLDatabase.from_uri(f"sqlite:///{settings.db_path}")
 
 examples = [
@@ -325,90 +314,3 @@ full_prompt = ChatPromptTemplate.from_messages(
         MessagesPlaceholder(variable_name="messages"),
     ]
 )
-
-# Example formatted prompt
-prompt_val = full_prompt.invoke(
-    {
-        "input": "What is the latest revenue of symbol APPL?",
-        "top_k": 5,
-        "dialect": "SQLite",
-        "context": context,
-        "agent_scratchpad": [],
-        "messages": [
-            HumanMessage(
-                content="What is the latest revenue of symbol APPL?"
-            ),
-            AIMessage(content="The latest revenue of symbol APPL is 10008389895."),
-            HumanMessage(content="What about META?"),
-        ],
-    }
-)
-
-print(prompt_val)
-
-# agent = create_sql_agent(
-#     llm=llm,
-#     toolkit=SQLDatabaseToolkit(db=db, llm=llm),
-#     prompt=full_prompt,
-#     verbose=True,
-#     agent_executor_kwargs={'handle_parsing_errors':True},
-#     agent_type="tool-calling",
-#     max_iterations=5
-# )
-
-# chatbot_db = SQLDatabase.from_uri(f"sqlite:///{settings.chatbot_db_path}")
-
-# chat_message_history = SQLChatMessageHistory(
-#     session_id="test_session_id_5", connection=chatbot_db._engine
-# )
-
-# first_question = "Can you find the balance sheets of 'AAPL' and 'GOOGL' in 2023? Please return only the most important fields"
-# demo_ephemeral_chat_history = ChatMessageHistory()
-# response = agent.invoke(
-#     {
-#         "input": first_question,
-#         "top_k": 5,
-#         "dialect": "SQLite",
-#         "context": context,
-#         "agent_scratchpad": [],
-#         "messages": [],
-#     },
-# )
-
-# print("RESPONSE:")
-# print(response['output'])
-
-# chat_message_history.add_user_message(first_question)
-# chat_message_history.add_ai_message(response['output'])
-# chat_message_history.add_user_message("Can you compare them with these of MSFT? Only the most important fields you returned above")
-
-# response = agent.invoke(    {
-#         "input": first_question,
-#         "top_k": 5,
-#         "dialect": "SQLite",
-#         "context": context,
-#         "agent_scratchpad": [],
-#         "messages": chat_message_history.messages,
-# })
-
-# print("RESPONSE 2:")
-# print(response['output'])
-
-
-# chat_message_history.add_ai_message(response['output'])
-# chat_message_history.add_user_message("Purely based on the data above if you were a value investor in which stock would you invest?")
-
-# response = agent.invoke(    {
-#         "input": first_question,
-#         "top_k": 5,
-#         "dialect": "SQLite",
-#         "context": context,
-#         "agent_scratchpad": [],
-#         "messages": chat_message_history.messages,
-# })
-
-# print("RESPONSE 3:")
-# print(response['output'])
-# chat_message_history.add_ai_message(response['output'])
-
-# print(chat_message_history.messages)
