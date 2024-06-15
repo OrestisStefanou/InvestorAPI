@@ -296,7 +296,23 @@ class CashFlow(pydantic.BaseModel):
 
         return values
 
+
 class StockFinancialsQuarterly(pydantic.BaseModel):
     balance_sheets: List[BalanceSheet]
     income_statements: List[IncomeStatement]
     cash_flows: List[CashFlow]
+
+
+class ChatbotQuestion(pydantic.BaseModel):
+    question: str
+    session_id: str
+
+
+class MessageSender(str, Enum):
+    Agent = 'Agent'
+    Human = 'Human'
+
+
+class ConversationMessage(pydantic.BaseModel):
+    message: str
+    sender: MessageSender

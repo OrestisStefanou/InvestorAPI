@@ -3,6 +3,7 @@ from langchain_openai import ChatOpenAI
 from langchain_community.agent_toolkits import create_sql_agent
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
 from langchain_community.chat_message_histories import SQLChatMessageHistory
+from langchain_core.messages.base import BaseMessage
 
 from app import settings
 from analytics.chatbot.prompt import (
@@ -33,7 +34,7 @@ class InvestorAgent:
         )
         self._conversation_db = SQLDatabase.from_uri(f"sqlite:///{settings.chatbot_db_path}")
     
-    def chat(self, question: str, session_id: str) -> str:
+    def chat(self, question: str, session_id: str) -> list[BaseMessage]:
         chat_message_history = SQLChatMessageHistory(
             session_id=session_id, 
             connection=self._conversation_db._engine
@@ -56,4 +57,4 @@ class InvestorAgent:
         )
         output = response["output"]
         chat_message_history.add_ai_message(output)
-        return output
+        return chat_message_history.messages

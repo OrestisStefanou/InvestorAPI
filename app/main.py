@@ -9,7 +9,8 @@ from app.api.routers import (
     collections,
     sectors,
     stocks,
-    machine_learning
+    machine_learning,
+    chatbot
 )
 
 app = FastAPI()
@@ -22,7 +23,7 @@ app.include_router(collections.router)
 app.include_router(sectors.router)
 app.include_router(stocks.router)
 app.include_router(machine_learning.router)
-
+app.include_router(chatbot.router)
 
 @app.on_event("shutdown")
 def shutdown_event():

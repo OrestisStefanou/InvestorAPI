@@ -9,9 +9,10 @@ from app.domain.tech_leader_stock import TechLeaderStock
 from app.domain.composite_stock import CompositeStock
 from app.domain.sector_performance import SectorPerformance
 from app.domain.sector import Sector
-from app.domain.income_statement import IncomeStatement
-from app.domain.balance_sheet import BalanceSheet
-from app.domain.cash_flow import CashFlow
+
+from langchain_core.messages.base import BaseMessage
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.ai import AIMessage
 
 
 def _sector_domain_model_to_schema(sector: Sector) -> schema.Sector:
@@ -151,3 +152,18 @@ def serialize_stock_financials(stock_financials: Dict[str, Any]) -> schema.Stock
         income_statements=income_statements,
         cash_flows=cash_flows
     )
+
+
+def serialize_chatbot_conversation_message(message: BaseMessage) -> schema.ConversationMessage:
+    if isinstance(message, HumanMessage):
+        return schema.ConversationMessage(
+            message=message.content,
+            sender=schema.MessageSender.Human
+        )
+    elif isinstance(message, AIMessage):
+        return schema.ConversationMessage(
+            message=message.content,
+            sender=schema.MessageSender.Agent
+        )
+    else:
+        raise ValueError(f"Invalid message type: {type(message)}")
