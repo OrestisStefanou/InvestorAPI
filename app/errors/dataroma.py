@@ -1,0 +1,2 @@
+class DataromaRequestError(Exception):
+	pass
