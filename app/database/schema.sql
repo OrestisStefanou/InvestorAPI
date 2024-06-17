@@ -308,3 +308,18 @@ CREATE TABLE stock_time_series (
     registered_date TEXT NOT NULL,
     registered_date_ts INT NOT NULL
 );
+
+CREATE TABLE super_investor_portfolio_holding (
+    super_investor TEXT NOT NULL,
+    stock TEXT NOT NULL,
+    pct_of_portfolio REAL NOT NULL,
+    shares REAL NOT NULL,
+    reported_price TEXT NOT NULL,
+    value TEXT NOT NULL
+);
+
+CREATE TABLE super_investor_portfolio_sector_analysis (
+    super_investor TEXT NOT NULL,
+    sector_name TEXT NOT NULL,
+    sector_pct REAL NOT NULL
+);

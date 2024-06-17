@@ -14,5 +14,7 @@ class Settings(BaseSettings):
     alpha_vantage_token: str = 'KNPL6J9N740SLRRG'
     # OPENAI
     openai_key: str = 'sk-proj-2GiJdBdzto6RDdJoaOvOT3BlbkFJLPlzQISLitP2dIAgwgbU'
+    # Dataroma
+    dataroma_base_url: str = 'https://www.dataroma.com/m'
     # App settings
     cache_time_minutes = 60 * 2
