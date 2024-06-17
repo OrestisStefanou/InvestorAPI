@@ -23,5 +23,6 @@ class SuperInvestorPortfolioSectorAnalysisEntry:
 
 @dataclass(frozen=True)
 class SuperInvestorPortfolio:
+    super_investor: SuperInvestor
     holdings: list[SuperInvestorPortfolioHolding]
     sector_analysis: list[SuperInvestorPortfolioSectorAnalysisEntry]

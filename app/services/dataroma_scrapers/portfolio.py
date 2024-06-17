@@ -52,6 +52,7 @@ class SuperInvestorPortfolioScraper:
         sector_analysis = cls._scrape_portfolio_sector_analysis(tables[1])
 
         return SuperInvestorPortfolio(
+            super_investor=super_investor,
             holdings=portfolio_holdings,
             sector_analysis=sector_analysis
         )
