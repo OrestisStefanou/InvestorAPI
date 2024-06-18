@@ -30,3 +30,18 @@ class DataromaClient(HttpClient):
             raise DataromaRequestError(f"Failed to get {super_investor} portfolio with status: {response.status_code}")
 
         return response.content
+
+    async def get_superinvestor_grand_portfolio(self, page_num: int = 1) -> str:
+        try:
+            response = await self.get(
+                endpoint=f'/g/portfolio.php?L={page_num}'
+            )
+        except HttpRequestError as err:
+            logging.error(f'Call to get super_investor grand portfolio page {page_num} failed with error: {str(err)}')
+            raise DataromaRequestError(f"Failed to get super_investor grand portfolio page {page_num}")
+        
+        if response.status_code != 200:
+            logging.error(f'Call to get super_investor grand portfolio page {page_num} failed with status: {response.status_code}')
+            raise DataromaRequestError(f"Failed to get super_investor grand portfolio page {page_num} with status: {response.status_code}")
+
+        return response.content

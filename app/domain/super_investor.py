@@ -26,3 +26,15 @@ class SuperInvestorPortfolio:
     super_investor: SuperInvestor
     holdings: list[SuperInvestorPortfolioHolding]
     sector_analysis: list[SuperInvestorPortfolioSectorAnalysisEntry]
+
+
+@dataclass(frozen=True)
+class SuperInvestorGrandPortfolioEntry:
+    stock: str
+    symbol: str
+    ownership_count: int
+
+
+@dataclass(frozen=True)
+class SuperInvestorGrandPortfolio:
+    portfolio: list[SuperInvestorGrandPortfolioEntry]

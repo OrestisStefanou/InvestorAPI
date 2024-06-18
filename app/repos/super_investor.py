@@ -5,7 +5,9 @@ from app.domain.super_investor import (
     SuperInvestor,
     SuperInvestorPortfolio,
     SuperInvestorPortfolioHolding,
-    SuperInvestorPortfolioSectorAnalysisEntry
+    SuperInvestorPortfolioSectorAnalysisEntry,
+    SuperInvestorGrandPortfolio,
+    SuperInvestorGrandPortfolioEntry
 )
 
 class SuperInvestorRepo(SqlRepo):
@@ -154,3 +156,48 @@ class SuperInvestorRepo(SqlRepo):
     def delete_super_investor_portfolio(self, super_investor: SuperInvestor):
         self.delete_super_investor_portfolio_holdings(super_investor)
         self.delete_super_investor_portfolio_sector_analysis(super_investor)
+
+    def add_super_investor_grand_portfolio(
+        self,
+        super_investor_grand_portfolio: SuperInvestorGrandPortfolio
+    ):
+        with self._db_conn as con:
+            con.executemany(
+                f"INSERT INTO super_investor_grand_portfolio VALUES(?, ?, ?)",
+                [
+                    (
+                        portfolio_entry.stock,
+                        portfolio_entry.symbol,
+                        portfolio_entry.ownership_count
+                    )
+                    for portfolio_entry in super_investor_grand_portfolio.portfolio
+                ]
+            )
+
+    def delete_super_investor_grand_portfolio(self):
+        with self._db_conn as con:
+            con.execute("DELETE FROM super_investor_grand_portfolio WHERE TRUE")
+
+    def get_super_investor_grand_portfolio(self) -> SuperInvestorGrandPortfolio:
+        cur = self._db_conn.cursor()
+        query = """
+            SELECT
+                stock,
+                symbol,
+                ownership_count
+            FROM super_investor_grand_portfolio
+        """
+
+        result = cur.execute(query)
+        portfolio = [
+            SuperInvestorGrandPortfolioEntry(
+                stock=row[0],
+                symbol=row[1],
+                ownership_count=row[2]
+            )
+            for row in result
+        ]
+        
+        return SuperInvestorGrandPortfolio(
+            portfolio=portfolio
+        )

@@ -323,3 +323,9 @@ CREATE TABLE super_investor_portfolio_sector_analysis (
     sector_name TEXT NOT NULL,
     sector_pct REAL NOT NULL
 );
+
+CREATE TABLE super_investor_grand_portfolio (
+    stock TEXT NOT NULL,
+    symbol TEXT NOT NULL,
+    ownership_count INT NOT NULL
+);
