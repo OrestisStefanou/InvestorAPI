@@ -143,40 +143,6 @@ examples = [
         """
     },
     {
-        "input": "Which symbol has the most cash right now?",
-        "query": """
-            WITH latest_fiscal_date AS (
-                SELECT
-                    symbol,
-                    MAX(fiscal_date_ending) AS latest_fiscal_date
-                FROM
-                    balance_sheet
-                GROUP BY
-                    symbol
-            ),
-            latest_cash_equivalents AS (
-                SELECT
-                    bs.symbol,
-                    bs.cash_and_cash_equivalents_at_carrying_value,
-                    lfd.latest_fiscal_date
-                FROM
-                    balance_sheet bs
-                JOIN
-                    latest_fiscal_date lfd
-                ON
-                    bs.symbol = lfd.symbol AND bs.fiscal_date_ending = lfd.latest_fiscal_date
-            )
-            SELECT
-                symbol,
-                cash_and_cash_equivalents_at_carrying_value
-            FROM
-                latest_cash_equivalents
-            ORDER BY
-                cash_and_cash_equivalents_at_carrying_value DESC
-            LIMIT 1;
-        """
-    },
-    {
         "input": "Which symbol has the most cash?",
         "query": """
             WITH latest_fiscal_date AS (
@@ -268,6 +234,30 @@ examples = [
                 GROUP BY sector
                 ORDER BY AVG(quarterly_earnings_growth_yoy)
                 LIMIT 1
+            """,
+    },
+    {
+        "input": "For which superinvestors do you have portfolio data?",
+        "query": """"
+                SELECT DISTINCT super_investor FROM super_investor_portfolio_holding;
+            """,
+    },
+    {
+        "input": "Can you give me the portfolio holdings of super investor Warren Buffet?",
+        "query": """"
+                SELECT * FROM super_investor_portfolio_holding WHERE super_investor='Warren Buffet';
+            """,
+    },
+    {
+        "input": "Can you give me the portfolio sector analysis of super investor Warren Buffet?",
+        "query": """"
+                SELECT * FROM super_investor_portfolio_sector_analysis WHERE super_investor='Warren Buffet';
+            """,
+    },
+    {
+        "input": "Which are the top 10 most hold stocks from super investors?",
+        "query": """"
+                SELECT * FROM super_investor_grand_portfolio ORDER BY ownership_count DESC LIMIT 10;
             """,
     }
 ]
