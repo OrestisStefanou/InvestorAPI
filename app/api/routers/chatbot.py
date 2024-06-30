@@ -1,14 +1,18 @@
+from typing import List
 from http import HTTPStatus
 
 from fastapi import (
     APIRouter,
-    HTTPException
+    HTTPException,
+    Depends
 )
 
 from app.api import serializers
 from app.api import schema
 from analytics.chatbot.agent import InvestorAgent
 from analytics.chatbot.prompt import examples
+from app.dependencies import create_db_conn
+from app.repos.sql_repo import SqlRepo
 
 router = APIRouter()
 
@@ -16,7 +20,7 @@ router = APIRouter()
     "/chatbot/conversation",
     tags=["Chatbot"],
     status_code=200,
-    response_model=list[schema.ConversationMessage]
+    response_model=List[schema.ConversationMessage]
 )
 async def create_conversation(question: schema.ChatbotQuestion):
     agent = InvestorAgent()
@@ -41,9 +45,29 @@ async def create_conversation(question: schema.ChatbotQuestion):
     "/chatbot/question_examples",
     tags=["Chatbot"],
     status_code=200,
-    response_model=list[str]
+    response_model=schema.ChatbotQuestionExamples
 )
 async def get_question_examples():
+    return schema.ChatbotQuestionExamples(
+        examples=[
+            example['input'] for example in examples
+    ])
+
+
+@router.get(
+    "/chatbot/context",
+    tags=["Chatbot"],
+    status_code=200,
+    response_model=List[schema.ChatbotDatabaseContext]
+)
+async def get_chatbot_context(db_session = Depends(create_db_conn)):
+    db_repo = SqlRepo(db_session)
+    db_context = db_repo.get_database_context()
+
     return [
-        example['input'] for example in examples
+        schema.ChatbotDatabaseContext(
+            table_name=context['table_name'],
+            table_columns=context['table_columns'],
+        )
+        for context in db_context
     ]
