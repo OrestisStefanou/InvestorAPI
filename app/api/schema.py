@@ -316,3 +316,12 @@ class MessageSender(str, Enum):
 class ConversationMessage(pydantic.BaseModel):
     message: str
     sender: MessageSender
+
+
+class ChatbotQuestionExamples(pydantic.BaseModel):
+    examples: List[str]
+
+
+class ChatbotDatabaseContext(pydantic.BaseModel):
+    table_name: str
+    table_columns: List[str]
