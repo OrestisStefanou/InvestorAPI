@@ -15,7 +15,7 @@ REQUESTS_PER_MINUTE_LIMIT = 70  # Provider limitation
 
 def get_symbols() -> List[str]:
     conn = get_db_conn()
-    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date='07-06-2024'").fetchall()
+    rows = conn.execute("SELECT DISTINCT symbol FROM stocks_with_sector WHERE registered_date='05-07-2024'").fetchall()
     return [
         row[0] for row in rows
     ]
