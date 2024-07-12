@@ -299,7 +299,6 @@ few_shot_prompt = FewShotPromptTemplate(
 full_prompt = ChatPromptTemplate.from_messages(
     [
         SystemMessagePromptTemplate(prompt=few_shot_prompt),
-        ("human", "{input}"),
         MessagesPlaceholder("agent_scratchpad"),
         MessagesPlaceholder(variable_name="messages"),
     ]

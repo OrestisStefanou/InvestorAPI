@@ -30,7 +30,7 @@ class InvestorAgent:
             verbose=True,
             agent_executor_kwargs={"handle_parsing_errors":True},
             agent_type="tool-calling",
-            max_iterations=5
+            max_iterations=10,
         )
         self._conversation_db = SQLDatabase.from_uri(f"sqlite:///{settings.chatbot_db_path}")
     
@@ -39,15 +39,11 @@ class InvestorAgent:
             session_id=session_id, 
             connection=self._conversation_db._engine
         )
-        if len(chat_message_history.messages) > 0:
-            first_question = chat_message_history.messages[0]
-        else:
-            first_question = question
 
         chat_message_history.add_user_message(question)
         response = self._sql_agent.invoke(
             {
-                "input": str(first_question),
+                "input": question,
                 "top_k": 5,
                 "dialect": "SQLite",
                 "context": context,
