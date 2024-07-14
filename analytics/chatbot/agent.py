@@ -15,7 +15,7 @@ class InvestorAgent:
     def __init__(
         self,
         temperature: float = 0.4,
-        model: str = "gpt-4-turbo"
+        model: str = "gpt-4o"
     ) -> None:
         self._llm = ChatOpenAI(
             model=model,
