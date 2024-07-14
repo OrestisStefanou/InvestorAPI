@@ -272,22 +272,7 @@ example_selector = SemanticSimilarityExampleSelector.from_examples(
 
 context = db.get_context()["table_info"]
 
-system_prefix = """You are a financial advisor agent designed to interact with a SQL database.
-Given an input question, create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
-Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most {top_k} results.
-You can order the results by a relevant column to return the most interesting examples in the database.
-You have access to tools for interacting with the database.
-Only use the given tools. Only use the information returned by the tools to construct your final answer.
-If you get an error while executing a query, rewrite the query and try again.
-DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
-If the question does not seem related to the database or investing related, just return "I don't know" as the answer.
-The database context is as follows:
-{context}
-
-Here are some examples of user inputs and their corresponding SQL queries:"""
-
-
-system_prefix_v2 = """You are an AI expert in investing designed to help people take an investment decision. You have access to tools 
+system_prefix = """You are an AI expert in investing designed to help people take an investment decision. You have access to tools 
 for interacting with a SQL database that contains market data that you can use to answer to the questions of the human.
 Given a question, create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
 Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most {top_k} results.
@@ -306,7 +291,7 @@ few_shot_prompt = FewShotPromptTemplate(
         "User input: {input}\nSQL query: {query}"
     ),
     input_variables=["input", "dialect", "top_k", "context"],
-    prefix=system_prefix_v2,
+    prefix=system_prefix,
     suffix="",
 )
 
