@@ -286,13 +286,27 @@ The database context is as follows:
 
 Here are some examples of user inputs and their corresponding SQL queries:"""
 
+
+system_prefix_v2 = """You are an AI expert in investing designed to help people take an investment decision. You have access to tools 
+for interacting with a SQL database that contains market data that you can use to answer to the questions of the human.
+Given a question, create a syntactically correct {dialect} query to run, then look at the results of the query and return the answer.
+Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most {top_k} results.
+You can order the results by a relevant column to return the most interesting examples in the database.
+If you get an error while executing a query, rewrite the query and try again.
+DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.
+If the question does not seem related to the database or investing related, just return "I only answer to questions related to investing." as the answer.
+The database context is as follows:
+{context}
+
+Here are some examples of questions and their corresponding SQL queries:"""
+
 few_shot_prompt = FewShotPromptTemplate(
     example_selector=example_selector,
     example_prompt=PromptTemplate.from_template(
         "User input: {input}\nSQL query: {query}"
     ),
     input_variables=["input", "dialect", "top_k", "context"],
-    prefix=system_prefix,
+    prefix=system_prefix_v2,
     suffix="",
 )
 
@@ -301,5 +315,6 @@ full_prompt = ChatPromptTemplate.from_messages(
         SystemMessagePromptTemplate(prompt=few_shot_prompt),
         MessagesPlaceholder("agent_scratchpad"),
         MessagesPlaceholder(variable_name="messages"),
+        ("ai", ":"),
     ]
 )
