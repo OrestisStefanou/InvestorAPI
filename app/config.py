@@ -11,9 +11,9 @@ class Settings(BaseSettings):
     y_finance_base_url: str = 'https://query1.finance.yahoo.com/v7'
     # Alpha vantage
     alpha_vantage_base_url: str = 'https://www.alphavantage.co/query'
-    alpha_vantage_token: str = 'KNPL6J9N740SLRRG'
+    alpha_vantage_token: str = ''
     # OPENAI
-    openai_key: str = 'sk-proj-2GiJdBdzto6RDdJoaOvOT3BlbkFJLPlzQISLitP2dIAgwgbU'
+    openai_key: str = ''
     # Dataroma
     dataroma_base_url: str = 'https://www.dataroma.com/m'
     # App settings
